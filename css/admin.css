@@ -938,12 +938,23 @@ body {
   box-shadow: var(--shadow-modal);
   width: 100%;
   max-width: 650px;
-  max-height: 90vh;
+  max-height: 88vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   transform: translateY(20px) scale(0.98);
   transition: all var(--transition-normal);
+}
+
+/* Pastikan form flex & stretch agar admin-modal-body bisa scroll dan footer selalu menempel di bawah */
+.admin-modal-dialog form,
+#form-crud-modal {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
 }
 
 .admin-modal-overlay.active .admin-modal-dialog {
@@ -956,6 +967,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-shrink: 0;
+  background-color: var(--admin-card-bg);
 }
 
 .admin-modal-header h3 {
@@ -979,19 +992,63 @@ body {
 }
 
 .admin-modal-body {
-  padding: 1.75rem;
+  padding: 1.5rem 1.75rem;
   overflow-y: auto;
-  flex: 1;
+  overflow-x: hidden;
+  flex: 1 1 auto;
+  min-height: 0;
+  -webkit-overflow-scrolling: touch;
 }
 
 .admin-modal-footer {
-  padding: 1.25rem 1.75rem;
+  padding: 1.15rem 1.75rem;
   border-top: 1px solid var(--admin-border);
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 0.75rem;
   background-color: var(--admin-bg);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
+
+.btn-modal-action {
+  padding: 0.6rem 1.35rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--admin-border);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all var(--transition-fast);
+}
+
+.btn-modal-cancel {
+  background: var(--admin-card-bg, #ffffff);
+  color: var(--admin-text-main, #334155);
+}
+
+.btn-modal-cancel:hover {
+  background: var(--admin-bg, #f1f5f9);
+  border-color: #cbd5e1;
+}
+
+.btn-modal-save {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border-color: #2563eb !important;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.35);
+}
+
+.btn-modal-save:hover {
+  background: #1d4ed8 !important;
+  border-color: #1d4ed8 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4);
 }
 
 /* =========================================================================
