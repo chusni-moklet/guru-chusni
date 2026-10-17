@@ -1,0 +1,886 @@
+/**
+ * PROFIL PENDIDIK - MAIN JAVASCRIPT
+ * Bpk. Rahmat Hidayat, S.Pd., M.Pd. - Guru Penggerak
+ * Features: Dark/Light Mode, Mobile Nav, Resources Search & Filter,
+ * Resource Detail Modal, Day Schedule Tabs, Gallery Lightbox,
+ * Contact Form with WhatsApp & Database Integration, FAQ Accordion, Back-to-Top,
+ * dan Dynamic Data Layer (DB / Google Spreadsheet sync).
+ */
+
+function initApp() {
+  initThemeToggle();
+  initMobileNav();
+  initScrollSpy();
+  initAccordion();
+  initBackToTop();
+  initContactForm();
+  initDiscreetAdminAccess();
+
+  // Integrasi Dynamic Database (LocalStorage + Google Apps Script)
+  if (window.DB) {
+    applyDynamicData();
+    DB.onDataChanged(() => {
+      applyDynamicData();
+    });
+
+    // Background sync jika URL Google Apps Script telah disetel
+    if (DB.getGASUrl()) {
+      DB.syncFromGoogleSheets().then(res => {
+        if (res.success) {
+          applyDynamicData();
+        }
+      }).catch(e => console.warn('Background sync note:', e));
+    }
+  } else {
+    // Fallback inisialisasi modul & galeri statis
+    initResourceFilterAndSearch();
+    initResourceModal();
+    initGalleryFilterAndLightbox();
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
+
+/* --------------------------------------------------
+   0. DYNAMIC DATA RENDER (MENERAPKAN DATA DARI DATABASE)
+   -------------------------------------------------- */
+function applyDynamicData() {
+  if (!window.DB) return;
+  const db = DB.getAll();
+  if (!db) return;
+
+  try { renderDynamicConfig(db.config); } catch (e) { console.error("Error renderDynamicConfig:", e); }
+  try { renderDynamicModul(db.modul); } catch (e) { console.error("Error renderDynamicModul:", e); }
+  try { renderDynamicPrestasi(db.prestasi); } catch (e) { console.error("Error renderDynamicPrestasi:", e); }
+  try { renderDynamicKarya(db.karya); } catch (e) { console.error("Error renderDynamicKarya:", e); }
+  try { renderDynamicGaleri(db.galeri); } catch (e) { console.error("Error renderDynamicGaleri:", e); }
+  try { renderDynamicKompetensi(db.kompetensi, db.edtech); } catch (e) { console.error("Error renderDynamicKompetensi:", e); }
+  try { renderDynamicTimeline(db.timeline); } catch (e) { console.error("Error renderDynamicTimeline:", e); }
+
+  // Inisialisasi ulang interaksi yang bergantung pada DOM baru
+  try { initResourceFilterAndSearch(); } catch (e) {}
+  try { initResourceModal(); } catch (e) {}
+  try { initGalleryFilterAndLightbox(); } catch (e) {}
+}
+
+function renderDynamicConfig(cfg) {
+  if (!cfg) return;
+
+  // 1. Announcement Bar
+  const announceP = document.querySelector('.top-announcement .announcement-content p');
+  const announceLink = document.querySelector('.top-announcement .announcement-link');
+  if (announceP && cfg.announcement_text) announceP.textContent = cfg.announcement_text;
+  if (announceLink && cfg.announcement_link) announceLink.href = cfg.announcement_link;
+
+  // 2. Brand Name & Sub
+  const brandNames = document.querySelectorAll('.brand-name');
+  const brandSubs = document.querySelectorAll('.brand-sub');
+  brandNames.forEach(el => el.textContent = cfg.teacher_name || 'Rahmat Hidayat');
+  brandSubs.forEach(el => el.textContent = (cfg.teacher_degrees ? cfg.teacher_degrees + ' • ' : '') + (cfg.teacher_tagline || 'Guru Penggerak'));
+
+  // 3. Hero Section
+  const heroBadge = document.querySelector('.hero-tag .tag-badge');
+  const heroSchool = document.querySelector('.hero-tag .tag-sub');
+  const heroTitle = document.querySelector('.hero-title');
+  const heroDesc = document.querySelector('.hero-description');
+  const teacherPhoto = document.querySelector('.teacher-photo');
+  const overlayName = document.querySelector('.teacher-card-overlay .overlay-name');
+  const overlayRole = document.querySelector('.teacher-card-overlay .overlay-role');
+
+  if (heroBadge && cfg.badge_award) heroBadge.innerHTML = `<i class="fa-solid fa-certificate"></i> ${cfg.badge_award}`;
+  if (heroSchool && cfg.school_name) heroSchool.textContent = cfg.school_name;
+  if (heroTitle && cfg.hero_title) {
+    heroTitle.innerHTML = escapeHtml(cfg.hero_title)
+      .replace('Hati', '<span class="text-gradient">Hati</span>')
+      .replace('Aksi & Teknologi', '<span class="text-gradient-alt">Aksi & Teknologi</span>');
+  }
+  if (heroDesc && cfg.hero_desc) heroDesc.textContent = cfg.hero_desc;
+  if (teacherPhoto && cfg.hero_image) teacherPhoto.src = cfg.hero_image;
+  if (overlayName && cfg.teacher_name) overlayName.textContent = 'Bpk. ' + cfg.teacher_name;
+  if (overlayRole && cfg.teacher_tagline) overlayRole.textContent = cfg.teacher_tagline;
+
+  // Hero Pills
+  const pills = document.querySelectorAll('.hero-meta-pills .meta-pill');
+  if (pills.length >= 3) {
+    if (cfg.nuptk) pills[0].innerHTML = `<i class="fa-solid fa-id-card"></i> <span>NUPTK: <strong>${cfg.nuptk}</strong></span>`;
+    if (cfg.teacher_status) pills[1].innerHTML = `<i class="fa-solid fa-award"></i> <span>Sertifikasi: <strong>${cfg.teacher_status}</strong></span>`;
+    if (cfg.city) pills[2].innerHTML = `<i class="fa-solid fa-location-dot"></i> <span>${cfg.city}</span>`;
+  }
+
+  // Floating Badges in Hero
+  const badgeTopRight = document.querySelector('.badge-top-right .badge-title');
+  const badgeBottomLeft = document.querySelector('.badge-bottom-left .badge-title');
+  if (badgeTopRight && cfg.badge_award) badgeTopRight.textContent = cfg.badge_award;
+  if (badgeBottomLeft && cfg.badge_snbt) badgeBottomLeft.textContent = cfg.badge_snbt;
+
+  // Stats Counters
+  const statNumbers = document.querySelectorAll('.stats-strip .stat-number');
+  if (statNumbers.length >= 4) {
+    if (cfg.stat_years) statNumbers[0].textContent = cfg.stat_years;
+    if (cfg.stat_students) statNumbers[1].textContent = cfg.stat_students;
+    if (cfg.stat_modules) statNumbers[2].textContent = cfg.stat_modules;
+    if (cfg.stat_certs) statNumbers[3].textContent = cfg.stat_certs;
+  }
+
+  // About Section Bio & Quotes
+  const aboutQuote = document.querySelector('.about-section .section-desc em');
+  if (aboutQuote && cfg.philosophy_quote) aboutQuote.textContent = `"${cfg.philosophy_quote}"`;
+
+  const bioTexts = document.querySelectorAll('.bio-card .bio-text');
+  if (bioTexts.length >= 2) {
+    if (cfg.bio_text1) bioTexts[0].textContent = cfg.bio_text1;
+    if (cfg.bio_text2) bioTexts[1].textContent = cfg.bio_text2;
+  }
+
+  // Biodata Table
+  const tableRows = document.querySelectorAll('.biodata-table tbody tr');
+  tableRows.forEach(row => {
+    const thText = row.querySelector('th')?.textContent.trim() || '';
+    const td = row.querySelector('td');
+    if (!td) return;
+
+    if (thText.includes('Nama Lengkap') && cfg.teacher_name) {
+      td.innerHTML = `<strong>${cfg.teacher_name}${cfg.teacher_degrees ? ', ' + cfg.teacher_degrees : ''}</strong>`;
+    } else if (thText.includes('NIP') && cfg.nip) {
+      td.textContent = cfg.nip;
+    } else if (thText.includes('NUPTK') && cfg.nuptk) {
+      td.textContent = cfg.nuptk;
+    } else if (thText.includes('Unit Kerja') && cfg.school_name) {
+      td.textContent = cfg.school_name;
+    } else if (thText.includes('Mata Pelajaran') && cfg.subjects_taught) {
+      td.textContent = cfg.subjects_taught;
+    } else if (thText.includes('Peran Tambahan') && cfg.additional_role) {
+      td.textContent = cfg.additional_role;
+    } else if (thText.includes('Status Pendidik') && cfg.teacher_status) {
+      td.innerHTML = `<span class="badge-success"><i class="fa-solid fa-circle-check"></i> ${cfg.teacher_status}</span>`;
+    } else if (thText.includes('Pendidikan') && cfg.last_education) {
+      td.innerHTML = cfg.last_education.replace(/\n/g, '<br>');
+    } else if (thText.includes('Email Resmi') && cfg.official_email) {
+      td.innerHTML = `<a href="mailto:${cfg.official_email}">${cfg.official_email}</a>`;
+    }
+  });
+
+  // Contact Info Section
+  const waVal = document.querySelector('.info-item a.text-emerald');
+  const waLinks = document.querySelectorAll('a[href*="wa.me"]');
+  const cleanWA = (cfg.whatsapp_number || '6281234567890').replace(/[^0-9]/g, '');
+
+  if (waVal && cfg.whatsapp_number) {
+    waVal.textContent = '+' + cleanWA.replace(/(\d{2})(\d{3})(\d{4})(\d{4})/, '$1 $2-$3-$4');
+  }
+
+  waLinks.forEach(link => {
+    const originalHref = link.getAttribute('href');
+    if (originalHref && originalHref.includes('wa.me/')) {
+      link.href = `https://wa.me/${cleanWA}?text=${encodeURIComponent('Halo ' + (cfg.teacher_name || 'Bpk. Guru') + ', saya ingin berkonsultasi mengenai pembelajaran.')}`;
+    }
+  });
+
+  // Footer text
+  const footerQuote = document.querySelector('.footer-quote em');
+  if (footerQuote && cfg.philosophy_quote) footerQuote.textContent = `"${cfg.philosophy_quote}"`;
+}
+
+function renderDynamicModul(modulList) {
+  const container = document.getElementById('resources-grid');
+  if (!container || !modulList || !modulList.length) return;
+
+  container.innerHTML = modulList.map(m => {
+    let badgeBg = 'bg-primary';
+    let iconClass = 'fa-solid fa-square-root-variable';
+    let fileFormat = 'PDF';
+
+    if (m.category === 'lkpd') {
+      badgeBg = 'bg-emerald';
+      iconClass = 'fa-solid fa-compass-drafting';
+    } else if (m.category === 'slide') {
+      badgeBg = 'bg-purple';
+      iconClass = 'fa-regular fa-file-powerpoint';
+      fileFormat = 'PPTX / Canva';
+    } else if (m.category === 'bank-soal') {
+      badgeBg = 'bg-amber';
+      iconClass = 'fa-solid fa-brain';
+    }
+
+    return `
+      <article class="resource-card" data-category="${escapeHtml(m.category)}" data-keywords="${escapeHtml(m.keywords || m.title)}">
+        <div class="resource-badge ${badgeBg}">${escapeHtml(m.badge || m.fase || 'Modul Ajar')}</div>
+        <div class="resource-icon"><i class="${iconClass}"></i></div>
+        <h3 class="resource-title">${escapeHtml(m.title)}</h3>
+        <p class="resource-snippet">${escapeHtml(m.snippet)}</p>
+        <div class="resource-meta">
+          <span><i class="fa-regular fa-file-pdf text-danger"></i> ${fileFormat}</span>
+          <span><i class="fa-solid fa-layer-group"></i> ${escapeHtml(m.fase)}</span>
+        </div>
+        <div class="resource-actions">
+          <button class="btn btn-sm btn-outline btn-preview" data-id="${escapeHtml(m.id)}">
+            <i class="fa-regular fa-eye"></i> Detail & CP
+          </button>
+          <a href="${escapeHtml(m.downloadLink || '#')}" class="btn btn-sm btn-primary btn-download" onclick="if (window.openPdfDocument && '${escapeHtml(m.downloadLink || '')}'.startsWith('data:')) { event.preventDefault(); window.openPdfDocument('${escapeHtml(m.downloadLink || '')}', '${escapeHtml(m.fileNotice || 'Modul.pdf')}'); } else { alert('Mengunduh: ${escapeHtml(m.fileNotice || m.title)}'); return ${m.downloadLink && m.downloadLink !== '#' ? 'true' : 'false'}; }">
+            <i class="fa-solid fa-download"></i> Unduh
+          </a>
+        </div>
+      </article>
+    `;
+  }).join('');
+}
+
+function renderDynamicPrestasi(prestasiList) {
+  const container = document.querySelector('.awards-grid');
+  if (!container || !prestasiList || !prestasiList.length) return;
+
+  container.innerHTML = prestasiList.map(p => `
+    <div class="award-card ${p.highlight ? 'highlight-award' : ''}">
+      <div class="award-year-badge">${escapeHtml(p.year)}</div>
+      <div class="award-icon"><i class="fa-solid ${escapeHtml(p.icon || 'fa-trophy')}"></i></div>
+      <h3 class="award-name">${escapeHtml(p.title)}</h3>
+      <p class="award-issuer">${escapeHtml(p.issuer)}</p>
+      <p class="award-desc">${escapeHtml(p.desc)}</p>
+      ${p.pdfUrl ? `
+        <div class="award-pdf-wrap">
+          <button type="button" class="award-pdf-btn" onclick="window.openPdfDocument('${escapeHtml(p.pdfUrl)}', '${escapeHtml(p.pdfFileName || 'Sertifikat.pdf')}')" title="Lihat Berkas / Sertifikat (PDF)">
+            <i class="fa-solid fa-file-pdf"></i>
+            <span class="award-pdf-text">${escapeHtml(p.pdfFileName ? (p.pdfFileName.length > 25 ? p.pdfFileName.substring(0, 22) + '...' : p.pdfFileName) : 'Lihat Sertifikat (PDF)')}</span>
+            <i class="fa-solid fa-arrow-up-right-from-square award-pdf-ext"></i>
+          </button>
+        </div>
+      ` : ''}
+    </div>
+  `).join('');
+}
+
+function renderDynamicKarya(karyaList) {
+  const container = document.getElementById('karya-grid');
+  if (!container) return;
+  if (!karyaList || !karyaList.length) {
+    karyaList = (window.DB && DB.getSection('karya')) || [];
+  }
+  if (!karyaList || !karyaList.length) return;
+
+  container.innerHTML = karyaList.map(item => `
+    <article class="project-card">
+      <div class="project-thumb-box">
+        <img src="${escapeHtml(item.thumbnail || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80')}" alt="${escapeHtml(item.title || 'Website')}" loading="lazy">
+        <div class="project-thumb-badge"><i class="fa-solid fa-globe"></i> Website</div>
+      </div>
+      <div class="project-body">
+        <h3 class="project-title">${escapeHtml(item.title || 'Nama Website')}</h3>
+        <p class="project-desc">${escapeHtml(item.desc || '')}</p>
+        <div class="project-footer">
+          <a href="${escapeHtml(item.link || '#')}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary project-visit-btn">
+            <span>Kunjungi Website</span> <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </a>
+        </div>
+      </div>
+    </article>
+  `).join('');
+}
+
+function renderDynamicGaleri(galeriList) {
+  const container = document.getElementById('gallery-grid');
+  if (!container || !galeriList || !galeriList.length) return;
+
+  container.innerHTML = galeriList.map(g => `
+    <div class="gallery-item" data-category="${escapeHtml(g.category || 'kelas')}">
+      <div class="gallery-thumb">
+        <img src="${escapeHtml(g.imgUrl)}" alt="${escapeHtml(g.title)}" loading="lazy">
+        <div class="gallery-overlay">
+          <div class="gallery-caption">
+            <span class="gallery-tag">${escapeHtml(g.categoryLabel || g.category)}</span>
+            <h4>${escapeHtml(g.title)}</h4>
+            <p>${escapeHtml(g.desc)}</p>
+          </div>
+          <button class="btn-zoom" aria-label="Perbesar Foto"><i class="fa-solid fa-maximize"></i></button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderDynamicKompetensi(kompetensiList, edtechList) {
+  const subContainer = document.querySelector('.subjects-grid');
+  if (subContainer && kompetensiList && kompetensiList.length) {
+    subContainer.innerHTML = kompetensiList.map(k => {
+      const fitur = Array.isArray(k.fiturList) ? k.fiturList : (typeof k.fiturList === 'string' ? k.fiturList.split('|') : []);
+      const fiturHtml = fitur.map(f => `<li><i class="fa-solid fa-check text-success"></i> ${escapeHtml(f)}</li>`).join('');
+
+      return `
+        <div class="subject-card">
+          <div class="subject-icon-bg ${escapeHtml(k.colorClass || 'bg-blue-subtle text-blue')}">
+            <i class="fa-solid ${escapeHtml(k.icon || 'fa-book')}"></i>
+          </div>
+          <span class="subject-level">${escapeHtml(k.tingkat)}</span>
+          <h3 class="subject-title">${escapeHtml(k.judul)}</h3>
+          <p class="subject-desc">${escapeHtml(k.desc)}</p>
+          <ul class="subject-features">
+            ${fiturHtml}
+          </ul>
+        </div>
+      `;
+    }).join('');
+  }
+
+  const toolContainer = document.querySelector('.tools-grid');
+  if (toolContainer && edtechList && edtechList.length) {
+    toolContainer.innerHTML = edtechList.map(e => `
+      <div class="tool-pill"><i class="${escapeHtml(e.icon)} ${escapeHtml(e.colorClass)}"></i> ${escapeHtml(e.name)}</div>
+    `).join('');
+  }
+}
+
+function renderDynamicTimeline(timelineList) {
+  const container = document.querySelector('.timeline-container');
+  if (!container || !timelineList || !timelineList.length) return;
+
+  container.innerHTML = timelineList.map(tl => `
+    <div class="timeline-item">
+      <div class="timeline-marker"></div>
+      <div class="timeline-content">
+        <span class="timeline-year">${escapeHtml(tl.year)}</span>
+        <h4 class="timeline-heading">${escapeHtml(tl.judul)}</h4>
+        <p class="timeline-institution">${escapeHtml(tl.institusi)}</p>
+        <p class="timeline-desc">${escapeHtml(tl.desc)}</p>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* --------------------------------------------------
+   1. DARK / LIGHT THEME TOGGLE
+   -------------------------------------------------- */
+function initThemeToggle() {
+  const toggleBtn = document.getElementById('theme-toggle');
+  if (!toggleBtn) return;
+
+  const savedTheme = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const currentTheme = savedTheme ? savedTheme : (prefersDark ? 'dark' : 'light');
+  document.documentElement.setAttribute('data-theme', currentTheme);
+
+  toggleBtn.addEventListener('click', () => {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const newTheme = isDark ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+  });
+}
+
+/* --------------------------------------------------
+   2. MOBILE NAVIGATION DRAWER
+   -------------------------------------------------- */
+function initMobileNav() {
+  const toggleBtn = document.getElementById('mobile-toggle');
+  const navMenu = document.getElementById('nav-menu');
+  const overlay = document.getElementById('mobile-overlay');
+  const navLinks = document.querySelectorAll('.nav-link');
+
+  if (!toggleBtn || !navMenu || !overlay) return;
+
+  function toggleMenu(open) {
+    const shouldOpen = open !== undefined ? open : !navMenu.classList.contains('open');
+    navMenu.classList.toggle('open', shouldOpen);
+    toggleBtn.classList.toggle('active', shouldOpen);
+    overlay.classList.toggle('active', shouldOpen);
+    toggleBtn.setAttribute('aria-expanded', shouldOpen ? 'true' : 'false');
+    document.body.style.overflow = shouldOpen ? 'hidden' : '';
+  }
+
+  toggleBtn.addEventListener('click', () => toggleMenu());
+  overlay.addEventListener('click', () => toggleMenu(false));
+
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      if (navMenu.classList.contains('open')) {
+        toggleMenu(false);
+      }
+    });
+  });
+}
+
+/* --------------------------------------------------
+   3. SCROLL SPY (ACTIVE NAVIGATION HIGHLIGHT)
+   -------------------------------------------------- */
+function initScrollSpy() {
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-link');
+
+  if (!sections.length || !navLinks.length) return;
+
+  window.addEventListener('scroll', () => {
+    let scrollY = window.pageYOffset;
+
+    sections.forEach(current => {
+      const sectionHeight = current.offsetHeight;
+      const sectionTop = current.offsetTop - 120;
+      const sectionId = current.getAttribute('id');
+
+      if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
+        navLinks.forEach(link => {
+          link.classList.remove('active');
+          if (link.getAttribute('href') === `#${sectionId}`) {
+            link.classList.add('active');
+          }
+        });
+      }
+    });
+  }, { passive: true });
+}
+
+/* --------------------------------------------------
+   4. RESOURCES SEARCH & FILTERING
+   -------------------------------------------------- */
+function initResourceFilterAndSearch() {
+  const searchInput = document.getElementById('resource-search');
+  const clearBtn = document.getElementById('resource-clear');
+  const filterPills = document.querySelectorAll('#category-pills .pill-btn');
+  const cards = document.querySelectorAll('.resource-card');
+  const noResults = document.getElementById('no-resources');
+  const resetBtn = document.getElementById('reset-filter-btn');
+
+  if (!cards.length) return;
+
+  let currentCategory = 'all';
+  let currentKeyword = '';
+
+  function applyFilters() {
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+      const category = card.getAttribute('data-category');
+      const keywords = card.getAttribute('data-keywords') || '';
+      const title = card.querySelector('.resource-title')?.textContent.toLowerCase() || '';
+      const snippet = card.querySelector('.resource-snippet')?.textContent.toLowerCase() || '';
+      
+      const searchTarget = `${keywords} ${title} ${snippet}`.toLowerCase();
+      const matchesCategory = (currentCategory === 'all' || category === currentCategory);
+      const matchesSearch = (!currentKeyword || searchTarget.includes(currentKeyword));
+
+      if (matchesCategory && matchesSearch) {
+        card.style.display = 'flex';
+        visibleCount++;
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    if (noResults) {
+      if (visibleCount === 0) {
+        noResults.classList.remove('hidden');
+      } else {
+        noResults.classList.add('hidden');
+      }
+    }
+  }
+
+  filterPills.forEach(pill => {
+    pill.onclick = () => {
+      filterPills.forEach(p => {
+        p.classList.remove('active');
+        p.setAttribute('aria-selected', 'false');
+      });
+      pill.classList.add('active');
+      pill.setAttribute('aria-selected', 'true');
+      currentCategory = pill.getAttribute('data-category');
+      applyFilters();
+    };
+  });
+
+  if (searchInput) {
+    searchInput.oninput = (e) => {
+      currentKeyword = e.target.value.trim().toLowerCase();
+      if (clearBtn) clearBtn.style.display = currentKeyword.length > 0 ? 'block' : 'none';
+      applyFilters();
+    };
+
+    if (clearBtn) {
+      clearBtn.onclick = () => {
+        searchInput.value = '';
+        currentKeyword = '';
+        clearBtn.style.display = 'none';
+        searchInput.focus();
+        applyFilters();
+      };
+    }
+  }
+
+  if (resetBtn) {
+    resetBtn.onclick = () => {
+      if (searchInput) searchInput.value = '';
+      currentKeyword = '';
+      if (clearBtn) clearBtn.style.display = 'none';
+
+      filterPills.forEach(p => {
+        p.classList.remove('active');
+        p.setAttribute('aria-selected', 'false');
+      });
+      const allPill = document.querySelector('#category-pills [data-category="all"]');
+      if (allPill) {
+        allPill.classList.add('active');
+        allPill.setAttribute('aria-selected', 'true');
+      }
+      currentCategory = 'all';
+      applyFilters();
+    };
+  }
+}
+
+/* --------------------------------------------------
+   5. RESOURCE DETAIL MODAL (DETAIL & CP)
+   -------------------------------------------------- */
+function initResourceModal() {
+  const modal = document.getElementById('resource-modal');
+  const modalCloseBtn = document.getElementById('btn-close-modal');
+  const modalCloseAction = document.getElementById('btn-modal-close-action');
+  const modalDownloadAction = document.getElementById('btn-modal-download-action');
+  const modalCategoryBadge = document.getElementById('modal-category-badge');
+  const modalTitle = document.getElementById('modal-resource-title');
+  const modalBody = document.getElementById('modal-body-content');
+  const previewBtns = document.querySelectorAll('.btn-preview');
+
+  if (!modal) return;
+
+  let activeFileName = "Materi_Edukasi.pdf";
+  let activeDownloadLink = "#";
+
+  function openModal(id) {
+    let itemData = null;
+
+    if (window.DB) {
+      const modulList = DB.getSection('modul') || [];
+      const found = modulList.find(m => String(m.id) === String(id));
+      if (found) {
+        itemData = {
+          category: found.badge || found.fase || 'Modul Ajar',
+          title: found.title,
+          content: `
+            <h4 style="margin-bottom: 0.5rem; color: var(--text-primary);"><i class="fa-solid fa-bullseye text-primary"></i> Capaian Pembelajaran (CP):</h4>
+            <p>${escapeHtml(found.cp || found.snippet)}</p>
+            
+            <h4 style="margin-top: 1rem; margin-bottom: 0.5rem; color: var(--text-primary);"><i class="fa-solid fa-list-check text-primary"></i> Alur Tujuan Pembelajaran (ATP):</h4>
+            <p>${escapeHtml(found.atp || '-')}</p>
+
+            <h4 style="margin-top: 1rem; margin-bottom: 0.5rem; color: var(--text-primary);"><i class="fa-solid fa-users text-primary"></i> Diferensiasi Pembelajaran:</h4>
+            <p>${escapeHtml(found.diferensiasi || '-')}</p>
+
+            <div style="background-color: var(--bg-secondary); border-left: 4px solid var(--brand-primary); padding: 0.85rem; border-radius: 4px; margin-top: 1rem;">
+              <small><strong>Kelengkapan Berkas:</strong> Berkas resmi disusun sesuai panduan Kurikulum Merdeka Kemendikbudristek RI.</small>
+            </div>
+          `,
+          fileNotice: found.fileNotice || 'Modul_Ajar.pdf',
+          downloadLink: found.downloadLink || '#'
+        };
+      }
+    }
+
+    if (!itemData) return;
+
+    modalCategoryBadge.textContent = itemData.category;
+    modalTitle.textContent = itemData.title;
+    modalBody.innerHTML = itemData.content;
+    activeFileName = itemData.fileNotice;
+    activeDownloadLink = itemData.downloadLink;
+
+    modal.classList.add('active');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal() {
+    modal.classList.remove('active');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  previewBtns.forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.getAttribute('data-id');
+      openModal(id);
+    };
+  });
+
+  if (modalCloseBtn) modalCloseBtn.onclick = closeModal;
+  if (modalCloseAction) modalCloseAction.onclick = closeModal;
+
+  if (modalDownloadAction) {
+    modalDownloadAction.onclick = () => {
+      alert(`Memulai pengunduhan berkas resmi:\n"${activeFileName}"\n\nTerima kasih telah memanfaatkan sumber belajar terbuka ini!`);
+      if (activeDownloadLink && activeDownloadLink !== '#') {
+        if (window.openPdfDocument) {
+          window.openPdfDocument(activeDownloadLink, activeFileName);
+        } else {
+          window.open(activeDownloadLink, '_blank');
+        }
+      }
+      closeModal();
+    };
+  }
+
+  modal.onclick = (e) => {
+    if (e.target === modal) closeModal();
+  };
+
+  document.onkeydown = (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('active')) {
+      closeModal();
+    }
+  };
+}
+
+
+/* --------------------------------------------------
+   7. GALERI FOTO & LIGHTBOX
+   -------------------------------------------------- */
+function initGalleryFilterAndLightbox() {
+  const filterBtns = document.querySelectorAll('#gallery-filters .gallery-filter-btn');
+  const galleryItems = document.querySelectorAll('#gallery-grid .gallery-item');
+  const lightbox = document.getElementById('lightbox-modal');
+  const lightboxImg = document.getElementById('lightbox-img');
+  const lightboxCaption = document.getElementById('lightbox-caption');
+  const lightboxClose = document.getElementById('lightbox-close');
+
+  if (!galleryItems.length) return;
+
+  filterBtns.forEach(btn => {
+    btn.onclick = () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const filter = btn.getAttribute('data-filter');
+
+      galleryItems.forEach(item => {
+        const itemCategory = item.getAttribute('data-category');
+        if (filter === 'all' || itemCategory === filter) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    };
+  });
+
+  galleryItems.forEach(item => {
+    const thumb = item.querySelector('.gallery-thumb');
+    if (!thumb) return;
+
+    thumb.onclick = () => {
+      const img = thumb.querySelector('img');
+      const title = thumb.querySelector('h4')?.textContent || '';
+      const desc = thumb.querySelector('p')?.textContent || '';
+
+      if (lightbox && lightboxImg && img) {
+        lightboxImg.src = img.src;
+        lightboxImg.alt = img.alt || title;
+        if (lightboxCaption) {
+          lightboxCaption.innerHTML = `<strong>${title}</strong><br><span style="font-size: 0.85rem; color: #cbd5e1;">${desc}</span>`;
+        }
+        lightbox.classList.add('active');
+        lightbox.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      }
+    };
+  });
+
+  function closeLightbox() {
+    if (!lightbox) return;
+    lightbox.classList.remove('active');
+    lightbox.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  if (lightboxClose) lightboxClose.onclick = closeLightbox;
+  if (lightbox) {
+    lightbox.onclick = (e) => {
+      if (e.target === lightbox) closeLightbox();
+    };
+  }
+}
+
+/* --------------------------------------------------
+   8. FORMULIR KONTAK DENGAN DATABASE & WHATSAPP
+   -------------------------------------------------- */
+function initContactForm() {
+  const form = document.getElementById('contact-teacher-form');
+  const alertBox = document.getElementById('form-alert');
+  const btnWhatsApp = document.getElementById('btn-send-whatsapp');
+
+  if (!form) return;
+
+  function generateWhatsAppText() {
+    const name = document.getElementById('form-name')?.value.trim() || 'Siswa/Wali';
+    const role = document.getElementById('form-role')?.value || 'Umum';
+    const email = document.getElementById('form-email')?.value.trim() || '-';
+    const whatsapp = document.getElementById('form-whatsapp')?.value.trim() || '-';
+    const subject = document.getElementById('form-subject')?.value || 'Konsultasi Belajar';
+    const message = document.getElementById('form-message')?.value.trim() || '-';
+
+    const teacherName = (window.DB && DB.getSection('config')?.teacher_name) || 'Rahmat Hidayat, S.Pd., M.Pd.';
+
+    const text = 
+      `*Halo Bpk. ${teacherName}*\n` +
+      `Saya ingin berkonsultasi melalui portal website profil guru:\n\n` +
+      `👤 *Nama:* ${name}\n` +
+      `🏷️ *Status:* ${role}\n` +
+      `📧 *Email:* ${email}\n` +
+      `📱 *No. Kontak:* ${whatsapp}\n` +
+      `📌 *Topik:* ${subject}\n\n` +
+      `💬 *Isi Pesan:*\n"${message}"\n\n` +
+      `_Pesan dikirim dari Formulir Website Profil Pendidik_`;
+
+    return encodeURIComponent(text);
+  }
+
+  // Handle Form Submit (Menyimpan ke Database & Spreadsheet)
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById('form-name')?.value.trim();
+    const role = document.getElementById('form-role')?.value;
+    const email = document.getElementById('form-email')?.value.trim();
+    const whatsapp = document.getElementById('form-whatsapp')?.value.trim();
+    const subject = document.getElementById('form-subject')?.value;
+    const message = document.getElementById('form-message')?.value.trim();
+
+    // Simpan ke database DB (localStorage + Google Apps Script jika terhubung)
+    if (window.DB) {
+      await DB.submitVisitorMessage({ name, role, email, whatsapp, subject, message });
+    }
+
+    // Tampilkan pesan berhasil
+    if (alertBox) {
+      alertBox.innerHTML = `
+        <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+          <i class="fa-solid fa-circle-check" style="font-size: 1.5rem; color: #10b981; margin-top: 0.15rem;"></i>
+          <div>
+            <h4 style="margin-bottom: 0.25rem; color: var(--text-primary);">Pesan Berhasil Terkirim ke Guru!</h4>
+            <p style="margin: 0; font-size: 0.875rem; color: var(--text-secondary);">
+              Terima kasih, <strong>${escapeHtml(name)}</strong>. Pesan Anda telah tersimpan di kotak masuk guru dan database spreadsheet. Anda juga dapat langsung meneruskan pesan ke WhatsApp melalui tombol di bawah.
+            </p>
+          </div>
+        </div>
+      `;
+      alertBox.classList.remove('hidden');
+      alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+      setTimeout(() => {
+        alertBox.classList.add('hidden');
+      }, 9000);
+    }
+
+    form.reset();
+  });
+
+  // Tombol Teruskan ke WhatsApp
+  if (btnWhatsApp) {
+    btnWhatsApp.addEventListener('click', () => {
+      const name = document.getElementById('form-name')?.value.trim();
+      const message = document.getElementById('form-message')?.value.trim();
+
+      if (!name || !message) {
+        alert('Mohon lengkapi minimal Nama dan Isi Pesan terlebih dahulu sebelum meneruskan ke WhatsApp.');
+        document.getElementById('form-name')?.focus();
+        return;
+      }
+
+      const cfgWA = (window.DB && DB.getSection('config')?.whatsapp_number) || '6281234567890';
+      const cleanWA = cfgWA.replace(/[^0-9]/g, '');
+      const encodedMsg = generateWhatsAppText();
+      const waUrl = `https://wa.me/${cleanWA}?text=${encodedMsg}`;
+
+      window.open(waUrl, '_blank', 'noopener,noreferrer');
+    });
+  }
+}
+
+/* --------------------------------------------------
+   9. FAQ ACCORDION
+   -------------------------------------------------- */
+function initAccordion() {
+  const triggers = document.querySelectorAll('.accordion-trigger');
+
+  triggers.forEach(trigger => {
+    trigger.addEventListener('click', () => {
+      const isExpanded = trigger.getAttribute('aria-expanded') === 'true';
+      const panel = trigger.nextElementSibling;
+
+      triggers.forEach(otherTrigger => {
+        if (otherTrigger !== trigger) {
+          otherTrigger.setAttribute('aria-expanded', 'false');
+          if (otherTrigger.nextElementSibling) {
+            otherTrigger.nextElementSibling.style.maxHeight = null;
+          }
+        }
+      });
+
+      if (isExpanded) {
+        trigger.setAttribute('aria-expanded', 'false');
+        panel.style.maxHeight = null;
+      } else {
+        trigger.setAttribute('aria-expanded', 'true');
+        panel.style.maxHeight = panel.scrollHeight + 'px';
+      }
+    });
+  });
+}
+
+/* --------------------------------------------------
+   10. BACK TO TOP BUTTON
+   -------------------------------------------------- */
+function initBackToTop() {
+  const backToTopBtn = document.getElementById('btn-back-to-top');
+  if (!backToTopBtn) return;
+
+  window.addEventListener('scroll', () => {
+    if (window.pageYOffset > 380) {
+      backToTopBtn.classList.add('visible');
+    } else {
+      backToTopBtn.classList.remove('visible');
+    }
+  }, { passive: true });
+
+  backToTopBtn.addEventListener('click', () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  });
+}
+
+/* --------------------------------------------------
+   11. HELPER ESCAPE HTML
+   -------------------------------------------------- */
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+/* --------------------------------------------------
+   12. AKSES ADMIN TERSEMBUNYI (DISCREET ADMIN ACCESS)
+   -------------------------------------------------- */
+function initDiscreetAdminAccess() {
+  // 1. Pintasan keyboard global: Ctrl + Shift + A atau Cmd + Shift + A
+  window.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+      e.preventDefault();
+      window.location.href = 'admin.html';
+    }
+  });
+
+  // 2. Klik ganda (double-click) pada logo / brand navbar untuk pemilik website
+  const brandEl = document.querySelector('.navbar-brand');
+  if (brandEl) {
+    brandEl.addEventListener('dblclick', (e) => {
+      e.preventDefault();
+      window.location.href = 'admin.html';
+    });
+  }
+}
+

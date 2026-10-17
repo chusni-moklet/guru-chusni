@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Admin | Kelola Profil & Database Pendidik</title>
+  
+  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome 6 CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <link rel="stylesheet" href="css/admin.css?v=2.3">
+</head>
+<body>
+
+  <!-- =========================================================================
+       1. LOGIN VIEW (DITAMPILKAN JIKA BELUM LOGIN)
+       ========================================================================= -->
+  <div id="auth-container" class="login-screen-wrap">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-logo">
+          <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+        <h1 class="login-title">Portal Admin Pendidik</h1>
+        <p class="login-subtitle">Masuk untuk mengelola seluruh data website profil dan database Google Spreadsheet.</p>
+      </div>
+
+      <div id="login-alert" class="login-demo-hint" style="display: none; margin-bottom: 1.25rem;"></div>
+
+      <form id="form-login">
+        <div class="form-group">
+          <label for="login-username" class="form-label">Username / Akun</label>
+          <div class="input-icon-wrap">
+            <i class="fa-solid fa-user prefix-icon"></i>
+            <input type="text" id="login-username" class="form-control" placeholder="Contoh: admin" required autofocus>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="login-password" class="form-label">Kata Sandi (Password)</label>
+          <div class="input-icon-wrap">
+            <i class="fa-solid fa-lock prefix-icon"></i>
+            <input type="password" id="login-password" class="form-control" placeholder="Masukkan password" required>
+            <button type="button" class="btn-toggle-password" id="btn-toggle-login-pass" aria-label="Lihat kata sandi">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-login-submit" id="btn-login-action">
+          <i class="fa-solid fa-right-to-bracket"></i> Masuk ke Dashboard
+        </button>
+      </form>
+
+      <div class="login-demo-hint">
+        <i class="fa-solid fa-circle-info text-primary"></i> 
+        <strong>Kredensial Bawaan:</strong><br>
+        Username: <code>admin</code> &bull; Password: <code>password</code> (atau <code>admin123</code>)<br>
+        <small style="color: var(--admin-text-muted);">Dapat dihubungkan langsung ke Google Apps Script Spreadsheet pada menu Pengaturan.</small>
+      </div>
+
+      <div class="login-footer-links">
+        <a href="index.html"><i class="fa-solid fa-arrow-left"></i> Kembali ke Website Utama</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       2. DASHBOARD ADMIN CONTAINER (DITAMPILKAN SETELAH LOGIN)
+       ========================================================================= -->
+  <div id="dashboard-container" class="admin-layout" style="display: none;">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="admin-sidebar" id="admin-sidebar">
+      <div class="sidebar-header">
+        <a href="#overview" class="sidebar-brand">
+          <div class="brand-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+          <div class="brand-text">
+            <h2>Profilku Admin</h2>
+            <span>Database Manager</span>
+          </div>
+        </a>
+      </div>
+
+      <ul class="sidebar-menu">
+        <li class="menu-category-title">Utama</li>
+        <li class="menu-item">
+          <a href="#overview" class="menu-link active" data-view="view-overview">
+            <i class="fa-solid fa-chart-pie"></i> Ikhtisar & Status
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="#profile" class="menu-link" data-view="view-profile">
+            <i class="fa-solid fa-id-card"></i> Profil & Identitas
+          </a>
+        </li>
+
+        <li class="menu-category-title">Konten Akademik</li>
+        <li class="menu-item">
+          <a href="#modul" class="menu-link" data-view="view-modul">
+            <i class="fa-solid fa-book-open"></i> Modul Ajar (OER)
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="#prestasi" class="menu-link" data-view="view-prestasi">
+            <i class="fa-solid fa-trophy"></i> Prestasi & Sertifikasi
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="#galeri" class="menu-link" data-view="view-galeri">
+            <i class="fa-solid fa-images"></i> Galeri Dokumentasi
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="#karya" class="menu-link" data-view="view-karya">
+            <i class="fa-solid fa-laptop-code"></i> Karya Website
+          </a>
+        </li>
+
+        <li class="menu-category-title">Pengayaan & Riwayat</li>
+        <li class="menu-item">
+          <a href="#kompetensi" class="menu-link" data-view="view-kompetensi">
+            <i class="fa-solid fa-shapes"></i> Mapel & EdTech
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="#timeline" class="menu-link" data-view="view-timeline">
+            <i class="fa-solid fa-timeline"></i> Riwayat & Linimasa
+          </a>
+        </li>
+
+        <li class="menu-category-title">Komunikasi & Sistem</li>
+        <li class="menu-item">
+          <a href="#inbox" class="menu-link" data-view="view-inbox">
+            <i class="fa-solid fa-inbox"></i> Kotak Pesan Form
+            <span class="menu-badge" id="badge-inbox-count">0</span>
+          </a>
+        </li>
+        <li class="menu-item">
+          <a href="#settings" class="menu-link" data-view="view-settings">
+            <i class="fa-solid fa-sliders"></i> Database & Spreadsheet
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <div class="user-snippet">
+          <div class="user-avatar" id="sidebar-user-avatar"><i class="fa-solid fa-user-tie"></i></div>
+          <div class="user-details">
+            <h4 id="sidebar-user-name">Bpk. Rahmat Hidayat</h4>
+            <span id="sidebar-user-role">Administrator</span>
+          </div>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <a href="index.html" target="_blank" class="btn-topbar-action" style="flex: 1; justify-content: center; font-size: 0.75rem;" title="Lihat Website">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Web
+          </a>
+          <button type="button" class="btn-sidebar-logout" id="btn-admin-logout" style="flex: 1;" title="Keluar">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> Keluar
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-main">
+      
+      <!-- Topbar Header -->
+      <header class="admin-topbar">
+        <div class="topbar-left">
+          <button type="button" class="btn-mobile-sidebar" id="btn-toggle-sidebar" aria-label="Buka Menu">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div class="page-title-group">
+            <h1 id="topbar-page-title">Ikhtisar & Status Database</h1>
+            <p id="topbar-page-subtitle">Ringkasan data website profil pendidik dan status sinkronisasi Google Sheets.</p>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <!-- Connection Status Badge -->
+          <div class="status-indicator status-local" id="header-status-indicator" title="Status Database">
+            <span class="status-dot"></span>
+            <span id="header-status-text">Mode Lokal</span>
+          </div>
+
+          <!-- Sync Buttons -->
+          <button type="button" class="btn-topbar-action primary" id="btn-sync-now" title="Sinkronkan dengan Google Spreadsheet">
+            <i class="fa-solid fa-arrows-rotate" id="sync-icon"></i>
+            <span>Sinkronkan</span>
+          </button>
+
+          <!-- Theme Toggle -->
+          <button type="button" class="btn-icon-only" id="admin-theme-toggle" title="Ganti Tema Gelap/Terang">
+            <i class="fa-solid fa-moon"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Content Views -->
+      <div class="admin-content">
+
+        <!-- =========================================================================
+             VIEW 1: IKHTISAR (OVERVIEW)
+             ========================================================================= -->
+        <section class="admin-view active" id="view-overview">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-info">
+                <span>Total Modul Ajar</span>
+                <h3 id="stat-count-modul">6</h3>
+              </div>
+              <div class="stat-icon" style="background: var(--color-primary-subtle); color: var(--color-primary);">
+                <i class="fa-solid fa-book-open"></i>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-info">
+                <span>Prestasi & Sertifikat</span>
+                <h3 id="stat-count-prestasi">6</h3>
+              </div>
+              <div class="stat-icon" style="background: var(--color-warning-subtle); color: var(--color-warning);">
+                <i class="fa-solid fa-trophy"></i>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-info">
+                <span>Foto Dokumentasi</span>
+                <h3 id="stat-count-galeri">6</h3>
+              </div>
+              <div class="stat-icon" style="background: var(--color-purple-subtle); color: var(--color-purple);">
+                <i class="fa-solid fa-images"></i>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-info">
+                <span>Karya Website</span>
+                <h3 id="stat-count-karya">3</h3>
+              </div>
+              <div class="stat-icon" style="background: var(--color-blue-subtle); color: var(--color-primary);">
+                <i class="fa-solid fa-laptop-code"></i>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-info">
+                <span>Pesan Formulir Masuk</span>
+                <h3 id="stat-count-inbox">0</h3>
+              </div>
+              <div class="stat-icon" style="background: var(--color-success-subtle); color: var(--color-success);">
+                <i class="fa-solid fa-envelope-open-text"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Connection Status Card -->
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h2 class="admin-card-title"><i class="fa-solid fa-database text-primary"></i> Status Database Google Spreadsheet</h2>
+              <div style="display: flex; gap: 0.5rem;">
+                <button type="button" class="btn-topbar-action" id="btn-quick-guide">
+                  <i class="fa-solid fa-book"></i> Panduan Pasang Google Apps Script
+                </button>
+              </div>
+            </div>
+            <div class="admin-card-body">
+              <div class="form-grid-2">
+                <div>
+                  <p style="margin-bottom: 0.5rem; font-weight: 600;">Status Integrasi:</p>
+                  <p id="overview-gas-status-desc" style="color: var(--admin-text-muted); font-size: 0.875rem;">
+                    Sedang menggunakan data penyimpanan browser (localStorage). Pasang URL Web App Google Apps Script untuk menyimpan data langsung ke Google Sheets secara real-time.
+                  </p>
+                </div>
+                <div>
+                  <p style="margin-bottom: 0.5rem; font-weight: 600;">URL Google Apps Script Aktif:</p>
+                  <code id="overview-gas-url-display" style="display: block; padding: 0.5rem 0.75rem; background: var(--admin-bg); border-radius: var(--radius-sm); border: 1px solid var(--admin-border); font-size: 0.8125rem; word-break: break-all;">
+                    Belum dikonfigurasi (Klik menu Pengaturan)
+                  </code>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Inquiries -->
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h2 class="admin-card-title"><i class="fa-solid fa-inbox text-success"></i> Pesan Masuk Terbaru dari Formulir</h2>
+              <a href="#inbox" class="btn-topbar-action" style="font-size: 0.8125rem;">Lihat Semua Pesan</a>
+            </div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Waktu</th>
+                    <th>Nama</th>
+                    <th>Peran</th>
+                    <th>Topik</th>
+                    <th>Pesan</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="table-overview-inbox">
+                  <!-- Rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- =========================================================================
+             VIEW 2: PROFIL & IDENTITAS (CONFIG)
+             ========================================================================= -->
+        <section class="admin-view" id="view-profile">
+          <form id="form-profile-config">
+            <div class="admin-card">
+              <div class="admin-card-header">
+                <h2 class="admin-card-title"><i class="fa-solid fa-user-tie text-primary"></i> Identitas & Biodata Resmi Pendidik</h2>
+                <button type="submit" class="btn-topbar-action primary">
+                  <i class="fa-solid fa-floppy-disk"></i> Simpan Profil
+                </button>
+              </div>
+              <div class="admin-card-body">
+                <div class="form-grid-3">
+                  <div class="form-group">
+                    <label class="form-label">Nama Lengkap (Tanpa Gelar)</label>
+                    <input type="text" class="form-control" name="teacher_name" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Gelar Akademik</label>
+                    <input type="text" class="form-control" name="teacher_degrees" placeholder="Contoh: S.Pd., M.Pd.">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Sub Gelar / Tagline</label>
+                    <input type="text" class="form-control" name="teacher_tagline">
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Unit Kerja / Nama Sekolah</label>
+                    <input type="text" class="form-control" name="school_name" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">NIP</label>
+                    <input type="text" class="form-control" name="nip">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">NUPTK</label>
+                    <input type="text" class="form-control" name="nuptk">
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Status Pendidik</label>
+                    <input type="text" class="form-control" name="teacher_status">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Pendidikan Terakhir</label>
+                    <input type="text" class="form-control" name="last_education">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Peran Tambahan</label>
+                    <input type="text" class="form-control" name="additional_role">
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Mata Pelajaran Diampu</label>
+                    <input type="text" class="form-control" name="subjects_taught">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Domisili / Kota</label>
+                    <input type="text" class="form-control" name="city">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Alamat Lengkap Instansi</label>
+                    <input type="text" class="form-control" name="address">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Hero Section & Tampilan Utama -->
+            <div class="admin-card">
+              <div class="admin-card-header">
+                <h2 class="admin-card-title"><i class="fa-solid fa-desktop text-purple"></i> Tampilan Halaman Depan (Hero & Pengumuman)</h2>
+              </div>
+              <div class="admin-card-body">
+                <div class="form-grid-2">
+                  <div class="form-group form-full">
+                    <label class="form-label">Pengumuman Baris Atas (Top Announcement Bar)</label>
+                    <input type="text" class="form-control" name="announcement_text">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Link Pengumuman Baris Atas</label>
+                    <input type="text" class="form-control" name="announcement_link" placeholder="#modul atau URL luar">
+                  </div>
+                  <div class="form-group form-full">
+                    <label class="form-label">Foto Profil Guru (Upload dari Direktori atau Tautan URL)</label>
+                    <div class="file-upload-wrapper">
+                      <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+                        <input type="file" id="input-profile-file" accept="image/*" style="display: none;">
+                        <button type="button" class="btn btn-sm btn-outline" id="btn-browse-profile-file">
+                          <i class="fa-solid fa-folder-open"></i> Upload Foto dari Direktori
+                        </button>
+                        <span style="font-size: 0.775rem; color: var(--admin-text-muted);">atau tempelkan link gambar langsung di bawah:</span>
+                      </div>
+                      <input type="text" class="form-control" name="hero_image" id="input-profile-img-url" placeholder="https://images.unsplash.com/... atau hasil upload file">
+                      <div class="img-preview-box">
+                        <img src="" id="preview-profile-img" alt="Pratinjau Foto Guru">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group form-full">
+                    <label class="form-label">Judul Besar Hero (Headline)</label>
+                    <input type="text" class="form-control" name="hero_title" required>
+                  </div>
+                  <div class="form-group form-full">
+                    <label class="form-label">Deskripsi Pengantar Hero</label>
+                    <textarea class="form-control" name="hero_desc" rows="3" required></textarea>
+                  </div>
+                  <div class="form-group form-full">
+                    <label class="form-label">Kutipan Filosofi Ki Hajar Dewantara / Mengajar</label>
+                    <textarea class="form-control" name="philosophy_quote" rows="2"></textarea>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Paragraf Bio 1 (Bagian Tentang)</label>
+                    <textarea class="form-control" name="bio_text1" rows="3"></textarea>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Paragraf Bio 2 (Bagian Tentang)</label>
+                    <textarea class="form-control" name="bio_text2" rows="3"></textarea>
+                  </div>
+                </div>
+
+                <div class="form-grid-4" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1rem;">
+                  <div class="form-group">
+                    <label class="form-label">Stat: Pengalaman</label>
+                    <input type="text" class="form-control" name="stat_years" placeholder="12+">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Stat: Siswa</label>
+                    <input type="text" class="form-control" name="stat_students" placeholder="1.200+">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Stat: Modul Ajar</label>
+                    <input type="text" class="form-control" name="stat_modules" placeholder="45+">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Stat: Sertifikasi</label>
+                    <input type="text" class="form-control" name="stat_certs" placeholder="16+">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Kontak & Sosial Media -->
+            <div class="admin-card">
+              <div class="admin-card-header">
+                <h2 class="admin-card-title"><i class="fa-solid fa-share-nodes text-success"></i> Kontak & Tautan Media Sosial</h2>
+                <button type="submit" class="btn-topbar-action primary">
+                  <i class="fa-solid fa-floppy-disk"></i> Simpan Semua Perubahan
+                </button>
+              </div>
+              <div class="admin-card-body">
+                <div class="form-grid-3">
+                  <div class="form-group">
+                    <label class="form-label">No. WhatsApp Resmi (Awali 62)</label>
+                    <input type="text" class="form-control" name="whatsapp_number" placeholder="6281234567890">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Email Kedinasan / Sekolah</label>
+                    <input type="email" class="form-control" name="official_email">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Email Pribadi / Publik</label>
+                    <input type="email" class="form-control" name="personal_email">
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">URL YouTube Pembelajaran</label>
+                    <input type="url" class="form-control" name="youtube_url">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">URL LinkedIn Pendidik</label>
+                    <input type="url" class="form-control" name="linkedin_url">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">URL Instagram Edukasi</label>
+                    <input type="url" class="form-control" name="instagram_url">
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">URL GitHub / Repositori Modul</label>
+                    <input type="url" class="form-control" name="github_url">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </section>
+
+        <!-- =========================================================================
+             VIEW 3: MODUL AJAR (OER)
+             ========================================================================= -->
+        <section class="admin-view" id="view-modul">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h2 class="admin-card-title"><i class="fa-solid fa-book-open text-primary"></i> Kelola Modul Ajar, LKPD & Bank Soal</h2>
+              <button type="button" class="btn-topbar-action primary" id="btn-add-modul">
+                <i class="fa-solid fa-plus"></i> Tambah Modul Baru
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Judul Materi</th>
+                    <th>Kategori</th>
+                    <th>Fase / Kelas</th>
+                    <th>Nama Berkas</th>
+                    <th style="width: 120px;">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="table-modul-body">
+                  <!-- Rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- =========================================================================
+             VIEW 4: PRESTASI & PENGHARGAAN
+             ========================================================================= -->
+        <section class="admin-view" id="view-prestasi">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h2 class="admin-card-title"><i class="fa-solid fa-trophy text-warning"></i> Kelola Prestasi, Sertifikasi & Buku</h2>
+              <button type="button" class="btn-topbar-action primary" id="btn-add-prestasi">
+                <i class="fa-solid fa-plus"></i> Tambah Prestasi Baru
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Tahun</th>
+                    <th>Nama Prestasi / Karya</th>
+                    <th>Penyelenggara / Lembaga</th>
+                    <th>Kategori</th>
+                    <th>Berkas PDF</th>
+                    <th>Unggulan</th>
+                    <th style="width: 120px;">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="table-prestasi-body">
+                  <!-- Rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+
+
+        <!-- =========================================================================
+             VIEW 6: GALERI DOKUMENTASI
+             ========================================================================= -->
+        <section class="admin-view" id="view-galeri">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h2 class="admin-card-title"><i class="fa-solid fa-images text-purple"></i> Kelola Galeri Pembelajaran & Aksi Nyata</h2>
+              <button type="button" class="btn-topbar-action primary" id="btn-add-galeri">
+                <i class="fa-solid fa-plus"></i> Tambah Foto Baru
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th style="width: 80px;">Pratinjau</th>
+                    <th>Judul Foto</th>
+                    <th>Kategori</th>
+                    <th>Deskripsi</th>
+                    <th style="width: 120px;">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="table-galeri-body">
+                  <!-- Rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- =========================================================================
+             VIEW 7: KARYA WEBSITE
+             ========================================================================= -->
+        <section class="admin-view" id="view-karya">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h2 class="admin-card-title"><i class="fa-solid fa-laptop-code text-primary"></i> Kelola Portofolio Karya Website</h2>
+              <button type="button" class="btn-topbar-action primary" id="btn-add-karya">
+                <i class="fa-solid fa-plus"></i> Tambah Karya Baru
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th style="width: 100px;">Thumbnail</th>
+                    <th>Nama Website</th>
+                    <th>Deskripsi</th>
+                    <th>Link Demo / URL</th>
+                    <th style="width: 120px;">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="table-karya-body">
+                  <!-- Rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+
+
+        <!-- =========================================================================
+             VIEW 8: KOMPETENSI & EDTECH
+             ========================================================================= -->
+        <section class="admin-view" id="view-kompetensi">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h2 class="admin-card-title"><i class="fa-solid fa-shapes text-primary"></i> Kelola Mata Pelajaran & Bidang Keahlian</h2>
+              <button type="button" class="btn-topbar-action primary" id="btn-add-kompetensi">
+                <i class="fa-solid fa-plus"></i> Tambah Mapel
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Mata Pelajaran</th>
+                    <th>Tingkat / Fase</th>
+                    <th>Deskripsi</th>
+                    <th style="width: 120px;">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="table-kompetensi-body">
+                  <!-- Rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h2 class="admin-card-title"><i class="fa-solid fa-toolbox text-warning"></i> Platform & Software EdTech</h2>
+              <button type="button" class="btn-topbar-action primary" id="btn-add-edtech">
+                <i class="fa-solid fa-plus"></i> Tambah Tool EdTech
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Nama Aplikasi</th>
+                    <th>Icon FontAwesome</th>
+                    <th style="width: 120px;">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="table-edtech-body">
+                  <!-- Rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- =========================================================================
+             VIEW 9: RIWAYAT & TIMELINE
+             ========================================================================= -->
+        <section class="admin-view" id="view-timeline">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h2 class="admin-card-title"><i class="fa-solid fa-timeline text-primary"></i> Linimasa Pendidikan & Karir Pendidik</h2>
+              <button type="button" class="btn-topbar-action primary" id="btn-add-timeline">
+                <i class="fa-solid fa-plus"></i> Tambah Riwayat Baru
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Tahun / Periode</th>
+                    <th>Jabatan / Jenjang</th>
+                    <th>Institusi</th>
+                    <th>Deskripsi</th>
+                    <th style="width: 120px;">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="table-timeline-body">
+                  <!-- Rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- =========================================================================
+             VIEW 10: KOTAK PESAN MASUK (INBOX)
+             ========================================================================= -->
+        <section class="admin-view" id="view-inbox">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h2 class="admin-card-title"><i class="fa-solid fa-inbox text-success"></i> Pesan Masuk dari Formulir Website</h2>
+            </div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Tanggal</th>
+                    <th>Nama Pengirim</th>
+                    <th>Status / Peran</th>
+                    <th>Kontak (WA & Email)</th>
+                    <th>Topik</th>
+                    <th>Isi Pesan</th>
+                    <th>Status</th>
+                    <th style="width: 120px;">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="table-inbox-body">
+                  <!-- Rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- =========================================================================
+             VIEW 11: PENGATURAN & GOOGLE APPS SCRIPT
+             ========================================================================= -->
+        <section class="admin-view" id="view-settings">
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h2 class="admin-card-title"><i class="fa-solid fa-link text-primary"></i> Hubungkan ke Database Google Spreadsheet</h2>
+            </div>
+            <div class="admin-card-body">
+              <div class="form-group">
+                <label class="form-label">URL Web App Google Apps Script</label>
+                <input type="url" id="setting-gas-url" class="form-control" placeholder="https://script.google.com/macros/s/AKfycb.../exec">
+                <p class="form-help">
+                  Masukkan URL Web App hasil Deploy Google Apps Script (Access: Anyone).
+                </p>
+              </div>
+
+              <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+                <button type="button" class="btn-topbar-action primary" id="btn-save-gas-url">
+                  <i class="fa-solid fa-floppy-disk"></i> Simpan URL
+                </button>
+                <button type="button" class="btn-topbar-action" id="btn-test-gas-conn">
+                  <i class="fa-solid fa-network-wired"></i> Uji Koneksi API
+                </button>
+                <button type="button" class="btn-topbar-action" id="btn-open-gas-modal">
+                  <i class="fa-solid fa-circle-question"></i> Lihat Panduan Langkah-demi-Langkah
+                </button>
+              </div>
+
+              <div id="conn-test-result" style="display: none; padding: 1rem; border-radius: var(--radius-md); font-size: 0.875rem; margin-bottom: 1.5rem;"></div>
+            </div>
+          </div>
+
+          <!-- Ubah Password Admin -->
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h2 class="admin-card-title"><i class="fa-solid fa-key text-warning"></i> Keamanan Akun & Ubah Password Admin</h2>
+            </div>
+            <div class="admin-card-body">
+              <form id="form-change-password">
+                <div class="form-grid-3">
+                  <div class="form-group">
+                    <label class="form-label">Password Saat Ini</label>
+                    <input type="password" class="form-control" id="input-old-pass" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Password Baru (Min. 5 Karakter)</label>
+                    <input type="password" class="form-control" id="input-new-pass" required>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Konfirmasi Password Baru</label>
+                    <input type="password" class="form-control" id="input-confirm-pass" required>
+                  </div>
+                </div>
+                <button type="submit" class="btn-topbar-action primary">
+                  <i class="fa-solid fa-lock"></i> Perbarui Password
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Backup & Restore Data -->
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <h2 class="admin-card-title"><i class="fa-solid fa-file-export text-success"></i> Backup & Cadangan Berkas JSON</h2>
+            </div>
+            <div class="admin-card-body">
+              <p style="font-size: 0.875rem; color: var(--admin-text-muted); margin-bottom: 1rem;">
+                Unduh seluruh data profil, modul, prestasi, dan galeri dalam format file JSON untuk pencadangan mandiri atau memindahkannya ke komputer lain.
+              </p>
+              <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                <button type="button" class="btn-topbar-action" id="btn-export-json">
+                  <i class="fa-solid fa-download"></i> Ekspor Backup JSON
+                </button>
+                <label class="btn-topbar-action" style="cursor: pointer; margin-bottom: 0;">
+                  <i class="fa-solid fa-upload"></i> Pulihkan dari JSON
+                  <input type="file" id="input-import-json" accept=".json" style="display: none;">
+                </label>
+                <button type="button" class="btn-topbar-action" id="btn-reset-data" style="color: var(--color-danger); border-color: rgba(239,68,68,0.3);">
+                  <i class="fa-solid fa-rotate-left"></i> Reset ke Data Awal Bawaan
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- =========================================================================
+       3. REUSABLE CRUD MODAL (MODUL, PRESTASI, GALERI, DLL)
+       ========================================================================= -->
+  <div class="admin-modal-overlay" id="crud-modal" aria-hidden="true">
+    <div class="admin-modal-dialog">
+      <div class="admin-modal-header">
+        <h3 id="crud-modal-title">Formulir Data</h3>
+        <button type="button" class="btn-close-modal" id="btn-close-crud-modal">&times;</button>
+      </div>
+      <form id="form-crud-modal">
+        <div class="admin-modal-body" id="crud-modal-body">
+          <!-- Dynamic form inputs rendered by JS -->
+        </div>
+        <div class="admin-modal-footer">
+          <button type="button" class="btn-topbar-action" id="btn-cancel-crud-modal">Batal</button>
+          <button type="submit" class="btn-topbar-action primary" id="btn-submit-crud-modal">
+            <i class="fa-solid fa-check"></i> Simpan Data
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       4. PANDUAN SETUP GOOGLE APPS SCRIPT MODAL
+       ========================================================================= -->
+  <div class="admin-modal-overlay" id="guide-modal" aria-hidden="true">
+    <div class="admin-modal-dialog" style="max-width: 750px;">
+      <div class="admin-modal-header">
+        <h3><i class="fa-solid fa-file-excel text-success"></i> Panduan Integrasi Google Spreadsheet</h3>
+        <button type="button" class="btn-close-modal" id="btn-close-guide-modal">&times;</button>
+      </div>
+      <div class="admin-modal-body" style="font-size: 0.9rem; line-height: 1.6;">
+        <h4 style="margin-bottom: 0.5rem; color: var(--admin-text-main);">Langkah Cepat (Hanya 3 Menit):</h4>
+        <ol style="padding-left: 1.25rem; margin-bottom: 1.5rem; color: var(--admin-text-main);">
+          <li style="margin-bottom: 0.5rem;">
+            Buka <a href="https://sheets.new" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary); font-weight: 600;">Google Spreadsheet Baru (sheets.new)</a> dan beri nama spreadsheet Anda, misalnya <strong>Database Profil Guru</strong>.
+          </li>
+          <li style="margin-bottom: 0.5rem;">
+            Klik menu <strong>Extensions (Ekstensi)</strong> &rarr; pilih <strong>Apps Script</strong>.
+          </li>
+          <li style="margin-bottom: 0.5rem;">
+            Hapus kode bawaan di editor <code>Code.gs</code>, lalu salin isi file <code>google-apps-script/Code.gs</code> yang telah tersedia di folder proyek ini.
+          </li>
+          <li style="margin-bottom: 0.5rem;">
+            Di bagian atas editor Apps Script, pilih fungsi <strong>setupDatabase</strong> lalu klik tombol <strong>Run (Jalankan)</strong>. Berikan izin akses saat diminta Google. Semua tabel/sheet akan otomatis dibuat!
+          </li>
+          <li style="margin-bottom: 0.5rem;">
+            Klik tombol biru <strong>Deploy (Terapkan)</strong> di pojok kanan atas &rarr; <strong>New Deployment (Penerapan Baru)</strong>.
+          </li>
+          <li style="margin-bottom: 0.5rem;">
+            Pilih jenis <strong>Web App (Aplikasi Web)</strong>:
+            <ul style="padding-left: 1.25rem; margin-top: 0.25rem;">
+              <li>Execute as: <strong>Me (email Anda)</strong></li>
+              <li>Who has access: <strong>Anyone (Siapa saja)</strong> &larr; <em>Wajib agar website bisa membaca data</em></li>
+            </ul>
+          </li>
+          <li style="margin-bottom: 0.5rem;">
+            Salin <strong>Web App URL</strong> yang dihasilkan (berakhiran <code>/exec</code>), lalu tempelkan pada menu <strong>Pengaturan & Google Spreadsheet</strong> di dashboard ini.
+          </li>
+        </ol>
+
+        <div style="background: var(--admin-bg); padding: 1rem; border-radius: var(--radius-md); border: 1px solid var(--admin-border);">
+          <strong>Catatan Keamanan:</strong> Siapa saja hanya dapat membaca data yang dipublikasikan (seperti modul dan profil) atau mengirim formulir pesan. Pengubahan data tetap dilindungi kata sandi administrator.
+        </div>
+      </div>
+      <div class="admin-modal-footer">
+        <button type="button" class="btn-topbar-action primary" id="btn-close-guide-footer">Mengerti</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script src="js/db.js?v=2.3"></script>
+  <script src="js/admin.js?v=2.3"></script>
+</body>
+</html>
