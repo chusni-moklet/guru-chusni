@@ -220,7 +220,7 @@ function renderDynamicModul(modulList) {
           <button class="btn btn-sm btn-outline btn-preview" data-id="${escapeHtml(m.id)}">
             <i class="fa-regular fa-eye"></i> Detail & CP
           </button>
-          <a href="${escapeHtml(m.downloadLink || '#')}" class="btn btn-sm btn-primary btn-download" onclick="if (window.openPdfDocument && '${escapeHtml(m.downloadLink || '')}'.startsWith('data:')) { event.preventDefault(); window.openPdfDocument('${escapeHtml(m.downloadLink || '')}', '${escapeHtml(m.fileNotice || 'Modul.pdf')}'); } else { alert('Mengunduh: ${escapeHtml(m.fileNotice || m.title)}'); return ${m.downloadLink && m.downloadLink !== '#' ? 'true' : 'false'}; }">
+          <a href="${escapeHtml(m.downloadLink || '#')}" class="btn btn-sm btn-primary btn-download" onclick="if (window.openPdfDocument && ('${escapeHtml(m.downloadLink || '')}'.startsWith('data:') || '${escapeHtml(m.downloadLink || '')}'.startsWith('indexeddb:'))) { event.preventDefault(); window.openPdfDocument('${escapeHtml(m.downloadLink || '')}', '${escapeHtml(m.fileNotice || 'Modul.pdf')}'); } else { alert('Mengunduh: ${escapeHtml(m.fileNotice || m.title)}'); return ${m.downloadLink && m.downloadLink !== '#' ? 'true' : 'false'}; }">
             <i class="fa-solid fa-download"></i> Unduh
           </a>
         </div>

@@ -982,10 +982,10 @@ const AdminApp = (function () {
     }
 
     if (form) {
-      form.addEventListener('submit', (e) => {
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        saveCrudModal();
-        closeModal();
+        const success = await saveCrudModal();
+        if (success !== false) closeModal();
       });
     }
   }
@@ -1167,8 +1167,8 @@ const AdminApp = (function () {
                   <i class="fa-solid fa-link"></i> Atau gunakan Tautan URL Dokumen (Google Drive / Cloud)
                 </button>
               </div>
-              <div id="wrapper-alt-prestasi-pdf-url" style="display: ${item && item.pdfUrl && !item.pdfUrl.startsWith('data:') ? 'block' : 'none'}; margin-top: 0.5rem;">
-                <input type="text" class="form-control" id="modal-prestasi-alt-pdf-url" placeholder="https://drive.google.com/file/d/... atau https://..." value="${escapeHtml(item && item.pdfUrl && !item.pdfUrl.startsWith('data:') ? item.pdfUrl : '')}">
+              <div id="wrapper-alt-prestasi-pdf-url" style="display: ${item && item.pdfUrl && !item.pdfUrl.startsWith('data:') && !item.pdfUrl.startsWith('indexeddb:') ? 'block' : 'none'}; margin-top: 0.5rem;">
+                <input type="text" class="form-control" name="altPdfUrl" id="modal-prestasi-alt-pdf-url" placeholder="https://drive.google.com/file/d/... atau https://..." value="${escapeHtml(item && item.pdfUrl && !item.pdfUrl.startsWith('data:') && !item.pdfUrl.startsWith('indexeddb:') ? item.pdfUrl : '')}">
                 <span style="font-size: 0.75rem; color: var(--admin-text-muted);">Masukkan link shareable Google Drive bila file PDF disimpan di cloud.</span>
               </div>
             </div>
@@ -1681,6 +1681,8 @@ const AdminApp = (function () {
 
     if (!fileInput || !dropzone || !pdfUrlInput) return;
 
+    const btnSubmitModal = document.getElementById('btn-submit-crud-modal');
+
     const handleFile = (file) => {
       if (!file) return;
       if (!file.name.toLowerCase().endsWith('.pdf') && file.type !== 'application/pdf') {
@@ -1692,14 +1694,24 @@ const AdminApp = (function () {
       const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
       const displaySize = sizeKb > 1024 ? `${sizeMb} MB` : `${sizeKb} KB`;
 
-      if (file.size > 5 * 1024 * 1024) {
-        showToast(`File berukuran ${displaySize}. File PDF di atas 5MB disarankan menggunakan tautan Google Drive untuk performa maksimal.`, 'warning', 6000);
+      if (file.size > 15 * 1024 * 1024) {
+        showToast(`File berukuran ${displaySize}. File PDF di atas 15MB disarankan menggunakan tautan Google Drive.`, 'warning', 6000);
       }
 
-      if (fileMetaEl) fileMetaEl.textContent = 'Membaca berkas PDF...';
+      window._isReadingPdfFile = true;
+      if (btnSubmitModal) {
+        btnSubmitModal.disabled = true;
+        btnSubmitModal.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses File PDF...';
+      }
+      if (fileMetaEl) fileMetaEl.textContent = `Sedang memuat ${file.name} (${displaySize})...`;
 
       const reader = new FileReader();
       reader.onload = (e) => {
+        window._isReadingPdfFile = false;
+        if (btnSubmitModal) {
+          btnSubmitModal.disabled = false;
+          btnSubmitModal.innerHTML = '<i class="fa-solid fa-check"></i> Simpan Data';
+        }
         const dataUrl = e.target.result;
         pdfUrlInput.value = dataUrl;
         if (pdfFileNameInput) pdfFileNameInput.value = file.name;
@@ -1710,6 +1722,11 @@ const AdminApp = (function () {
         showToast(`File PDF "${file.name}" (${displaySize}) berhasil dimuat!`, 'success');
       };
       reader.onerror = () => {
+        window._isReadingPdfFile = false;
+        if (btnSubmitModal) {
+          btnSubmitModal.disabled = false;
+          btnSubmitModal.innerHTML = '<i class="fa-solid fa-check"></i> Simpan Data';
+        }
         showToast('Gagal membaca file PDF dari disk.', 'error');
       };
       reader.readAsDataURL(file);
@@ -1797,17 +1814,20 @@ const AdminApp = (function () {
     }
 
     if (altUrlInput) {
-      altUrlInput.addEventListener('input', () => {
+      const syncAltUrl = () => {
         const urlVal = altUrlInput.value.trim();
         if (urlVal) {
           pdfUrlInput.value = urlVal;
-          const inferredName = urlVal.split('/').pop().split('?')[0] || 'Dokumen_Google_Drive.pdf';
-          if (pdfFileNameInput) pdfFileNameInput.value = inferredName;
-          if (fileNameEl) fileNameEl.textContent = inferredName;
-          if (fileMetaEl) fileMetaEl.textContent = 'Tautan Dokumen Online: ' + urlVal;
+          const inferredName = urlVal.split('/').pop().split('?')[0] || 'Dokumen_Online.pdf';
+          if (pdfFileNameInput && !pdfFileNameInput.value) pdfFileNameInput.value = inferredName;
+          if (fileNameEl) fileNameEl.textContent = pdfFileNameInput.value || inferredName;
+          if (fileMetaEl) fileMetaEl.textContent = 'Tautan Dokumen Online: ' + (urlVal.length > 35 ? urlVal.substring(0, 32) + '...' : urlVal);
           if (previewBox) previewBox.style.display = 'flex';
         }
-      });
+      };
+      altUrlInput.addEventListener('input', syncAltUrl);
+      altUrlInput.addEventListener('change', syncAltUrl);
+      altUrlInput.addEventListener('paste', () => setTimeout(syncAltUrl, 50));
     }
   }
 
@@ -1826,6 +1846,8 @@ const AdminApp = (function () {
 
     if (!fileInput || !dropzone || !downloadLinkInput) return;
 
+    const btnSubmitModal = document.getElementById('btn-submit-crud-modal');
+
     const handleFile = (file) => {
       if (!file) return;
       if (!file.name.toLowerCase().endsWith('.pdf') && file.type !== 'application/pdf') {
@@ -1837,14 +1859,24 @@ const AdminApp = (function () {
       const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
       const displaySize = sizeKb > 1024 ? `${sizeMb} MB` : `${sizeKb} KB`;
 
-      if (file.size > 5 * 1024 * 1024) {
-        showToast(`File berukuran ${displaySize}. File PDF di atas 5MB disarankan menggunakan tautan Google Drive untuk performa maksimal.`, 'warning', 6000);
+      if (file.size > 15 * 1024 * 1024) {
+        showToast(`File berukuran ${displaySize}. File PDF di atas 15MB disarankan menggunakan tautan Google Drive.`, 'warning', 6000);
       }
 
-      if (fileMetaEl) fileMetaEl.textContent = 'Membaca dokumen PDF...';
+      window._isReadingPdfFile = true;
+      if (btnSubmitModal) {
+        btnSubmitModal.disabled = true;
+        btnSubmitModal.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses File PDF...';
+      }
+      if (fileMetaEl) fileMetaEl.textContent = `Sedang memuat ${file.name} (${displaySize})...`;
 
       const reader = new FileReader();
       reader.onload = (e) => {
+        window._isReadingPdfFile = false;
+        if (btnSubmitModal) {
+          btnSubmitModal.disabled = false;
+          btnSubmitModal.innerHTML = '<i class="fa-solid fa-check"></i> Simpan Data';
+        }
         const dataUrl = e.target.result;
         downloadLinkInput.value = dataUrl;
         if (fileNoticeInput) fileNoticeInput.value = file.name;
@@ -1854,6 +1886,11 @@ const AdminApp = (function () {
         showToast(`File PDF "${file.name}" (${displaySize}) berhasil dimuat!`, 'success');
       };
       reader.onerror = () => {
+        window._isReadingPdfFile = false;
+        if (btnSubmitModal) {
+          btnSubmitModal.disabled = false;
+          btnSubmitModal.innerHTML = '<i class="fa-solid fa-check"></i> Simpan Data';
+        }
         showToast('Gagal membaca file PDF dari disk.', 'error');
       };
       reader.readAsDataURL(file);
@@ -1944,11 +1981,17 @@ const AdminApp = (function () {
     }
   }
 
-  function saveCrudModal() {
-    if (!currentModalAction) return;
+  async function saveCrudModal() {
+    if (!currentModalAction) return false;
     const { type, id, isEdit } = currentModalAction;
     const form = document.getElementById('form-crud-modal');
-    if (!form) return;
+    if (!form) return false;
+
+    // Pastikan tidak submit saat file sedang dibaca oleh FileReader
+    if (window._isReadingPdfFile) {
+      showToast('Harap tunggu hingga berkas PDF selesai diproses...', 'warning');
+      return false;
+    }
 
     const formData = new FormData(form);
     let items = DB.getSection(type) || [];
@@ -1972,20 +2015,71 @@ const AdminApp = (function () {
 
     if (type === 'galeri' && !newItem.imgUrl) {
       showToast('Harap pilih file gambar dari direktori atau masukkan URL gambar terlebih dahulu!', 'error');
-      return;
+      return false;
     }
 
     if (type === 'karya' && !newItem.thumbnail) {
       showToast('Harap pilih thumbnail gambar website dari direktori atau masukkan URL gambar!', 'error');
-      return;
+      return false;
+    }
+
+    const itemId = isEdit ? id : String(Date.now());
+    newItem.id = itemId;
+
+    // Penanganan khusus berkas PDF Prestasi (IndexedDB + fallback cloud URL)
+    if (type === 'prestasi') {
+      const hiddenUrl = document.getElementById('modal-prestasi-pdf-url');
+      const hiddenName = document.getElementById('modal-prestasi-pdf-filename');
+      const altUrl = document.getElementById('modal-prestasi-alt-pdf-url');
+
+      let finalPdfUrl = (hiddenUrl && hiddenUrl.value.trim()) || newItem.pdfUrl || '';
+      let finalPdfName = (hiddenName && hiddenName.value.trim()) || newItem.pdfFileName || '';
+
+      if (!finalPdfUrl && altUrl && altUrl.value.trim()) {
+        finalPdfUrl = altUrl.value.trim();
+        if (!finalPdfName) {
+          finalPdfName = finalPdfUrl.split('/').pop().split('?')[0] || 'Dokumen_Online.pdf';
+        }
+      }
+
+      if (finalPdfUrl && finalPdfUrl.startsWith('data:')) {
+        if (DB.PdfStore) {
+          await DB.PdfStore.savePdf('prestasi_' + itemId, finalPdfUrl, finalPdfName);
+          newItem.pdfUrl = 'indexeddb:prestasi_' + itemId;
+        } else {
+          newItem.pdfUrl = finalPdfUrl;
+        }
+      } else {
+        newItem.pdfUrl = finalPdfUrl;
+      }
+      newItem.pdfFileName = finalPdfName || (newItem.title ? `${newItem.title}.pdf` : 'Berkas_Sertifikat.pdf');
+    }
+
+    // Penanganan khusus berkas PDF Modul Ajar (IndexedDB + fallback cloud URL)
+    if (type === 'modul') {
+      const hiddenLink = document.getElementById('modal-modul-download-link');
+      const hiddenNotice = document.getElementById('modal-modul-file-notice');
+
+      let finalLink = (hiddenLink && hiddenLink.value.trim()) || newItem.downloadLink || '#';
+      let finalNotice = (hiddenNotice && hiddenNotice.value.trim()) || newItem.fileNotice || '';
+
+      if (finalLink && finalLink.startsWith('data:')) {
+        if (DB.PdfStore) {
+          await DB.PdfStore.savePdf('modul_' + itemId, finalLink, finalNotice);
+          newItem.downloadLink = 'indexeddb:modul_' + itemId;
+        } else {
+          newItem.downloadLink = finalLink;
+        }
+      } else {
+        newItem.downloadLink = finalLink || '#';
+      }
+      newItem.fileNotice = finalNotice || (newItem.title ? `${newItem.title}.pdf` : 'Modul_Ajar.pdf');
     }
 
     if (isEdit) {
-      newItem.id = id;
       items = items.map(x => x.id === id ? Object.assign({}, x, newItem) : x);
       showToast('Data berhasil diperbarui!', 'success');
     } else {
-      newItem.id = String(Date.now());
       items.push(newItem);
       showToast('Data baru berhasil ditambahkan!', 'success');
     }
@@ -1999,6 +2093,8 @@ const AdminApp = (function () {
         if (res.success) showToast('Tersimpan ke Google Sheets!', 'success');
       });
     }
+
+    return true;
   }
 
   function editItem(type, id) {
@@ -2010,6 +2106,14 @@ const AdminApp = (function () {
       let items = DB.getSection(type) || [];
       items = items.filter(x => x.id !== id);
       DB.setSection(type, items);
+
+      if (type === 'prestasi' && DB.PdfStore) {
+        DB.PdfStore.deletePdf('prestasi_' + id);
+      }
+      if (type === 'modul' && DB.PdfStore) {
+        DB.PdfStore.deletePdf('modul_' + id);
+      }
+
       showToast('Data berhasil dihapus.', 'info');
       renderAllViews();
 

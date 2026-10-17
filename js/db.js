@@ -498,6 +498,31 @@ const DB = (function () {
       notifyListeners();
     } catch (e) {
       console.error("Gagal menyimpan ke localStorage", e);
+      // Fallback jika quota localStorage terlampaui (misal string Base64 besar)
+      if (e && (e.name === 'QuotaExceededError' || e.code === 22 || e.number === -2147024882)) {
+        try {
+          const stripped = JSON.parse(JSON.stringify(currentData));
+          if (Array.isArray(stripped.prestasi)) {
+            stripped.prestasi.forEach(p => {
+              if (p.pdfUrl && p.pdfUrl.startsWith('data:')) {
+                p.pdfUrl = 'indexeddb:prestasi_' + p.id;
+              }
+            });
+          }
+          if (Array.isArray(stripped.modul)) {
+            stripped.modul.forEach(m => {
+              if (m.downloadLink && m.downloadLink.startsWith('data:')) {
+                m.downloadLink = 'indexeddb:modul_' + m.id;
+              }
+            });
+          }
+          localStorage.setItem(STORAGE_KEY_DATA, JSON.stringify(stripped));
+          console.log("Penyimpanan localStorage diamankan dengan referensi IndexedDB.");
+          notifyListeners();
+        } catch (innerErr) {
+          console.error("Masih gagal menyimpan fallback ke localStorage:", innerErr);
+        }
+      }
     }
   }
 
@@ -601,34 +626,54 @@ const DB = (function () {
         const incoming = json.data;
         if (incoming.config) currentData.config = Object.assign({}, currentData.config, incoming.config);
         if (Array.isArray(incoming.modul) && incoming.modul.length) {
-          currentData.modul = incoming.modul.map(m => ({
-            id: String(m.ID || m.id || ''),
-            title: m.Judul || m.title || '',
-            category: m.Kategori || m.category || 'modul-ajar',
-            badge: m.Badge || m.badge || '',
-            fase: m.Fase || m.fase || '',
-            snippet: m.Snippet || m.snippet || '',
-            fileNotice: m.FileNotice || m.fileNotice || '',
-            downloadLink: m.DownloadLink || m.downloadLink || '#',
-            cp: m.CP || m.cp || '',
-            atp: m.ATP || m.atp || '',
-            diferensiasi: m.Diferensiasi || m.diferensiasi || '',
-            keywords: m.Keywords || m.keywords || ''
-          }));
+          currentData.modul = incoming.modul.map(m => {
+            const existing = (currentData.modul || []).find(x => String(x.id) === String(m.ID || m.id));
+            let downloadLink = m.DownloadLink || m.downloadLink || '#';
+            let fileNotice = m.FileNotice || m.fileNotice || '';
+            // Pertahankan berkas lokal jika Google Sheets kosong atau referensi indexeddb
+            if ((!downloadLink || downloadLink === '#' || downloadLink.startsWith('indexeddb:')) && existing && existing.downloadLink && existing.downloadLink !== '#') {
+              downloadLink = existing.downloadLink;
+              fileNotice = existing.fileNotice || fileNotice;
+            }
+            return {
+              id: String(m.ID || m.id || ''),
+              title: m.Judul || m.title || '',
+              category: m.Kategori || m.category || 'modul-ajar',
+              badge: m.Badge || m.badge || '',
+              fase: m.Fase || m.fase || '',
+              snippet: m.Snippet || m.snippet || '',
+              fileNotice: fileNotice,
+              downloadLink: downloadLink,
+              cp: m.CP || m.cp || '',
+              atp: m.ATP || m.atp || '',
+              diferensiasi: m.Diferensiasi || m.diferensiasi || '',
+              keywords: m.Keywords || m.keywords || ''
+            };
+          });
         }
         if (Array.isArray(incoming.prestasi) && incoming.prestasi.length) {
-          currentData.prestasi = incoming.prestasi.map(p => ({
-            id: String(p.ID || p.id || ''),
-            year: String(p.Tahun || p.year || ''),
-            title: p.Judul || p.title || '',
-            issuer: p.Penyelenggara || p.issuer || '',
-            category: p.Kategori || p.category || '',
-            icon: p.Icon || p.icon || 'fa-trophy',
-            desc: p.Deskripsi || p.desc || '',
-            highlight: String(p.Highlight || p.highlight).toUpperCase() === 'TRUE',
-            pdfUrl: p.PdfUrl || p.pdfUrl || '',
-            pdfFileName: p.PdfFileName || p.pdfFileName || ''
-          }));
+          currentData.prestasi = incoming.prestasi.map(p => {
+            const existing = (currentData.prestasi || []).find(x => String(x.id) === String(p.ID || p.id));
+            let pdfUrl = p.PdfUrl || p.pdfUrl || '';
+            let pdfFileName = p.PdfFileName || p.pdfFileName || '';
+            // Pertahankan berkas lokal jika Google Sheets kosong atau referensi indexeddb
+            if ((!pdfUrl || pdfUrl.startsWith('indexeddb:')) && existing && existing.pdfUrl) {
+              pdfUrl = existing.pdfUrl;
+              pdfFileName = existing.pdfFileName || pdfFileName;
+            }
+            return {
+              id: String(p.ID || p.id || ''),
+              year: String(p.Tahun || p.year || ''),
+              title: p.Judul || p.title || '',
+              issuer: p.Penyelenggara || p.issuer || '',
+              category: p.Kategori || p.category || '',
+              icon: p.Icon || p.icon || 'fa-trophy',
+              desc: p.Deskripsi || p.desc || '',
+              highlight: String(p.Highlight || p.highlight).toUpperCase() === 'TRUE',
+              pdfUrl: pdfUrl,
+              pdfFileName: pdfFileName
+            };
+          });
         }
         if (Array.isArray(incoming.jadwal) && incoming.jadwal.length) {
           currentData.jadwal = incoming.jadwal.map(j => ({
@@ -742,29 +787,41 @@ const DB = (function () {
         action: 'saveAll',
         data: {
           config: currentData.config,
-          modul: currentData.modul,
-          prestasi: (currentData.prestasi || []).map(p => ({
-            ID: p.id,
-            id: p.id,
-            Tahun: p.year,
-            year: p.year,
-            Judul: p.title,
-            title: p.title,
-            Penyelenggara: p.issuer,
-            issuer: p.issuer,
-            Kategori: p.category,
-            category: p.category,
-            Icon: p.icon,
-            icon: p.icon,
-            Deskripsi: p.desc,
-            desc: p.desc,
-            Highlight: p.highlight,
-            highlight: p.highlight,
-            PdfUrl: p.pdfUrl || '',
-            pdfUrl: p.pdfUrl || '',
-            PdfFileName: p.pdfFileName || '',
-            pdfFileName: p.pdfFileName || ''
-          })),
+          modul: (currentData.modul || []).map(m => {
+            let safeLink = m.downloadLink || '#';
+            if (safeLink.startsWith('data:') && safeLink.length > 500) {
+              safeLink = 'indexeddb:modul_' + m.id;
+            }
+            return Object.assign({}, m, { downloadLink: safeLink });
+          }),
+          prestasi: (currentData.prestasi || []).map(p => {
+            let safePdfUrl = p.pdfUrl || '';
+            if (safePdfUrl.startsWith('data:') && safePdfUrl.length > 500) {
+              safePdfUrl = 'indexeddb:prestasi_' + p.id;
+            }
+            return {
+              ID: p.id,
+              id: p.id,
+              Tahun: p.year,
+              year: p.year,
+              Judul: p.title,
+              title: p.title,
+              Penyelenggara: p.issuer,
+              issuer: p.issuer,
+              Kategori: p.category,
+              category: p.category,
+              Icon: p.icon,
+              icon: p.icon,
+              Deskripsi: p.desc,
+              desc: p.desc,
+              Highlight: p.highlight,
+              highlight: p.highlight,
+              PdfUrl: safePdfUrl,
+              pdfUrl: safePdfUrl,
+              PdfFileName: p.pdfFileName || '',
+              pdfFileName: p.pdfFileName || ''
+            };
+          }),
           jadwal: currentData.jadwal,
           galeri: currentData.galeri,
           karya: (currentData.karya || []).map(k => ({
@@ -1033,14 +1090,128 @@ const DB = (function () {
     }
   }
 
-  // Helper Universal untuk membuka / melihat berkas PDF (Mendukung base64 Data URL, Blob, maupun Link URL)
-  function openPdfDocument(pdfUrl, fileName = 'Dokumen.pdf') {
-    if (!pdfUrl) {
+  /* --------------------------------------------------
+     INDEXEDDB STORE UNTUK BERKAS PDF BESAR
+     (Mencegah QuotaExceededError pada LocalStorage & Google Sheets)
+     -------------------------------------------------- */
+  const PdfStore = (function() {
+    const DB_NAME = 'ProfilGuruPdfStore';
+    const DB_VERSION = 1;
+    const STORE_NAME = 'pdf_files';
+    let dbInstance = null;
+
+    function openDB() {
+      return new Promise((resolve, reject) => {
+        if (dbInstance) return resolve(dbInstance);
+        if (typeof window === 'undefined' || !window.indexedDB) {
+          return reject(new Error('IndexedDB tidak didukung oleh browser ini.'));
+        }
+        const req = window.indexedDB.open(DB_NAME, DB_VERSION);
+        req.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains(STORE_NAME)) {
+            db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+          }
+        };
+        req.onsuccess = (e) => {
+          dbInstance = e.target.result;
+          resolve(dbInstance);
+        };
+        req.onerror = (e) => reject(e.target.error);
+      });
+    }
+
+    async function savePdf(id, dataUrl, fileName) {
+      if (!id || !dataUrl) return false;
+      try {
+        const db = await openDB();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction([STORE_NAME], 'readwrite');
+          const store = tx.objectStore(STORE_NAME);
+          store.put({
+            id: String(id),
+            dataUrl: dataUrl,
+            fileName: fileName || 'Dokumen.pdf',
+            updatedAt: Date.now()
+          });
+          tx.oncomplete = () => resolve(true);
+          tx.onerror = (e) => reject(e.target.error);
+        });
+      } catch (err) {
+        console.warn('Gagal menyimpan PDF ke IndexedDB:', err);
+        return false;
+      }
+    }
+
+    async function getPdf(id) {
+      if (!id) return null;
+      try {
+        const db = await openDB();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction([STORE_NAME], 'readonly');
+          const store = tx.objectStore(STORE_NAME);
+          const req = store.get(String(id));
+          req.onsuccess = (e) => resolve(e.target.result || null);
+          req.onerror = (e) => reject(e.target.error);
+        });
+      } catch (err) {
+        console.warn('Gagal membaca PDF dari IndexedDB:', err);
+        return null;
+      }
+    }
+
+    async function deletePdf(id) {
+      if (!id) return false;
+      try {
+        const db = await openDB();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction([STORE_NAME], 'readwrite');
+          const store = tx.objectStore(STORE_NAME);
+          store.delete(String(id));
+          tx.oncomplete = () => resolve(true);
+          tx.onerror = (e) => reject(e.target.error);
+        });
+      } catch (err) {
+        console.warn('Gagal menghapus PDF dari IndexedDB:', err);
+        return false;
+      }
+    }
+
+    return {
+      openDB,
+      savePdf,
+      getPdf,
+      deletePdf
+    };
+  })();
+
+  // Helper Universal untuk membuka / melihat berkas PDF (Mendukung IndexedDB, base64 Data URL, Blob, maupun Link URL)
+  async function openPdfDocument(pdfUrl, fileName = 'Dokumen.pdf') {
+    if (!pdfUrl || pdfUrl === '#') {
       alert('Berkas PDF belum tersedia atau belum diunggah.');
       return;
     }
 
-    // Jika berupa Base64 Data URL (data:application/pdf... atau data:application/octet-stream... atau data:...)
+    // 1. Jika disimpan di IndexedDB (indexeddb:id_dokumen)
+    if (pdfUrl.startsWith('indexeddb:')) {
+      const id = pdfUrl.replace('indexeddb:', '').trim();
+      try {
+        const record = await PdfStore.getPdf(id);
+        if (record && record.dataUrl) {
+          openPdfDocument(record.dataUrl, record.fileName || fileName);
+          return;
+        } else {
+          alert('Berkas PDF di penyimpanan lokal tidak ditemukan atau telah dibersihkan oleh browser.');
+          return;
+        }
+      } catch (err) {
+        console.error('Error membaca PDF dari IndexedDB:', err);
+        alert('Gagal memuat berkas PDF dari penyimpanan browser.');
+        return;
+      }
+    }
+
+    // 2. Jika berupa Base64 Data URL (data:application/pdf... atau data:...)
     if (pdfUrl.startsWith('data:')) {
       try {
         const parts = pdfUrl.split(';base64,');
@@ -1063,7 +1234,7 @@ const DB = (function () {
           a.target = '_blank';
           document.body.appendChild(a);
           a.click();
-          setTimeout(() => a.remove(), 200);
+          setTimeout(() => a.remove(), 500);
         }
         return;
       } catch (err) {
@@ -1071,7 +1242,7 @@ const DB = (function () {
       }
     }
 
-    // Jika berupa URL http / https / direct link
+    // 3. Jika berupa URL biasa (Google Drive, cloud storage, direct link)
     window.open(pdfUrl, '_blank');
   }
 
@@ -1107,6 +1278,7 @@ const DB = (function () {
     exportBackup,
     importBackup,
     openPdfDocument,
+    PdfStore,
     onDataChanged,
     DEFAULT_DATA
   };
