@@ -1674,6 +1674,12 @@ button {
   flex-shrink: 0;
 }
 
+.award-pdf-btn i.fa-file-image {
+  font-size: 1.15rem;
+  color: #2563eb;
+  flex-shrink: 0;
+}
+
 .award-pdf-text {
   flex: 1;
   overflow: hidden;
@@ -1698,6 +1704,17 @@ button {
 .award-pdf-btn:hover .award-pdf-ext {
   opacity: 1;
   color: #ef4444;
+}
+
+.award-pdf-btn.is-image:hover {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.08);
+  color: #2563eb;
+}
+
+.award-pdf-btn.is-image:hover .award-pdf-ext {
+  opacity: 1;
+  color: #2563eb;
 }
 
 /* --------------------------------------------------

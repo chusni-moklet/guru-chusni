@@ -517,7 +517,14 @@ const AdminApp = (function () {
       return;
     }
 
-    tbody.innerHTML = items.map(p => `
+    tbody.innerHTML = items.map(p => {
+      const isImg = (p.pdfFileName && /\.(jpe?g|png|webp|gif|bmp|svg)$/i.test(p.pdfFileName)) || 
+                    (p.pdfUrl && (p.pdfUrl.startsWith('data:image/') || /\.(jpe?g|png|webp)(\?|$)/i.test(p.pdfUrl)));
+      const badgeClass = isImg ? 'btn-pdf-badge badge-image' : 'btn-pdf-badge';
+      const iconClass = isImg ? 'fa-solid fa-file-image' : 'fa-solid fa-file-pdf';
+      const titleText = isImg ? 'Lihat Berkas Gambar / Sertifikat' : 'Lihat Berkas PDF / Sertifikat';
+      const defaultText = isImg ? 'Lihat Gambar' : 'Lihat PDF';
+      return `
       <tr>
         <td><span class="table-badge" style="background: var(--color-warning-subtle); color: var(--color-warning);">${escapeHtml(p.year)}</span></td>
         <td><strong>${escapeHtml(p.title)}</strong></td>
@@ -525,9 +532,9 @@ const AdminApp = (function () {
         <td>${escapeHtml(p.category)}</td>
         <td>
           ${p.pdfUrl ? `
-            <button type="button" class="btn-pdf-badge" onclick="AdminApp.viewPdf('${escapeHtml(p.id)}')" title="Lihat Berkas PDF / Sertifikat">
-              <i class="fa-solid fa-file-pdf"></i>
-              <span>${escapeHtml(p.pdfFileName ? (p.pdfFileName.length > 18 ? p.pdfFileName.substring(0, 15) + '...' : p.pdfFileName) : 'Lihat PDF')}</span>
+            <button type="button" class="${badgeClass}" onclick="AdminApp.viewPdf('${escapeHtml(p.id)}')" title="${titleText}">
+              <i class="${iconClass}"></i>
+              <span>${escapeHtml(p.pdfFileName ? (p.pdfFileName.length > 18 ? p.pdfFileName.substring(0, 15) + '...' : p.pdfFileName) : defaultText)}</span>
             </button>
           ` : '<span style="color: var(--admin-text-muted); font-size: 0.8rem;">-</span>'}
         </td>
@@ -543,7 +550,8 @@ const AdminApp = (function () {
           </div>
         </td>
       </tr>
-    `).join('');
+      `;
+    }).join('');
   }
 
   /* --------------------------------------------------
@@ -1120,38 +1128,41 @@ const AdminApp = (function () {
             <textarea class="form-control" name="desc" rows="2">${escapeHtml(item ? item.desc : '')}</textarea>
           </div>
 
-          <!-- Upload Berkas PDF (Sertifikat / Piagam / Dokumen) -->
+          ${(() => {
+            const itemIsImg = item && ((item.pdfFileName && /\.(jpe?g|png|webp|gif|bmp|svg)$/i.test(item.pdfFileName)) || (item.pdfUrl && (item.pdfUrl.startsWith('data:image/') || /\.(jpe?g|png|webp)(\?|$)/i.test(item.pdfUrl))));
+            return `
+          <!-- Upload Berkas PDF / Gambar (Sertifikat / Piagam / Dokumen) -->
           <div class="form-group">
-            <label class="form-label"><i class="fa-solid fa-file-pdf text-danger"></i> Upload Berkas / Sertifikat (PDF)</label>
+            <label class="form-label"><i class="fa-solid fa-file-lines text-primary"></i> Upload Berkas / Sertifikat (PDF atau Gambar)</label>
             <div class="file-upload-wrapper">
-              <input type="file" id="modal-prestasi-pdf-input" accept=".pdf,application/pdf" style="display: none;">
+              <input type="file" id="modal-prestasi-pdf-input" accept=".pdf,application/pdf,image/png,image/jpeg,image/jpg,image/webp" style="display: none;">
               
               <div class="file-upload-dropzone pdf-dropzone" id="modal-prestasi-pdf-dropzone">
-                <div class="upload-icon" style="color: #ef4444;"><i class="fa-solid fa-file-arrow-up"></i></div>
+                <div class="upload-icon" id="modal-prestasi-dropzone-icon" style="color: var(--color-primary);"><i class="fa-solid fa-cloud-arrow-up"></i></div>
                 <div class="upload-text">
-                  <span class="upload-main-text"><strong>Klik untuk memilih berkas PDF</strong> atau seret file ke sini</span>
-                  <span class="upload-sub-text">Pilih file PDF sertifikat/piagam dari direktori komputer (Format .pdf)</span>
+                  <span class="upload-main-text"><strong>Klik untuk memilih berkas PDF atau Gambar</strong> atau seret ke sini</span>
+                  <span class="upload-sub-text">Pilih file sertifikat/piagam (Format .pdf, .jpg, .png, .webp)</span>
                 </div>
-                <button type="button" class="btn-browse-file" id="modal-prestasi-btn-browse" style="border-color: #ef4444; color: #ef4444;">Pilih File PDF</button>
+                <button type="button" class="btn-browse-file" id="modal-prestasi-btn-browse" style="border-color: var(--color-primary); color: var(--color-primary);">Pilih Berkas</button>
               </div>
 
-              <!-- Preview info file PDF terpilih -->
-              <div class="upload-preview-container pdf-preview-card" id="modal-prestasi-pdf-preview" style="${item && item.pdfUrl ? 'display: flex;' : 'display: none;'}">
-                <div class="pdf-preview-icon">
-                  <i class="fa-solid fa-file-pdf"></i>
+              <!-- Preview info file terpilih -->
+              <div class="upload-preview-container pdf-preview-card ${itemIsImg ? 'is-image' : ''}" id="modal-prestasi-pdf-preview" style="${item && item.pdfUrl ? 'display: flex;' : 'display: none;'}">
+                <div class="pdf-preview-icon ${itemIsImg ? 'is-image' : ''}" id="modal-prestasi-pdf-preview-icon">
+                  <i class="fa-solid ${itemIsImg ? 'fa-file-image' : 'fa-file-pdf'}"></i>
                 </div>
                 <div class="upload-preview-details">
-                  <span id="modal-prestasi-pdf-name" class="upload-file-name">${item && item.pdfFileName ? escapeHtml(item.pdfFileName) : (item && item.pdfUrl ? 'Dokumen_Sertifikat.pdf' : 'Berkas PDF')}</span>
-                  <span id="modal-prestasi-pdf-meta" class="upload-file-meta">${item && item.pdfUrl ? 'Dokumen PDF tersimpan & siap dilihat' : 'Siap disimpan'}</span>
+                  <span id="modal-prestasi-pdf-name" class="upload-file-name">${item && item.pdfFileName ? escapeHtml(item.pdfFileName) : (item && item.pdfUrl ? (itemIsImg ? 'Dokumen_Sertifikat.jpg' : 'Dokumen_Sertifikat.pdf') : 'Berkas Sertifikat')}</span>
+                  <span id="modal-prestasi-pdf-meta" class="upload-file-meta">${item && item.pdfUrl ? 'Berkas tersimpan & siap dilihat' : 'Siap disimpan'}</span>
                 </div>
                 <div class="upload-preview-actions" style="display: flex; gap: 0.35rem;">
-                  <button type="button" class="btn-topbar-action" id="modal-prestasi-btn-view-pdf" title="Lihat / Pratinjau Dokumen PDF">
+                  <button type="button" class="btn-topbar-action" id="modal-prestasi-btn-view-pdf" title="Lihat / Pratinjau Berkas">
                     <i class="fa-solid fa-eye"></i> Buka
                   </button>
-                  <button type="button" class="btn-topbar-action" id="modal-prestasi-btn-change-pdf" title="Ganti File PDF">
+                  <button type="button" class="btn-topbar-action" id="modal-prestasi-btn-change-pdf" title="Ganti File">
                     <i class="fa-solid fa-arrows-rotate"></i> Ganti
                   </button>
-                  <button type="button" class="btn-action delete" id="modal-prestasi-btn-remove-pdf" title="Hapus Berkas PDF">
+                  <button type="button" class="btn-action delete" id="modal-prestasi-btn-remove-pdf" title="Hapus Berkas">
                     <i class="fa-solid fa-trash"></i>
                   </button>
                 </div>
@@ -1164,15 +1175,17 @@ const AdminApp = (function () {
               <!-- Alternatif: URL Google Drive / Link Cloud -->
               <div class="alt-url-toggle" style="margin-top: 0.5rem; font-size: 0.8rem;">
                 <button type="button" id="btn-toggle-prestasi-pdf-url" style="background: none; border: none; color: var(--color-primary); cursor: pointer; text-decoration: underline; padding: 0;">
-                  <i class="fa-solid fa-link"></i> Atau gunakan Tautan URL Dokumen (Google Drive / Cloud)
+                  <i class="fa-solid fa-link"></i> Atau gunakan Tautan URL Dokumen / Gambar (Google Drive / Cloud)
                 </button>
               </div>
               <div id="wrapper-alt-prestasi-pdf-url" style="display: ${item && item.pdfUrl && !item.pdfUrl.startsWith('data:') && !item.pdfUrl.startsWith('indexeddb:') ? 'block' : 'none'}; margin-top: 0.5rem;">
                 <input type="text" class="form-control" name="altPdfUrl" id="modal-prestasi-alt-pdf-url" placeholder="https://drive.google.com/file/d/... atau https://..." value="${escapeHtml(item && item.pdfUrl && !item.pdfUrl.startsWith('data:') && !item.pdfUrl.startsWith('indexeddb:') ? item.pdfUrl : '')}">
-                <span style="font-size: 0.75rem; color: var(--admin-text-muted);">Masukkan link shareable Google Drive bila file PDF disimpan di cloud.</span>
+                <span style="font-size: 0.75rem; color: var(--admin-text-muted);">Masukkan tautan shareable Google Drive / Cloud bila berkas disimpan secara daring.</span>
               </div>
             </div>
           </div>
+            `;
+          })()}
 
           <div class="form-grid-2">
             <div class="form-group">
@@ -1409,7 +1422,7 @@ const AdminApp = (function () {
   /* --------------------------------------------------
      HELPER PROSES GAMBAR DARI DIREKTORI (CANVAS RESIZER)
      -------------------------------------------------- */
-  function processImageFile(file, maxWidth = 800, maxHeight = 600, quality = 0.78) {
+  function processImageFile(file, maxWidth = 800, maxHeight = 600, quality = 0.78, strictSizeLimit = true) {
     return new Promise((resolve, reject) => {
       if (!file || !file.type.startsWith('image/')) {
         return reject(new Error('File yang dipilih bukan berkas gambar yang valid.'));
@@ -1438,11 +1451,11 @@ const AdminApp = (function () {
           let dataUrl = canvas.toDataURL('image/jpeg', quality);
 
           // Jika string dataURL melebihi 45.000 karakter (batas aman Google Sheets adalah 50.000 karakter per cell),
-          // kompres ulang secara bertahap agar aman tersimpan di Google Sheets & localStorage
-          if (dataUrl.length > 45000) {
+          // kompres ulang secara bertahap bila strictSizeLimit aktif (misal foto profil, galeri, thumbnail karya)
+          if (strictSizeLimit && dataUrl.length > 45000) {
             dataUrl = canvas.toDataURL('image/jpeg', 0.65);
           }
-          if (dataUrl.length > 45000) {
+          if (strictSizeLimit && dataUrl.length > 45000) {
             const smallerCanvas = document.createElement('canvas');
             smallerCanvas.width = Math.round(width * 0.75);
             smallerCanvas.height = Math.round(height * 0.75);
@@ -1668,6 +1681,7 @@ const AdminApp = (function () {
     const dropzone = document.getElementById('modal-prestasi-pdf-dropzone');
     const btnBrowse = document.getElementById('modal-prestasi-btn-browse');
     const previewBox = document.getElementById('modal-prestasi-pdf-preview');
+    const previewIcon = document.getElementById('modal-prestasi-pdf-preview-icon');
     const fileNameEl = document.getElementById('modal-prestasi-pdf-name');
     const fileMetaEl = document.getElementById('modal-prestasi-pdf-meta');
     const btnView = document.getElementById('modal-prestasi-btn-view-pdf');
@@ -1683,10 +1697,33 @@ const AdminApp = (function () {
 
     const btnSubmitModal = document.getElementById('btn-submit-crud-modal');
 
-    const handleFile = (file) => {
+    const updatePreviewIcon = (isImg) => {
+      if (previewIcon) {
+        if (isImg) {
+          previewIcon.className = 'pdf-preview-icon is-image';
+          previewIcon.innerHTML = '<i class="fa-solid fa-file-image"></i>';
+        } else {
+          previewIcon.className = 'pdf-preview-icon';
+          previewIcon.innerHTML = '<i class="fa-solid fa-file-pdf"></i>';
+        }
+      }
+      if (previewBox) {
+        if (isImg) {
+          previewBox.classList.add('is-image');
+        } else {
+          previewBox.classList.remove('is-image');
+        }
+      }
+    };
+
+    const handleFile = async (file) => {
       if (!file) return;
-      if (!file.name.toLowerCase().endsWith('.pdf') && file.type !== 'application/pdf') {
-        showToast('Harap pilih dokumen sertifikat berformat .pdf!', 'error');
+
+      const isPdf = file.name.toLowerCase().endsWith('.pdf') || file.type === 'application/pdf';
+      const isImage = file.type.startsWith('image/') || /\.(jpe?g|png|webp|gif|bmp)$/i.test(file.name);
+
+      if (!isPdf && !isImage) {
+        showToast('Harap pilih dokumen sertifikat berformat PDF (.pdf) atau gambar (.jpg, .png, .webp)!', 'error');
         return;
       }
 
@@ -1694,42 +1731,71 @@ const AdminApp = (function () {
       const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
       const displaySize = sizeKb > 1024 ? `${sizeMb} MB` : `${sizeKb} KB`;
 
-      if (file.size > 15 * 1024 * 1024) {
-        showToast(`File berukuran ${displaySize}. File PDF di atas 15MB disarankan menggunakan tautan Google Drive.`, 'warning', 6000);
-      }
-
       window._isReadingPdfFile = true;
       if (btnSubmitModal) {
         btnSubmitModal.disabled = true;
-        btnSubmitModal.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses File PDF...';
+        btnSubmitModal.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Memproses ${isImage ? 'Gambar' : 'PDF'}...`;
       }
       if (fileMetaEl) fileMetaEl.textContent = `Sedang memuat ${file.name} (${displaySize})...`;
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        window._isReadingPdfFile = false;
-        if (btnSubmitModal) {
-          btnSubmitModal.disabled = false;
-          btnSubmitModal.innerHTML = '<i class="fa-solid fa-check"></i> Simpan Data';
+      if (isImage) {
+        try {
+          // Kompresi berkualitas tinggi untuk sertifikat/piagam gambar
+          const res = await processImageFile(file, 1800, 1400, 0.88, false);
+          window._isReadingPdfFile = false;
+          if (btnSubmitModal) {
+            btnSubmitModal.disabled = false;
+            btnSubmitModal.innerHTML = '<i class="fa-solid fa-check"></i> Simpan Data';
+          }
+          pdfUrlInput.value = res.dataUrl;
+          if (pdfFileNameInput) pdfFileNameInput.value = file.name;
+          if (fileNameEl) fileNameEl.textContent = file.name;
+          if (fileMetaEl) fileMetaEl.textContent = `Gambar (${res.sizeKb} KB) • Siap disimpan`;
+          updatePreviewIcon(true);
+          if (previewBox) previewBox.style.display = 'flex';
+          if (altUrlInput) altUrlInput.value = '';
+          showToast(`Gambar sertifikat "${file.name}" berhasil dimuat!`, 'success');
+        } catch (err) {
+          window._isReadingPdfFile = false;
+          if (btnSubmitModal) {
+            btnSubmitModal.disabled = false;
+            btnSubmitModal.innerHTML = '<i class="fa-solid fa-check"></i> Simpan Data';
+          }
+          showToast('Gagal memproses file gambar sertifikat.', 'error');
         }
-        const dataUrl = e.target.result;
-        pdfUrlInput.value = dataUrl;
-        if (pdfFileNameInput) pdfFileNameInput.value = file.name;
-        if (fileNameEl) fileNameEl.textContent = file.name;
-        if (fileMetaEl) fileMetaEl.textContent = `Ukuran: ${displaySize} • Siap disimpan`;
-        if (previewBox) previewBox.style.display = 'flex';
-        if (altUrlInput) altUrlInput.value = '';
-        showToast(`File PDF "${file.name}" (${displaySize}) berhasil dimuat!`, 'success');
-      };
-      reader.onerror = () => {
-        window._isReadingPdfFile = false;
-        if (btnSubmitModal) {
-          btnSubmitModal.disabled = false;
-          btnSubmitModal.innerHTML = '<i class="fa-solid fa-check"></i> Simpan Data';
+      } else {
+        // Berkas format PDF
+        if (file.size > 15 * 1024 * 1024) {
+          showToast(`File berukuran ${displaySize}. File PDF di atas 15MB disarankan menggunakan tautan Google Drive.`, 'warning', 6000);
         }
-        showToast('Gagal membaca file PDF dari disk.', 'error');
-      };
-      reader.readAsDataURL(file);
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          window._isReadingPdfFile = false;
+          if (btnSubmitModal) {
+            btnSubmitModal.disabled = false;
+            btnSubmitModal.innerHTML = '<i class="fa-solid fa-check"></i> Simpan Data';
+          }
+          const dataUrl = e.target.result;
+          pdfUrlInput.value = dataUrl;
+          if (pdfFileNameInput) pdfFileNameInput.value = file.name;
+          if (fileNameEl) fileNameEl.textContent = file.name;
+          if (fileMetaEl) fileMetaEl.textContent = `PDF (${displaySize}) • Siap disimpan`;
+          updatePreviewIcon(false);
+          if (previewBox) previewBox.style.display = 'flex';
+          if (altUrlInput) altUrlInput.value = '';
+          showToast(`File PDF "${file.name}" (${displaySize}) berhasil dimuat!`, 'success');
+        };
+        reader.onerror = () => {
+          window._isReadingPdfFile = false;
+          if (btnSubmitModal) {
+            btnSubmitModal.disabled = false;
+            btnSubmitModal.innerHTML = '<i class="fa-solid fa-check"></i> Simpan Data';
+          }
+          showToast('Gagal membaca file PDF dari disk.', 'error');
+        };
+        reader.readAsDataURL(file);
+      }
     };
 
     fileInput.addEventListener('change', (e) => {
@@ -1759,7 +1825,7 @@ const AdminApp = (function () {
         if (pdfFileNameInput) pdfFileNameInput.value = '';
         if (altUrlInput) altUrlInput.value = '';
         if (previewBox) previewBox.style.display = 'none';
-        showToast('Berkas PDF dihapus.', 'info');
+        showToast('Berkas sertifikat dihapus.', 'info');
       });
     }
 
@@ -1767,7 +1833,7 @@ const AdminApp = (function () {
       btnView.addEventListener('click', (e) => {
         e.stopPropagation();
         const url = pdfUrlInput.value;
-        const name = (pdfFileNameInput && pdfFileNameInput.value) || 'Sertifikat.pdf';
+        const name = (pdfFileNameInput && pdfFileNameInput.value) || 'Sertifikat';
         if (url) {
           if (window.openPdfDocument) {
             window.openPdfDocument(url, name);
@@ -1775,7 +1841,7 @@ const AdminApp = (function () {
             window.open(url, '_blank');
           }
         } else {
-          showToast('Belum ada berkas PDF yang dipilih.', 'warning');
+          showToast('Belum ada berkas yang dipilih.', 'warning');
         }
       });
     }
@@ -1818,10 +1884,12 @@ const AdminApp = (function () {
         const urlVal = altUrlInput.value.trim();
         if (urlVal) {
           pdfUrlInput.value = urlVal;
-          const inferredName = urlVal.split('/').pop().split('?')[0] || 'Dokumen_Online.pdf';
+          const inferredName = urlVal.split('/').pop().split('?')[0] || 'Dokumen_Online';
+          const isImg = /\.(jpe?g|png|webp|gif|bmp|svg)$/i.test(inferredName);
+          updatePreviewIcon(isImg);
           if (pdfFileNameInput && !pdfFileNameInput.value) pdfFileNameInput.value = inferredName;
           if (fileNameEl) fileNameEl.textContent = pdfFileNameInput.value || inferredName;
-          if (fileMetaEl) fileMetaEl.textContent = 'Tautan Dokumen Online: ' + (urlVal.length > 35 ? urlVal.substring(0, 32) + '...' : urlVal);
+          if (fileMetaEl) fileMetaEl.textContent = 'Tautan Berkas Online: ' + (urlVal.length > 35 ? urlVal.substring(0, 32) + '...' : urlVal);
           if (previewBox) previewBox.style.display = 'flex';
         }
       };
@@ -1989,7 +2057,7 @@ const AdminApp = (function () {
 
     // Pastikan tidak submit saat file sedang dibaca oleh FileReader
     if (window._isReadingPdfFile) {
-      showToast('Harap tunggu hingga berkas PDF selesai diproses...', 'warning');
+      showToast('Harap tunggu hingga berkas selesai diproses...', 'warning');
       return false;
     }
 
@@ -2026,7 +2094,7 @@ const AdminApp = (function () {
     const itemId = isEdit ? id : String(Date.now());
     newItem.id = itemId;
 
-    // Penanganan khusus berkas PDF Prestasi (IndexedDB + fallback cloud URL)
+    // Penanganan khusus berkas Prestasi (PDF / Gambar - IndexedDB + fallback cloud URL)
     if (type === 'prestasi') {
       const hiddenUrl = document.getElementById('modal-prestasi-pdf-url');
       const hiddenName = document.getElementById('modal-prestasi-pdf-filename');
@@ -2038,7 +2106,7 @@ const AdminApp = (function () {
       if (!finalPdfUrl && altUrl && altUrl.value.trim()) {
         finalPdfUrl = altUrl.value.trim();
         if (!finalPdfName) {
-          finalPdfName = finalPdfUrl.split('/').pop().split('?')[0] || 'Dokumen_Online.pdf';
+          finalPdfName = finalPdfUrl.split('/').pop().split('?')[0] || 'Dokumen_Online';
         }
       }
 
@@ -2052,7 +2120,9 @@ const AdminApp = (function () {
       } else {
         newItem.pdfUrl = finalPdfUrl;
       }
-      newItem.pdfFileName = finalPdfName || (newItem.title ? `${newItem.title}.pdf` : 'Berkas_Sertifikat.pdf');
+      const isImg = (finalPdfName && /\.(jpe?g|png|webp|gif|bmp|svg)$/i.test(finalPdfName)) || (finalPdfUrl && finalPdfUrl.startsWith('data:image/'));
+      const defaultExt = isImg ? 'jpg' : 'pdf';
+      newItem.pdfFileName = finalPdfName || (newItem.title ? `${newItem.title}.${defaultExt}` : `Berkas_Sertifikat.${defaultExt}`);
     }
 
     // Penanganan khusus berkas PDF Modul Ajar (IndexedDB + fallback cloud URL)
@@ -2183,11 +2253,13 @@ const AdminApp = (function () {
     const items = DB.getSection('prestasi') || [];
     const item = items.find(x => x.id === id);
     if (!item || !item.pdfUrl) {
-      showToast('Berkas PDF belum tersedia atau belum diunggah untuk prestasi ini.', 'warning');
+      showToast('Berkas sertifikat belum tersedia atau belum diunggah untuk prestasi ini.', 'warning');
       return;
     }
+    const isImg = (item.pdfFileName && /\.(jpe?g|png|webp|gif|bmp|svg)$/i.test(item.pdfFileName)) || (item.pdfUrl && item.pdfUrl.startsWith('data:image/'));
+    const defaultName = isImg ? `${item.title || 'Sertifikat'}.jpg` : `${item.title || 'Sertifikat'}.pdf`;
     if (window.openPdfDocument) {
-      window.openPdfDocument(item.pdfUrl, item.pdfFileName || `${item.title}.pdf`);
+      window.openPdfDocument(item.pdfUrl, item.pdfFileName || defaultName);
     } else {
       window.open(item.pdfUrl, '_blank');
     }

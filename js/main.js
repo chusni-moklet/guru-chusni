@@ -240,15 +240,24 @@ function renderDynamicPrestasi(prestasiList) {
       <h3 class="award-name">${escapeHtml(p.title)}</h3>
       <p class="award-issuer">${escapeHtml(p.issuer)}</p>
       <p class="award-desc">${escapeHtml(p.desc)}</p>
-      ${p.pdfUrl ? `
+      ${p.pdfUrl ? (() => {
+        const isImg = (p.pdfFileName && /\.(jpe?g|png|webp|gif|bmp|svg)$/i.test(p.pdfFileName)) || 
+                      (p.pdfUrl && (p.pdfUrl.startsWith('data:image/') || /\.(jpe?g|png|webp)(\?|$)/i.test(p.pdfUrl)));
+        const btnClass = isImg ? 'award-pdf-btn is-image' : 'award-pdf-btn';
+        const iconClass = isImg ? 'fa-solid fa-file-image' : 'fa-solid fa-file-pdf';
+        const titleText = isImg ? 'Lihat Berkas / Sertifikat (Gambar)' : 'Lihat Berkas / Sertifikat (PDF)';
+        const defaultName = isImg ? 'Sertifikat.jpg' : 'Sertifikat.pdf';
+        const defaultLabel = isImg ? 'Lihat Sertifikat (Gambar)' : 'Lihat Sertifikat (PDF)';
+        return `
         <div class="award-pdf-wrap">
-          <button type="button" class="award-pdf-btn" onclick="window.openPdfDocument('${escapeHtml(p.pdfUrl)}', '${escapeHtml(p.pdfFileName || 'Sertifikat.pdf')}')" title="Lihat Berkas / Sertifikat (PDF)">
-            <i class="fa-solid fa-file-pdf"></i>
-            <span class="award-pdf-text">${escapeHtml(p.pdfFileName ? (p.pdfFileName.length > 25 ? p.pdfFileName.substring(0, 22) + '...' : p.pdfFileName) : 'Lihat Sertifikat (PDF)')}</span>
+          <button type="button" class="${btnClass}" onclick="window.openPdfDocument('${escapeHtml(p.pdfUrl)}', '${escapeHtml(p.pdfFileName || defaultName)}')" title="${titleText}">
+            <i class="${iconClass}"></i>
+            <span class="award-pdf-text">${escapeHtml(p.pdfFileName ? (p.pdfFileName.length > 25 ? p.pdfFileName.substring(0, 22) + '...' : p.pdfFileName) : defaultLabel)}</span>
             <i class="fa-solid fa-arrow-up-right-from-square award-pdf-ext"></i>
           </button>
         </div>
-      ` : ''}
+        `;
+      })() : ''}
     </div>
   `).join('');
 }

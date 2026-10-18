@@ -1193,3 +1193,24 @@ body {
   transform: translateY(-1px);
   box-shadow: var(--shadow-sm);
 }
+
+.btn-pdf-badge.badge-image {
+  border-color: #3b82f6;
+  color: #2563eb;
+  background: #eff6ff;
+}
+
+.btn-pdf-badge.badge-image:hover {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.pdf-preview-card.is-image {
+  border-color: #93c5fd;
+}
+
+.pdf-preview-icon.is-image {
+  background: #dbeafe;
+  color: #2563eb;
+}
+

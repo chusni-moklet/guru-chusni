@@ -1185,10 +1185,10 @@ const DB = (function () {
     };
   })();
 
-  // Helper Universal untuk membuka / melihat berkas PDF (Mendukung IndexedDB, base64 Data URL, Blob, maupun Link URL)
+  // Helper Universal untuk membuka / melihat berkas PDF & Gambar (Mendukung IndexedDB, base64 Data URL, Blob, maupun Link URL)
   async function openPdfDocument(pdfUrl, fileName = 'Dokumen.pdf') {
     if (!pdfUrl || pdfUrl === '#') {
-      alert('Berkas PDF belum tersedia atau belum diunggah.');
+      alert('Berkas (PDF / Gambar) belum tersedia atau belum diunggah.');
       return;
     }
 
@@ -1201,17 +1201,17 @@ const DB = (function () {
           openPdfDocument(record.dataUrl, record.fileName || fileName);
           return;
         } else {
-          alert('Berkas PDF di penyimpanan lokal tidak ditemukan atau telah dibersihkan oleh browser.');
+          alert('Berkas di penyimpanan lokal tidak ditemukan atau telah dibersihkan oleh browser.');
           return;
         }
       } catch (err) {
-        console.error('Error membaca PDF dari IndexedDB:', err);
-        alert('Gagal memuat berkas PDF dari penyimpanan browser.');
+        console.error('Error membaca berkas dari IndexedDB:', err);
+        alert('Gagal memuat berkas dari penyimpanan browser.');
         return;
       }
     }
 
-    // 2. Jika berupa Base64 Data URL (data:application/pdf... atau data:...)
+    // 2. Jika berupa Base64 Data URL (data:application/pdf... atau data:image/...)
     if (pdfUrl.startsWith('data:')) {
       try {
         const parts = pdfUrl.split(';base64,');
@@ -1230,7 +1230,7 @@ const DB = (function () {
           // Jika diblokir pop-up blocker browser, gunakan simulasi klik download
           const a = document.createElement('a');
           a.href = blobUrl;
-          a.download = fileName || 'Dokumen.pdf';
+          a.download = fileName || 'Dokumen';
           a.target = '_blank';
           document.body.appendChild(a);
           a.click();
@@ -1238,7 +1238,7 @@ const DB = (function () {
         }
         return;
       } catch (err) {
-        console.error('Gagal membuka Blob PDF:', err);
+        console.error('Gagal membuka Blob Dokumen:', err);
       }
     }
 
@@ -1278,6 +1278,7 @@ const DB = (function () {
     exportBackup,
     importBackup,
     openPdfDocument,
+    openDocument: openPdfDocument,
     PdfStore,
     onDataChanged,
     DEFAULT_DATA
@@ -1287,3 +1288,4 @@ const DB = (function () {
 // Ekspor ke window agar bisa diakses di main.js & admin.js
 window.DB = DB;
 window.openPdfDocument = DB.openPdfDocument;
+window.openDocument = DB.openPdfDocument;
