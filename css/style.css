@@ -1720,14 +1720,18 @@ button {
 /* --------------------------------------------------
    11-TOGGLE. TOMBOL LIHAT LEBIH BANYAK (MINIMIZE / MAXIMIZE)
    -------------------------------------------------- */
-.awards-toggle-wrap {
+.awards-toggle-wrap,
+.karya-toggle-wrap,
+.gallery-toggle-wrap {
   margin-top: 2.75rem;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.btn-toggle-awards {
+.btn-toggle-awards,
+.btn-toggle-karya,
+.btn-toggle-gallery {
   display: inline-flex;
   align-items: center;
   gap: 0.75rem;
@@ -1744,14 +1748,21 @@ button {
   text-decoration: none;
 }
 
-.btn-toggle-awards:hover {
+.btn-toggle-awards:hover,
+.btn-toggle-karya:hover,
+.btn-toggle-gallery:hover {
   background: var(--brand-primary);
   color: #ffffff;
   transform: translateY(-2px);
   box-shadow: 0 10px 24px -6px rgba(37, 99, 235, 0.35);
 }
 
-.btn-toggle-awards .btn-toggle-awards-icon {
+.btn-toggle-awards .btn-toggle-awards-icon,
+.btn-toggle-karya .btn-toggle-awards-icon,
+.btn-toggle-gallery .btn-toggle-awards-icon,
+.btn-toggle-awards .btn-toggle-icon,
+.btn-toggle-karya .btn-toggle-icon,
+.btn-toggle-gallery .btn-toggle-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1764,35 +1775,56 @@ button {
   transition: all var(--transition-normal);
 }
 
-.btn-toggle-awards:hover .btn-toggle-awards-icon {
+.btn-toggle-awards:hover .btn-toggle-awards-icon,
+.btn-toggle-karya:hover .btn-toggle-awards-icon,
+.btn-toggle-gallery:hover .btn-toggle-awards-icon,
+.btn-toggle-awards:hover .btn-toggle-icon,
+.btn-toggle-karya:hover .btn-toggle-icon,
+.btn-toggle-gallery:hover .btn-toggle-icon {
   background: rgba(255, 255, 255, 0.25);
   color: #ffffff;
 }
 
-.btn-toggle-awards.is-expanded {
+.btn-toggle-awards.is-expanded,
+.btn-toggle-karya.is-expanded,
+.btn-toggle-gallery.is-expanded {
   border-color: var(--border-color);
   background: var(--bg-card);
   color: var(--text-secondary);
 }
 
-.btn-toggle-awards.is-expanded:hover {
+.btn-toggle-awards.is-expanded:hover,
+.btn-toggle-karya.is-expanded:hover,
+.btn-toggle-gallery.is-expanded:hover {
   background: var(--bg-tertiary);
   color: var(--text-primary);
   border-color: var(--brand-primary);
   box-shadow: var(--shadow-sm);
 }
 
-.btn-toggle-awards.is-expanded .btn-toggle-awards-icon {
+.btn-toggle-awards.is-expanded .btn-toggle-awards-icon,
+.btn-toggle-karya.is-expanded .btn-toggle-awards-icon,
+.btn-toggle-gallery.is-expanded .btn-toggle-awards-icon,
+.btn-toggle-awards.is-expanded .btn-toggle-icon,
+.btn-toggle-karya.is-expanded .btn-toggle-icon,
+.btn-toggle-gallery.is-expanded .btn-toggle-icon {
   background: var(--bg-tertiary);
   color: var(--text-secondary);
 }
 
-.btn-toggle-awards.is-expanded:hover .btn-toggle-awards-icon {
+.btn-toggle-awards.is-expanded:hover .btn-toggle-awards-icon,
+.btn-toggle-karya.is-expanded:hover .btn-toggle-awards-icon,
+.btn-toggle-gallery.is-expanded:hover .btn-toggle-awards-icon,
+.btn-toggle-awards.is-expanded:hover .btn-toggle-icon,
+.btn-toggle-karya.is-expanded:hover .btn-toggle-icon,
+.btn-toggle-gallery.is-expanded:hover .btn-toggle-icon {
   background: var(--brand-light);
   color: var(--brand-primary);
 }
 
-.award-card.award-card-extra {
+.award-card.award-card-extra,
+.project-card.project-card-extra,
+.gallery-item.gallery-item-extra {
   animation: awardFadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
@@ -1808,7 +1840,9 @@ button {
 }
 
 @media (max-width: 576px) {
-  .btn-toggle-awards {
+  .btn-toggle-awards,
+  .btn-toggle-karya,
+  .btn-toggle-gallery {
     width: 100%;
     justify-content: center;
     padding: 0.8rem 1.25rem;

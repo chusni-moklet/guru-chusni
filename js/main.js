@@ -336,6 +336,8 @@ function renderAwardsToggleButton(toggleWrap, total, limit) {
   }
 }
 
+let isKaryaExpanded = false;
+
 function renderDynamicKarya(karyaList) {
   const container = document.getElementById('karya-grid');
   if (!container) return;
@@ -344,8 +346,17 @@ function renderDynamicKarya(karyaList) {
   }
   if (!karyaList || !karyaList.length) return;
 
-  container.innerHTML = karyaList.map(item => `
-    <article class="project-card">
+  const LIMIT = 6;
+  const total = karyaList.length;
+  const hasMore = total > LIMIT;
+
+  container.innerHTML = karyaList.map((item, index) => {
+    const isExtra = index >= LIMIT;
+    const cardStyle = (isExtra && !isKaryaExpanded) ? 'display: none;' : '';
+    const extraClass = isExtra ? 'project-card-extra' : '';
+
+    return `
+    <article class="project-card ${extraClass}" ${cardStyle ? `style="${cardStyle}"` : ''}>
       <div class="project-thumb-box">
         <img src="${escapeHtml(item.thumbnail || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80')}" alt="${escapeHtml(item.title || 'Website')}" loading="lazy">
         <div class="project-thumb-badge"><i class="fa-solid fa-globe"></i> Website</div>
@@ -360,8 +371,76 @@ function renderDynamicKarya(karyaList) {
         </div>
       </div>
     </article>
-  `).join('');
+    `;
+  }).join('');
+
+  // Handle Kontainer Tombol Toggle Karya (Minimize / Maximize)
+  let toggleWrap = document.getElementById('karya-toggle-wrap');
+  if (!toggleWrap) {
+    toggleWrap = document.createElement('div');
+    toggleWrap.id = 'karya-toggle-wrap';
+    toggleWrap.className = 'karya-toggle-wrap text-center';
+    container.parentNode.insertBefore(toggleWrap, container.nextSibling);
+  }
+
+  if (hasMore) {
+    toggleWrap.style.display = 'flex';
+    renderKaryaToggleButton(toggleWrap, total, LIMIT);
+  } else {
+    toggleWrap.style.display = 'none';
+    toggleWrap.innerHTML = '';
+  }
 }
+
+function renderKaryaToggleButton(toggleWrap, total, limit) {
+  const extraCount = total - limit;
+  toggleWrap.innerHTML = `
+    <button type="button" class="btn btn-toggle-karya ${isKaryaExpanded ? 'is-expanded' : ''}" id="btn-toggle-karya" aria-expanded="${isKaryaExpanded ? 'true' : 'false'}">
+      <span class="btn-toggle-icon"><i class="fa-solid ${isKaryaExpanded ? 'fa-chevron-up' : 'fa-chevron-down'}"></i></span>
+      <span class="btn-toggle-text">${isKaryaExpanded ? 'Tampilkan Lebih Sedikit (Minimize)' : `Lihat Lebih Banyak (${extraCount} Karya Lainnya)`}</span>
+    </button>
+  `;
+
+  const btn = toggleWrap.querySelector('#btn-toggle-karya');
+  if (btn) {
+    btn.onclick = () => {
+      isKaryaExpanded = !isKaryaExpanded;
+      const extraCards = document.querySelectorAll('.project-card-extra');
+
+      if (isKaryaExpanded) {
+        extraCards.forEach(card => {
+          card.style.display = 'flex';
+        });
+        btn.classList.add('is-expanded');
+        btn.setAttribute('aria-expanded', 'true');
+        const icon = btn.querySelector('.btn-toggle-icon i');
+        if (icon) icon.className = 'fa-solid fa-chevron-up';
+        const text = btn.querySelector('.btn-toggle-text');
+        if (text) text.textContent = 'Tampilkan Lebih Sedikit (Minimize)';
+      } else {
+        extraCards.forEach(card => {
+          card.style.display = 'none';
+        });
+        btn.classList.remove('is-expanded');
+        btn.setAttribute('aria-expanded', 'false');
+        const icon = btn.querySelector('.btn-toggle-icon i');
+        if (icon) icon.className = 'fa-solid fa-chevron-down';
+        const text = btn.querySelector('.btn-toggle-text');
+        if (text) text.textContent = `Lihat Lebih Banyak (${extraCount} Karya Lainnya)`;
+
+        const karyaSection = document.getElementById('karya');
+        if (karyaSection) {
+          const navHeight = 80;
+          const targetY = karyaSection.getBoundingClientRect().top + window.pageYOffset - navHeight;
+          window.scrollTo({ top: targetY, behavior: 'smooth' });
+        }
+      }
+    };
+  }
+}
+
+let isGaleriExpanded = false;
+let currentGaleriFilter = 'all';
 
 function renderDynamicGaleri(galeriList) {
   const container = document.getElementById('gallery-grid');
@@ -382,6 +461,104 @@ function renderDynamicGaleri(galeriList) {
       </div>
     </div>
   `).join('');
+
+  // Update total badge di filter "Semua Foto"
+  const allFilterBtn = document.querySelector('#gallery-filters .gallery-filter-btn[data-filter="all"]');
+  if (allFilterBtn) {
+    allFilterBtn.textContent = `Semua Foto (${galeriList.length})`;
+  }
+
+  // Terapkan filter & batasan 6 foto (Minimize / Maximize)
+  applyGalleryFilterAndLimit();
+}
+
+function applyGalleryFilterAndLimit() {
+  const container = document.getElementById('gallery-grid');
+  if (!container) return;
+
+  const galleryItems = Array.from(container.querySelectorAll('.gallery-item'));
+  if (!galleryItems.length) return;
+
+  const LIMIT = 6;
+
+  // 1. Dapatkan item yang cocok dengan filter kategori aktif
+  const matchingItems = galleryItems.filter(item => {
+    const cat = item.getAttribute('data-category');
+    return currentGaleriFilter === 'all' || cat === currentGaleriFilter;
+  });
+
+  const total = matchingItems.length;
+  const hasMore = total > LIMIT;
+
+  // 2. Sembunyikan item yang tidak sesuai kategori
+  galleryItems.forEach(item => {
+    const cat = item.getAttribute('data-category');
+    const isMatch = (currentGaleriFilter === 'all' || cat === currentGaleriFilter);
+    if (!isMatch) {
+      item.style.display = 'none';
+      item.classList.remove('gallery-item-extra');
+    }
+  });
+
+  // 3. Terapkan batasan 6 foto pada item yang cocok
+  matchingItems.forEach((item, index) => {
+    const isExtra = index >= LIMIT;
+    if (isExtra) {
+      item.classList.add('gallery-item-extra');
+      if (isGaleriExpanded) {
+        item.style.display = 'block';
+      } else {
+        item.style.display = 'none';
+      }
+    } else {
+      item.classList.remove('gallery-item-extra');
+      item.style.display = 'block';
+    }
+  });
+
+  // 4. Handle tombol toggle Galeri
+  let toggleWrap = document.getElementById('gallery-toggle-wrap');
+  if (!toggleWrap) {
+    toggleWrap = document.createElement('div');
+    toggleWrap.id = 'gallery-toggle-wrap';
+    toggleWrap.className = 'gallery-toggle-wrap text-center';
+    container.parentNode.insertBefore(toggleWrap, container.nextSibling);
+  }
+
+  if (hasMore) {
+    toggleWrap.style.display = 'flex';
+    renderGalleryToggleButton(toggleWrap, total, LIMIT);
+  } else {
+    toggleWrap.style.display = 'none';
+    toggleWrap.innerHTML = '';
+  }
+}
+
+function renderGalleryToggleButton(toggleWrap, total, limit) {
+  const extraCount = total - limit;
+  toggleWrap.innerHTML = `
+    <button type="button" class="btn btn-toggle-gallery ${isGaleriExpanded ? 'is-expanded' : ''}" id="btn-toggle-gallery" aria-expanded="${isGaleriExpanded ? 'true' : 'false'}">
+      <span class="btn-toggle-icon"><i class="fa-solid ${isGaleriExpanded ? 'fa-chevron-up' : 'fa-chevron-down'}"></i></span>
+      <span class="btn-toggle-text">${isGaleriExpanded ? 'Tampilkan Lebih Sedikit (Minimize)' : `Lihat Lebih Banyak (${extraCount} Foto Lainnya)`}</span>
+    </button>
+  `;
+
+  const btn = toggleWrap.querySelector('#btn-toggle-gallery');
+  if (btn) {
+    btn.onclick = () => {
+      isGaleriExpanded = !isGaleriExpanded;
+      applyGalleryFilterAndLimit();
+
+      if (!isGaleriExpanded) {
+        const gallerySection = document.getElementById('galeri');
+        if (gallerySection) {
+          const navHeight = 80;
+          const targetY = gallerySection.getBoundingClientRect().top + window.pageYOffset - navHeight;
+          window.scrollTo({ top: targetY, behavior: 'smooth' });
+        }
+      }
+    };
+  }
 }
 
 function renderDynamicKompetensi(kompetensiList, edtechList) {
@@ -727,21 +904,17 @@ function initGalleryFilterAndLightbox() {
 
   if (!galleryItems.length) return;
 
+  // Inisialisasi batasan tampilan awal (6 foto)
+  applyGalleryFilterAndLimit();
+
   filterBtns.forEach(btn => {
     btn.onclick = () => {
       filterBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
 
-      const filter = btn.getAttribute('data-filter');
-
-      galleryItems.forEach(item => {
-        const itemCategory = item.getAttribute('data-category');
-        if (filter === 'all' || itemCategory === filter) {
-          item.style.display = 'block';
-        } else {
-          item.style.display = 'none';
-        }
-      });
+      const filter = btn.getAttribute('data-filter') || 'all';
+      currentGaleriFilter = filter;
+      applyGalleryFilterAndLimit();
     };
   });
 
