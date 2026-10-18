@@ -99,6 +99,11 @@
             <i class="fa-solid fa-id-card"></i> Profil & Identitas
           </a>
         </li>
+        <li class="menu-item">
+          <a href="#badges" class="menu-link" data-view="view-badges">
+            <i class="fa-solid fa-award"></i> Badge & Label Hero
+          </a>
+        </li>
 
         <li class="menu-category-title">Konten Akademik</li>
         <li class="menu-item">
@@ -497,6 +502,271 @@
                   <div class="form-group">
                     <label class="form-label">URL GitHub / Repositori Modul</label>
                     <input type="url" class="form-control" name="github_url">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </section>
+
+        <!-- =========================================================================
+             VIEW BADGES: KELOLA BADGE & LABEL HERO FOTO
+             ========================================================================= -->
+        <section class="admin-view" id="view-badges">
+          <form id="form-badges-config">
+            <div class="admin-card">
+              <div class="admin-card-header">
+                <h2 class="admin-card-title"><i class="fa-solid fa-award text-warning"></i> Kelola Badge & Label Melayang (Hero Foto)</h2>
+                <button type="submit" class="btn-topbar-action primary">
+                  <i class="fa-solid fa-floppy-disk"></i> Simpan Perubahan Badge
+                </button>
+              </div>
+              <div class="admin-card-body">
+                <p style="color: var(--admin-text-muted); font-size: 0.875rem; margin-bottom: 1.5rem;">
+                  Sesuaikan badge prestasi/pencapaian melayang di sekitar foto profil guru dan teks pita header pada halaman depan website.
+                </p>
+
+                <div class="badge-editor-grid">
+                  <!-- Formulir Pengaturan Badge -->
+                  <div class="badge-form-column">
+                    <!-- Badge 1: Kanan Atas -->
+                    <div class="badge-item-card">
+                      <div class="badge-item-card-header">
+                        <h4 class="badge-item-title">
+                          <span class="badge-tag-icon-box" style="background: #d97706;"><i class="fa-solid fa-trophy"></i></span>
+                          Badge 1 (Pojok Kanan Atas Foto)
+                        </h4>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                          <label for="badge_award_hide" style="font-size: 0.8rem; color: var(--admin-text-muted); cursor: pointer;">Status:</label>
+                          <select class="form-control" name="badge_award_hide" id="badge_award_hide" style="width: auto; padding: 0.25rem 0.6rem; font-size: 0.8rem;">
+                            <option value="false">Tampilkan</option>
+                            <option value="true">Sembunyikan</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="form-grid-2">
+                        <div class="form-group">
+                          <label class="form-label">Judul Utama Badge</label>
+                          <input type="text" class="form-control" name="badge_award" id="input-badge-award" placeholder="Contoh: Juara 1 Guru Inovatif Prov. Jabar">
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label">Subjudul / Keterangan</label>
+                          <input type="text" class="form-control" name="badge_award_sub" id="input-badge-award-sub" placeholder="Contoh: Tingkat Provinsi Jawa Barat">
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label">Ikon FontAwesome</label>
+                          <select class="form-control" name="badge_award_icon" id="select-badge-award-icon">
+                            <option value="fa-solid fa-trophy">🏆 Piala (fa-trophy)</option>
+                            <option value="fa-solid fa-medal">🥇 Medali (fa-medal)</option>
+                            <option value="fa-solid fa-star">⭐ Bintang (fa-star)</option>
+                            <option value="fa-solid fa-certificate">📜 Sertifikat (fa-certificate)</option>
+                            <option value="fa-solid fa-award">🎖️ Penghargaan (fa-award)</option>
+                            <option value="fa-solid fa-ribbon">🎗️ Pita Prestasi (fa-ribbon)</option>
+                          </select>
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label">Warna Ikon</label>
+                          <select class="form-control" name="badge_award_color" id="select-badge-award-color">
+                            <option value="bg-amber">Amber / Emas</option>
+                            <option value="bg-emerald">Emerald / Hijau</option>
+                            <option value="bg-blue">Blue / Biru</option>
+                            <option value="bg-purple">Purple / Ungu</option>
+                            <option value="bg-rose">Rose / Merah</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Badge 2: Kiri Bawah -->
+                    <div class="badge-item-card">
+                      <div class="badge-item-card-header">
+                        <h4 class="badge-item-title">
+                          <span class="badge-tag-icon-box" style="background: #059669;"><i class="fa-solid fa-user-graduate"></i></span>
+                          Badge 2 (Pojok Kiri Bawah Foto)
+                        </h4>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                          <label for="badge_snbt_hide" style="font-size: 0.8rem; color: var(--admin-text-muted); cursor: pointer;">Status:</label>
+                          <select class="form-control" name="badge_snbt_hide" id="badge_snbt_hide" style="width: auto; padding: 0.25rem 0.6rem; font-size: 0.8rem;">
+                            <option value="false">Tampilkan</option>
+                            <option value="true">Sembunyikan</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="form-grid-2">
+                        <div class="form-group">
+                          <label class="form-label">Judul Utama Badge</label>
+                          <input type="text" class="form-control" name="badge_snbt" id="input-badge-snbt" placeholder="Contoh: 98% Siswa Lolos SNBT">
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label">Subjudul / Keterangan</label>
+                          <input type="text" class="form-control" name="badge_snbt_sub" id="input-badge-snbt-sub" placeholder="Contoh: Bimbingan Penalaran Matematika">
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label">Ikon FontAwesome</label>
+                          <select class="form-control" name="badge_snbt_icon" id="select-badge-snbt-icon">
+                            <option value="fa-solid fa-user-graduate">🎓 Kelulusan / Toga (fa-user-graduate)</option>
+                            <option value="fa-solid fa-graduation-cap">🎓 Topi Wisuda (fa-graduation-cap)</option>
+                            <option value="fa-solid fa-users">👥 Kelompok Siswa (fa-users)</option>
+                            <option value="fa-solid fa-chart-line">📈 Peningkatan Prestasi (fa-chart-line)</option>
+                            <option value="fa-solid fa-chalkboard-user">👨‍🏫 Bimbingan Belajar (fa-chalkboard-user)</option>
+                            <option value="fa-solid fa-circle-check">✅ Sukses / Lulus (fa-circle-check)</option>
+                          </select>
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label">Warna Ikon</label>
+                          <select class="form-control" name="badge_snbt_color" id="select-badge-snbt-color">
+                            <option value="bg-emerald">Emerald / Hijau</option>
+                            <option value="bg-amber">Amber / Emas</option>
+                            <option value="bg-blue">Blue / Biru</option>
+                            <option value="bg-purple">Purple / Ungu</option>
+                            <option value="bg-rose">Rose / Merah</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Badge 3: Kanan Bawah -->
+                    <div class="badge-item-card">
+                      <div class="badge-item-card-header">
+                        <h4 class="badge-item-title">
+                          <span class="badge-tag-icon-box" style="background: #0284c7;"><i class="fa-solid fa-book-bookmark"></i></span>
+                          Badge 3 (Pojok Kanan Bawah Foto)
+                        </h4>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                          <label for="badge_module_hide" style="font-size: 0.8rem; color: var(--admin-text-muted); cursor: pointer;">Status:</label>
+                          <select class="form-control" name="badge_module_hide" id="badge_module_hide" style="width: auto; padding: 0.25rem 0.6rem; font-size: 0.8rem;">
+                            <option value="false">Tampilkan</option>
+                            <option value="true">Sembunyikan</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="form-grid-2">
+                        <div class="form-group">
+                          <label class="form-label">Judul Utama Badge</label>
+                          <input type="text" class="form-control" name="badge_module" id="input-badge-module" placeholder="Contoh: 28+ Modul Merdeka">
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label">Subjudul / Keterangan</label>
+                          <input type="text" class="form-control" name="badge_module_sub" id="input-badge-module-sub" placeholder="Contoh: Siap Pakai & Berdiferensiasi">
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label">Ikon FontAwesome</label>
+                          <select class="form-control" name="badge_module_icon" id="select-badge-module-icon">
+                            <option value="fa-solid fa-book-bookmark">📖 Buku / Modul (fa-book-bookmark)</option>
+                            <option value="fa-solid fa-file-lines">📄 Perangkat Ajar (fa-file-lines)</option>
+                            <option value="fa-solid fa-cloud-arrow-down">📥 Unduhan Materi (fa-cloud-arrow-down)</option>
+                            <option value="fa-solid fa-laptop-code">💻 EdTech / Coding (fa-laptop-code)</option>
+                            <option value="fa-solid fa-shapes">🧩 Praktikum Inovatif (fa-shapes)</option>
+                          </select>
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label">Warna Ikon</label>
+                          <select class="form-control" name="badge_module_color" id="select-badge-module-color">
+                            <option value="bg-blue">Blue / Biru</option>
+                            <option value="bg-emerald">Emerald / Hijau</option>
+                            <option value="bg-amber">Amber / Emas</option>
+                            <option value="bg-purple">Purple / Ungu</option>
+                            <option value="bg-rose">Rose / Merah</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Label Pita Header Hero -->
+                    <div class="badge-item-card">
+                      <div class="badge-item-card-header">
+                        <h4 class="badge-item-title">
+                          <span class="badge-tag-icon-box" style="background: #7c3aed;"><i class="fa-solid fa-certificate"></i></span>
+                          Label Pita Header (Di Atas Judul Headline)
+                        </h4>
+                      </div>
+                      <div class="form-grid-2">
+                        <div class="form-group">
+                          <label class="form-label">Teks Pita / Badge</label>
+                          <input type="text" class="form-control" name="hero_tag_badge" id="input-hero-tag-badge" placeholder="Contoh: Guru Penggerak Kemendikdasmen">
+                        </div>
+                        <div class="form-group">
+                          <label class="form-label">Sub Label (Nama Sekolah / Instansi)</label>
+                          <input type="text" class="form-control" name="hero_tag_sub" id="input-hero-tag-sub" placeholder="Contoh: SMK Telkom Malang">
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style="margin-top: 1rem;">
+                      <button type="submit" class="btn-topbar-action primary" style="padding: 0.75rem 1.5rem; font-size: 0.95rem;">
+                        <i class="fa-solid fa-floppy-disk"></i> Simpan Semua Perubahan Badge
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Kolom Pratinjau Interaktif (Live Preview) -->
+                  <div class="badge-preview-column">
+                    <div class="badge-preview-sticky">
+                      <div style="background: var(--admin-card-bg); border: 1px solid var(--admin-border); border-radius: var(--radius-md); padding: 1.25rem;">
+                        <h4 style="font-size: 0.9rem; font-weight: 700; color: var(--admin-text-main); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem;">
+                          <i class="fa-solid fa-eye text-primary"></i> Pratinjau Langsung (Live Preview)
+                        </h4>
+                        <p style="font-size: 0.75rem; color: var(--admin-text-muted); margin-bottom: 1.5rem;">
+                          Tampilan badge di halaman utama akan langsung mengikuti format berikut:
+                        </p>
+
+                        <div class="badge-live-canvas">
+                          <!-- Badge 1: Top Right -->
+                          <div class="badge-live-float pos-top-right" id="preview-live-badge-1">
+                            <div class="badge-live-icon bg-amber" id="preview-icon-box-1">
+                              <i class="fa-solid fa-trophy" id="preview-icon-1"></i>
+                            </div>
+                            <div class="badge-live-info">
+                              <span class="badge-live-title" id="preview-title-1">Juara 1 Guru Inovatif Prov. Jabar</span>
+                              <span class="badge-live-sub" id="preview-sub-1">Tingkat Provinsi Jawa Barat</span>
+                            </div>
+                          </div>
+
+                          <!-- Teacher Card -->
+                          <div class="badge-live-card">
+                            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=80" id="preview-live-img" alt="Foto Guru">
+                            <div class="badge-live-overlay">
+                              <span class="name" id="preview-live-name">Bpk. Muhammad Chusni Agus</span>
+                              <span class="role" id="preview-live-role">Guru Penggerak</span>
+                            </div>
+                          </div>
+
+                          <!-- Badge 2: Bottom Left -->
+                          <div class="badge-live-float pos-bottom-left" id="preview-live-badge-2">
+                            <div class="badge-live-icon bg-emerald" id="preview-icon-box-2">
+                              <i class="fa-solid fa-user-graduate" id="preview-icon-2"></i>
+                            </div>
+                            <div class="badge-live-info">
+                              <span class="badge-live-title" id="preview-title-2">98% Siswa Lolos SNBT</span>
+                              <span class="badge-live-sub" id="preview-sub-2">Bimbingan Penalaran Matematika</span>
+                            </div>
+                          </div>
+
+                          <!-- Badge 3: Bottom Right -->
+                          <div class="badge-live-float pos-bottom-right" id="preview-live-badge-3">
+                            <div class="badge-live-icon bg-blue" id="preview-icon-box-3">
+                              <i class="fa-solid fa-book-bookmark" id="preview-icon-3"></i>
+                            </div>
+                            <div class="badge-live-info">
+                              <span class="badge-live-title" id="preview-title-3">28+ Modul Merdeka</span>
+                              <span class="badge-live-sub" id="preview-sub-3">Siap Pakai & Berdiferensiasi</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div style="background: var(--admin-bg); padding: 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--admin-border); margin-top: 1rem;">
+                          <div style="font-size: 0.75rem; color: var(--admin-text-muted); margin-bottom: 0.25rem;">Pratinjau Pita Header:</div>
+                          <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                            <span class="table-badge" style="background: var(--color-purple-subtle); color: var(--color-purple);" id="preview-live-tag">
+                              <i class="fa-solid fa-certificate"></i> Guru Penggerak Kemendikdasmen
+                            </span>
+                            <span style="font-size: 0.775rem; font-weight: 600; color: var(--admin-text-main);" id="preview-live-school">
+                              SMK Telkom Malang
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

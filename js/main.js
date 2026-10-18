@@ -91,8 +91,13 @@ function renderDynamicConfig(cfg) {
   const overlayName = document.querySelector('.teacher-card-overlay .overlay-name');
   const overlayRole = document.querySelector('.teacher-card-overlay .overlay-role');
 
-  if (heroBadge && cfg.badge_award) heroBadge.innerHTML = `<i class="fa-solid fa-certificate"></i> ${cfg.badge_award}`;
-  if (heroSchool && cfg.school_name) heroSchool.textContent = cfg.school_name;
+  if (heroBadge) {
+    const badgeText = cfg.hero_tag_badge || 'Guru Penggerak Kemendikdasmen';
+    heroBadge.innerHTML = `<i class="fa-solid fa-certificate"></i> ${escapeHtml(badgeText)}`;
+  }
+  if (heroSchool) {
+    heroSchool.textContent = cfg.hero_tag_sub || cfg.school_name || 'SMK Telkom Malang';
+  }
   if (heroTitle && cfg.hero_title) {
     heroTitle.innerHTML = escapeHtml(cfg.hero_title)
       .replace('Hati', '<span class="text-gradient">Hati</span>')
@@ -111,11 +116,63 @@ function renderDynamicConfig(cfg) {
     if (cfg.city) pills[2].innerHTML = `<i class="fa-solid fa-location-dot"></i> <span>${cfg.city}</span>`;
   }
 
-  // Floating Badges in Hero
-  const badgeTopRight = document.querySelector('.badge-top-right .badge-title');
-  const badgeBottomLeft = document.querySelector('.badge-bottom-left .badge-title');
-  if (badgeTopRight && cfg.badge_award) badgeTopRight.textContent = cfg.badge_award;
-  if (badgeBottomLeft && cfg.badge_snbt) badgeBottomLeft.textContent = cfg.badge_snbt;
+  // Floating Badges in Hero Photo
+  const badgeTopRightEl = document.querySelector('.badge-top-right');
+  if (badgeTopRightEl) {
+    if (cfg.badge_award_hide === 'true' || cfg.badge_award === '') {
+      badgeTopRightEl.style.display = 'none';
+    } else {
+      badgeTopRightEl.style.display = '';
+      const title = badgeTopRightEl.querySelector('.badge-title');
+      const sub = badgeTopRightEl.querySelector('.badge-subtitle');
+      const icon = badgeTopRightEl.querySelector('.badge-icon i');
+      const iconBox = badgeTopRightEl.querySelector('.badge-icon');
+      if (title && cfg.badge_award) title.textContent = cfg.badge_award;
+      if (sub && cfg.badge_award_sub) sub.textContent = cfg.badge_award_sub;
+      if (icon && cfg.badge_award_icon) icon.className = cfg.badge_award_icon;
+      if (iconBox && cfg.badge_award_color) {
+        iconBox.className = `badge-icon ${cfg.badge_award_color}`;
+      }
+    }
+  }
+
+  const badgeBottomLeftEl = document.querySelector('.badge-bottom-left');
+  if (badgeBottomLeftEl) {
+    if (cfg.badge_snbt_hide === 'true' || cfg.badge_snbt === '') {
+      badgeBottomLeftEl.style.display = 'none';
+    } else {
+      badgeBottomLeftEl.style.display = '';
+      const title = badgeBottomLeftEl.querySelector('.badge-title');
+      const sub = badgeBottomLeftEl.querySelector('.badge-subtitle');
+      const icon = badgeBottomLeftEl.querySelector('.badge-icon i');
+      const iconBox = badgeBottomLeftEl.querySelector('.badge-icon');
+      if (title && cfg.badge_snbt) title.textContent = cfg.badge_snbt;
+      if (sub && cfg.badge_snbt_sub) sub.textContent = cfg.badge_snbt_sub;
+      if (icon && cfg.badge_snbt_icon) icon.className = cfg.badge_snbt_icon;
+      if (iconBox && cfg.badge_snbt_color) {
+        iconBox.className = `badge-icon ${cfg.badge_snbt_color}`;
+      }
+    }
+  }
+
+  const badgeBottomRightEl = document.querySelector('.badge-bottom-right');
+  if (badgeBottomRightEl) {
+    if (cfg.badge_module_hide === 'true' || cfg.badge_module === '') {
+      badgeBottomRightEl.style.display = 'none';
+    } else {
+      badgeBottomRightEl.style.display = '';
+      const title = badgeBottomRightEl.querySelector('.badge-title');
+      const sub = badgeBottomRightEl.querySelector('.badge-subtitle');
+      const icon = badgeBottomRightEl.querySelector('.badge-icon i');
+      const iconBox = badgeBottomRightEl.querySelector('.badge-icon');
+      if (title && cfg.badge_module) title.textContent = cfg.badge_module;
+      if (sub && cfg.badge_module_sub) sub.textContent = cfg.badge_module_sub;
+      if (icon && cfg.badge_module_icon) icon.className = cfg.badge_module_icon;
+      if (iconBox && cfg.badge_module_color) {
+        iconBox.className = `badge-icon ${cfg.badge_module_color}`;
+      }
+    }
+  }
 
   // Stats Counters
   const statNumbers = document.querySelectorAll('.stats-strip .stat-number');

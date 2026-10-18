@@ -20,6 +20,7 @@ const AdminApp = (function () {
     initNavigation();
     initSyncAndStatus();
     initProfileConfig();
+    initBadgesConfig();
     initModulCRUD();
     initPrestasiCRUD();
     initGaleriCRUD();
@@ -168,6 +169,7 @@ const AdminApp = (function () {
     const viewTitles = {
       'view-overview': { title: 'Ikhtisar & Status Database', sub: 'Ringkasan data profil pendidik dan status sinkronisasi Google Sheets.' },
       'view-profile': { title: 'Profil & Identitas Pendidik', sub: 'Ubah biodata resmi, NIP, NUPTK, foto profil, dan teks halaman depan.' },
+      'view-badges': { title: 'Kelola Badge & Label Hero Foto', sub: 'Ubah teks judul, subjudul, ikon, warna, dan status tampil badge melayang di foto profil guru.' },
       'view-modul': { title: 'Kelola Modul Ajar & Sumber Belajar', sub: 'Tambah, ubah, dan hapus modul kurikulum merdeka, LKPD, serta bank soal.' },
       'view-prestasi': { title: 'Kelola Prestasi & Penghargaan', sub: 'Daftar piagam kejuaraan, sertifikasi profesi, dan publikasi buku pendidik.' },
       'view-galeri': { title: 'Kelola Galeri Dokumentasi', sub: 'Kelola dokumentasi foto aktivitas kelas, gelar karya P5, dan workshop.' },
@@ -315,6 +317,7 @@ const AdminApp = (function () {
   function renderAllViews() {
     renderOverviewStats();
     populateProfileForm();
+    populateBadgesForm();
     renderModulTable();
     renderPrestasiTable();
     renderGaleriTable();
@@ -450,6 +453,150 @@ const AdminApp = (function () {
 
     if (previewImg && config.hero_image) {
       previewImg.src = config.hero_image;
+    }
+  }
+
+  /* --------------------------------------------------
+     7b. KELOLA BADGE & LABEL HERO (FOTO & HEADER)
+     -------------------------------------------------- */
+  function initBadgesConfig() {
+    const form = document.getElementById('form-badges-config');
+    if (!form) return;
+
+    // Real-time update live preview saat pengguna mengetik atau memilih opsi
+    form.addEventListener('input', () => {
+      updateBadgesLivePreview();
+    });
+    form.addEventListener('change', () => {
+      updateBadgesLivePreview();
+    });
+
+    // Simpan konfigurasi badge
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const updatedConfig = Object.assign({}, DB.getSection('config'));
+
+      formData.forEach((val, key) => {
+        updatedConfig[key] = val.trim();
+      });
+
+      DB.setSection('config', updatedConfig);
+      showToast('Badge dan label hero berhasil disimpan!', 'success');
+
+      // Jika terhubung ke Google Apps Script, sinkronkan
+      if (DB.getGASUrl()) {
+        DB.syncToGoogleSheets().then(res => {
+          if (res && res.success) {
+            showToast('Perubahan badge berhasil disinkronkan ke Google Sheets!', 'success');
+          }
+        });
+      }
+    });
+  }
+
+  function populateBadgesForm() {
+    const form = document.getElementById('form-badges-config');
+    const config = DB.getSection('config');
+    if (!form || !config) return;
+
+    for (const key in config) {
+      const input = form.elements[key];
+      if (input) {
+        input.value = config[key];
+      }
+    }
+
+    updateBadgesLivePreview();
+  }
+
+  function updateBadgesLivePreview() {
+    const form = document.getElementById('form-badges-config');
+    const cfg = DB.getSection('config') || {};
+
+    const getVal = (name, fallback) => {
+      if (form && form.elements[name] && form.elements[name].value !== undefined) {
+        return form.elements[name].value.trim();
+      }
+      return cfg[name] !== undefined ? cfg[name] : fallback;
+    };
+
+    // Badge 1 (Pojok Kanan Atas)
+    const badgeAward = getVal('badge_award', 'Juara 1 Guru Inovatif Prov. Jabar');
+    const badgeAwardSub = getVal('badge_award_sub', 'Tingkat Provinsi Jawa Barat');
+    const badgeAwardIcon = getVal('badge_award_icon', 'fa-solid fa-trophy');
+    const badgeAwardColor = getVal('badge_award_color', 'bg-amber');
+    const badgeAwardHide = getVal('badge_award_hide', 'false');
+
+    const badge1El = document.getElementById('preview-live-badge-1');
+    const title1El = document.getElementById('preview-title-1');
+    const sub1El = document.getElementById('preview-sub-1');
+    const icon1El = document.getElementById('preview-icon-1');
+    const iconBox1El = document.getElementById('preview-icon-box-1');
+
+    if (badge1El) badge1El.style.display = (badgeAwardHide === 'true' || badgeAward === '') ? 'none' : 'flex';
+    if (title1El) title1El.textContent = badgeAward || 'Juara 1 Guru Inovatif Prov. Jabar';
+    if (sub1El) sub1El.textContent = badgeAwardSub;
+    if (icon1El) icon1El.className = badgeAwardIcon || 'fa-solid fa-trophy';
+    if (iconBox1El) iconBox1El.className = `badge-live-icon ${badgeAwardColor || 'bg-amber'}`;
+
+    // Badge 2 (Pojok Kiri Bawah)
+    const badgeSnbt = getVal('badge_snbt', '98% Siswa Lolos SNBT');
+    const badgeSnbtSub = getVal('badge_snbt_sub', 'Bimbingan Penalaran Matematika');
+    const badgeSnbtIcon = getVal('badge_snbt_icon', 'fa-solid fa-user-graduate');
+    const badgeSnbtColor = getVal('badge_snbt_color', 'bg-emerald');
+    const badgeSnbtHide = getVal('badge_snbt_hide', 'false');
+
+    const badge2El = document.getElementById('preview-live-badge-2');
+    const title2El = document.getElementById('preview-title-2');
+    const sub2El = document.getElementById('preview-sub-2');
+    const icon2El = document.getElementById('preview-icon-2');
+    const iconBox2El = document.getElementById('preview-icon-box-2');
+
+    if (badge2El) badge2El.style.display = (badgeSnbtHide === 'true' || badgeSnbt === '') ? 'none' : 'flex';
+    if (title2El) title2El.textContent = badgeSnbt || '98% Siswa Lolos SNBT';
+    if (sub2El) sub2El.textContent = badgeSnbtSub;
+    if (icon2El) icon2El.className = badgeSnbtIcon || 'fa-solid fa-user-graduate';
+    if (iconBox2El) iconBox2El.className = `badge-live-icon ${badgeSnbtColor || 'bg-emerald'}`;
+
+    // Badge 3 (Pojok Kanan Bawah)
+    const badgeModule = getVal('badge_module', '28+ Modul Merdeka');
+    const badgeModuleSub = getVal('badge_module_sub', 'Siap Pakai & Berdiferensiasi');
+    const badgeModuleIcon = getVal('badge_module_icon', 'fa-solid fa-book-bookmark');
+    const badgeModuleColor = getVal('badge_module_color', 'bg-blue');
+    const badgeModuleHide = getVal('badge_module_hide', 'false');
+
+    const badge3El = document.getElementById('preview-live-badge-3');
+    const title3El = document.getElementById('preview-title-3');
+    const sub3El = document.getElementById('preview-sub-3');
+    const icon3El = document.getElementById('preview-icon-3');
+    const iconBox3El = document.getElementById('preview-icon-box-3');
+
+    if (badge3El) badge3El.style.display = (badgeModuleHide === 'true' || badgeModule === '') ? 'none' : 'flex';
+    if (title3El) title3El.textContent = badgeModule || '28+ Modul Merdeka';
+    if (sub3El) sub3El.textContent = badgeModuleSub;
+    if (icon3El) icon3El.className = badgeModuleIcon || 'fa-solid fa-book-bookmark';
+    if (iconBox3El) iconBox3El.className = `badge-live-icon ${badgeModuleColor || 'bg-blue'}`;
+
+    // Kartu Foto & Identitas Guru
+    const imgLiveEl = document.getElementById('preview-live-img');
+    const nameLiveEl = document.getElementById('preview-live-name');
+    const roleLiveEl = document.getElementById('preview-live-role');
+    if (imgLiveEl && cfg.hero_image) imgLiveEl.src = cfg.hero_image;
+    if (nameLiveEl && cfg.teacher_name) nameLiveEl.textContent = 'Bpk. ' + cfg.teacher_name;
+    if (roleLiveEl) roleLiveEl.textContent = cfg.teacher_tagline || cfg.teacher_title || 'Guru Penggerak';
+
+    // Label Pita Header (Di Atas Headline)
+    const tagLiveEl = document.getElementById('preview-live-tag');
+    const schoolLiveEl = document.getElementById('preview-live-school');
+    const heroTagBadge = getVal('hero_tag_badge', 'Guru Penggerak Kemendikdasmen');
+    const heroTagSub = getVal('hero_tag_sub', cfg.school_name || 'SMK Telkom Malang');
+
+    if (tagLiveEl) {
+      tagLiveEl.innerHTML = `<i class="fa-solid fa-certificate"></i> ${escapeHtml(heroTagBadge || 'Guru Penggerak')}`;
+    }
+    if (schoolLiveEl) {
+      schoolLiveEl.textContent = heroTagSub || 'SMK Telkom Malang';
     }
   }
 

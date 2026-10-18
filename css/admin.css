@@ -1231,3 +1231,184 @@ body {
   color: #2563eb;
 }
 
+/* ==========================================================================
+   BADGE EDITOR & LIVE PREVIEW IN ADMIN
+   ========================================================================== */
+.badge-editor-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .badge-editor-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.badge-item-card {
+  background: var(--admin-bg);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  transition: all var(--transition-fast);
+}
+
+.badge-item-card:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.badge-item-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.badge-item-title {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--admin-text-main);
+  margin: 0;
+}
+
+.badge-tag-icon-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: #fff;
+}
+
+.badge-preview-sticky {
+  position: sticky;
+  top: 90px;
+}
+
+.badge-live-canvas {
+  position: relative;
+  width: 100%;
+  max-width: 300px;
+  margin: 1.5rem auto 2.5rem;
+}
+
+.badge-live-card {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--admin-border);
+  background: var(--admin-card-bg);
+}
+
+.badge-live-card img {
+  width: 100%;
+  height: 320px;
+  object-fit: cover;
+  display: block;
+}
+
+.badge-live-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1.5rem 1rem 0.85rem;
+  background: linear-gradient(to top, rgba(15, 23, 42, 0.92) 0%, rgba(15, 23, 42, 0.5) 60%, transparent 100%);
+  color: #fff;
+}
+
+.badge-live-overlay .name {
+  font-weight: 700;
+  font-size: 0.95rem;
+  display: block;
+  color: #fff;
+}
+
+.badge-live-overlay .role {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.badge-live-float {
+  position: absolute;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: var(--admin-card-bg);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--admin-border);
+  transition: all var(--transition-fast);
+}
+
+.badge-live-float.pos-top-right {
+  top: -16px;
+  right: -12px;
+}
+
+.badge-live-float.pos-bottom-left {
+  bottom: 90px;
+  left: -18px;
+}
+
+.badge-live-float.pos-bottom-right {
+  bottom: -22px;
+  right: 10px;
+}
+
+.badge-live-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.badge-live-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.badge-live-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--admin-text-main);
+  white-space: nowrap;
+  max-width: 170px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.badge-live-sub {
+  font-size: 0.65rem;
+  color: var(--admin-text-muted);
+  white-space: nowrap;
+  max-width: 170px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.badge-live-icon.bg-amber { background-color: #d97706 !important; color: #fff; }
+.badge-live-icon.bg-emerald { background-color: #059669 !important; color: #fff; }
+.badge-live-icon.bg-blue { background-color: #0284c7 !important; color: #fff; }
+.badge-live-icon.bg-purple { background-color: #7c3aed !important; color: #fff; }
+.badge-live-icon.bg-rose { background-color: #e11d48 !important; color: #fff; }
+
+
+
