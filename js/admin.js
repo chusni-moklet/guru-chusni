@@ -483,6 +483,12 @@ const AdminApp = (function () {
         <td><code>${escapeHtml(m.fileNotice || '-')}</code></td>
         <td>
           <div class="table-actions">
+            <button type="button" class="btn-action move" onclick="AdminApp.moveItem('modul', '${m.id}', 'up')" title="Pindah Naik" ${index === 0 ? 'disabled' : ''}>
+              <i class="fa-solid fa-arrow-up"></i>
+            </button>
+            <button type="button" class="btn-action move" onclick="AdminApp.moveItem('modul', '${m.id}', 'down')" title="Pindah Turun" ${index === items.length - 1 ? 'disabled' : ''}>
+              <i class="fa-solid fa-arrow-down"></i>
+            </button>
             <button type="button" class="btn-action edit" onclick="AdminApp.editItem('modul', '${m.id}')" title="Ubah Modul">
               <i class="fa-solid fa-pen-to-square"></i>
             </button>
@@ -517,7 +523,7 @@ const AdminApp = (function () {
       return;
     }
 
-    tbody.innerHTML = items.map(p => {
+    tbody.innerHTML = items.map((p, index) => {
       const isImg = (p.pdfFileName && /\.(jpe?g|png|webp|gif|bmp|svg)$/i.test(p.pdfFileName)) || 
                     (p.pdfUrl && (p.pdfUrl.startsWith('data:image/') || /\.(jpe?g|png|webp)(\?|$)/i.test(p.pdfUrl)));
       const badgeClass = isImg ? 'btn-pdf-badge badge-image' : 'btn-pdf-badge';
@@ -541,6 +547,12 @@ const AdminApp = (function () {
         <td>${p.highlight ? '<span style="color: var(--color-success); font-weight: 600;"><i class="fa-solid fa-star"></i> Ya</span>' : '-'}</td>
         <td>
           <div class="table-actions">
+            <button type="button" class="btn-action move" onclick="AdminApp.moveItem('prestasi', '${p.id}', 'up')" title="Pindah Naik" ${index === 0 ? 'disabled' : ''}>
+              <i class="fa-solid fa-arrow-up"></i>
+            </button>
+            <button type="button" class="btn-action move" onclick="AdminApp.moveItem('prestasi', '${p.id}', 'down')" title="Pindah Turun" ${index === items.length - 1 ? 'disabled' : ''}>
+              <i class="fa-solid fa-arrow-down"></i>
+            </button>
             <button type="button" class="btn-action edit" onclick="AdminApp.editItem('prestasi', '${p.id}')" title="Ubah Prestasi">
               <i class="fa-solid fa-pen-to-square"></i>
             </button>
@@ -576,7 +588,7 @@ const AdminApp = (function () {
       return;
     }
 
-    tbody.innerHTML = items.map(g => `
+    tbody.innerHTML = items.map((g, index) => `
       <tr>
         <td>
           <img src="${escapeHtml(g.imgUrl)}" alt="" style="width: 50px; height: 50px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--admin-border);">
@@ -586,6 +598,12 @@ const AdminApp = (function () {
         <td><small>${escapeHtml(g.desc)}</small></td>
         <td>
           <div class="table-actions">
+            <button type="button" class="btn-action move" onclick="AdminApp.moveItem('galeri', '${g.id}', 'up')" title="Pindah Naik" ${index === 0 ? 'disabled' : ''}>
+              <i class="fa-solid fa-arrow-up"></i>
+            </button>
+            <button type="button" class="btn-action move" onclick="AdminApp.moveItem('galeri', '${g.id}', 'down')" title="Pindah Turun" ${index === items.length - 1 ? 'disabled' : ''}>
+              <i class="fa-solid fa-arrow-down"></i>
+            </button>
             <button type="button" class="btn-action edit" onclick="AdminApp.editItem('galeri', '${g.id}')" title="Ubah Foto">
               <i class="fa-solid fa-pen-to-square"></i>
             </button>
@@ -620,7 +638,7 @@ const AdminApp = (function () {
       return;
     }
 
-    tbody.innerHTML = items.map(k => `
+    tbody.innerHTML = items.map((k, index) => `
       <tr>
         <td>
           <img src="${escapeHtml(k.thumbnail)}" alt="" style="width: 72px; height: 48px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--admin-border); box-shadow: var(--shadow-sm);">
@@ -634,6 +652,12 @@ const AdminApp = (function () {
         </td>
         <td>
           <div class="table-actions">
+            <button type="button" class="btn-action move" onclick="AdminApp.moveItem('karya', '${k.id}', 'up')" title="Pindah Naik" ${index === 0 ? 'disabled' : ''}>
+              <i class="fa-solid fa-arrow-up"></i>
+            </button>
+            <button type="button" class="btn-action move" onclick="AdminApp.moveItem('karya', '${k.id}', 'down')" title="Pindah Turun" ${index === items.length - 1 ? 'disabled' : ''}>
+              <i class="fa-solid fa-arrow-down"></i>
+            </button>
             <button type="button" class="btn-action edit" onclick="AdminApp.editItem('karya', '${k.id}')" title="Ubah Karya">
               <i class="fa-solid fa-pen-to-square"></i>
             </button>
@@ -670,13 +694,19 @@ const AdminApp = (function () {
     const tbodyKomp = document.getElementById('table-kompetensi-body');
     const kompetensiItems = DB.getSection('kompetensi') || [];
     if (tbodyKomp) {
-      tbodyKomp.innerHTML = kompetensiItems.map(k => `
+      tbodyKomp.innerHTML = kompetensiItems.map((k, index) => `
         <tr>
           <td><strong>${escapeHtml(k.judul)}</strong></td>
           <td><span class="table-badge" style="background: var(--color-primary-subtle); color: var(--color-primary);">${escapeHtml(k.tingkat)}</span></td>
           <td><small>${escapeHtml(k.desc)}</small></td>
           <td>
             <div class="table-actions">
+              <button type="button" class="btn-action move" onclick="AdminApp.moveItem('kompetensi', '${k.id}', 'up')" title="Pindah Naik" ${index === 0 ? 'disabled' : ''}>
+                <i class="fa-solid fa-arrow-up"></i>
+              </button>
+              <button type="button" class="btn-action move" onclick="AdminApp.moveItem('kompetensi', '${k.id}', 'down')" title="Pindah Turun" ${index === kompetensiItems.length - 1 ? 'disabled' : ''}>
+                <i class="fa-solid fa-arrow-down"></i>
+              </button>
               <button type="button" class="btn-action edit" onclick="AdminApp.editItem('kompetensi', '${k.id}')" title="Ubah Mapel">
                 <i class="fa-solid fa-pen-to-square"></i>
               </button>
@@ -693,12 +723,18 @@ const AdminApp = (function () {
     const tbodyEdtech = document.getElementById('table-edtech-body');
     const edtechItems = DB.getSection('edtech') || [];
     if (tbodyEdtech) {
-      tbodyEdtech.innerHTML = edtechItems.map(e => `
+      tbodyEdtech.innerHTML = edtechItems.map((e, index) => `
         <tr>
           <td><i class="${escapeHtml(e.icon)} ${escapeHtml(e.colorClass)}" style="font-size: 1.1rem; margin-right: 0.5rem;"></i> <strong>${escapeHtml(e.name)}</strong></td>
           <td><code>${escapeHtml(e.icon)}</code></td>
           <td>
             <div class="table-actions">
+              <button type="button" class="btn-action move" onclick="AdminApp.moveItem('edtech', '${e.id}', 'up')" title="Pindah Naik" ${index === 0 ? 'disabled' : ''}>
+                <i class="fa-solid fa-arrow-up"></i>
+              </button>
+              <button type="button" class="btn-action move" onclick="AdminApp.moveItem('edtech', '${e.id}', 'down')" title="Pindah Turun" ${index === edtechItems.length - 1 ? 'disabled' : ''}>
+                <i class="fa-solid fa-arrow-down"></i>
+              </button>
               <button type="button" class="btn-action edit" onclick="AdminApp.editItem('edtech', '${e.id}')" title="Ubah Tool">
                 <i class="fa-solid fa-pen-to-square"></i>
               </button>
@@ -729,7 +765,12 @@ const AdminApp = (function () {
     const items = DB.getSection('timeline') || [];
     if (!tbody) return;
 
-    tbody.innerHTML = items.map(tl => `
+    if (!items.length) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--admin-text-muted); padding: 2rem;">Belum ada riwayat pendidikan & karir.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = items.map((tl, index) => `
       <tr>
         <td><strong>${escapeHtml(tl.year)}</strong></td>
         <td><strong>${escapeHtml(tl.judul)}</strong></td>
@@ -737,6 +778,12 @@ const AdminApp = (function () {
         <td><small>${escapeHtml(tl.desc)}</small></td>
         <td>
           <div class="table-actions">
+            <button type="button" class="btn-action move" onclick="AdminApp.moveItem('timeline', '${tl.id}', 'up')" title="Pindah Naik" ${index === 0 ? 'disabled' : ''}>
+              <i class="fa-solid fa-arrow-up"></i>
+            </button>
+            <button type="button" class="btn-action move" onclick="AdminApp.moveItem('timeline', '${tl.id}', 'down')" title="Pindah Turun" ${index === items.length - 1 ? 'disabled' : ''}>
+              <i class="fa-solid fa-arrow-down"></i>
+            </button>
             <button type="button" class="btn-action edit" onclick="AdminApp.editItem('timeline', '${tl.id}')" title="Ubah Linimasa">
               <i class="fa-solid fa-pen-to-square"></i>
             </button>
@@ -2171,6 +2218,36 @@ const AdminApp = (function () {
     openCrudModal(type, id);
   }
 
+  function moveItem(type, id, direction) {
+    let items = DB.getSection(type) || [];
+    const index = items.findIndex(x => String(x.id) === String(id));
+    if (index === -1) return;
+
+    if (direction === 'up') {
+      if (index === 0) return;
+      const temp = items[index];
+      items[index] = items[index - 1];
+      items[index - 1] = temp;
+    } else if (direction === 'down') {
+      if (index >= items.length - 1) return;
+      const temp = items[index];
+      items[index] = items[index + 1];
+      items[index + 1] = temp;
+    } else {
+      return;
+    }
+
+    DB.setSection(type, items);
+    renderAllViews();
+    showToast('Posisi urutan berhasil diubah!', 'success', 2000);
+
+    if (DB.getGASUrl()) {
+      DB.syncToGoogleSheets().catch(err => {
+        console.warn('Sync to Google Sheets error:', err);
+      });
+    }
+  }
+
   function deleteItem(type, id) {
     if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
       let items = DB.getSection(type) || [];
@@ -2268,6 +2345,7 @@ const AdminApp = (function () {
   return {
     init,
     editItem,
+    moveItem,
     deleteItem,
     toggleMessageRead,
     deleteMessageItem,
