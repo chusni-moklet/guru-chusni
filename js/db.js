@@ -8,6 +8,7 @@
  */
 
 const DB = (function () {
+  const DEFAULT_GAS_URL = 'https://script.google.com/macros/s/AKfycbxSOTYBQCo78xH_SyR9iomP9Kr442SDY2vPgWVba2D3b1o2ZnaqkaDgqy61tLdpH2It/exec';
   const STORAGE_KEY_DATA = 'profilku_data_v3';
   const STORAGE_KEY_GAS_URL = 'profilku_gas_url';
   const STORAGE_KEY_SESSION = 'profilku_admin_session';
@@ -68,90 +69,90 @@ const DB = (function () {
   },
   "modul": [
     {
-      "id": "1",
-      "title": "Modul Ajar: Fungsi Eksponen & Logaritma Berdiferensiasi",
-      "category": "modul-ajar",
-      "badge": "Modul Ajar • Fase E (Kelas X)",
-      "fase": "Fase E (Kelas X)",
-      "snippet": "Dilengkapi pemetaan kebutuhan belajar murid, aktivitas kontekstual peluruhan radioaktif & bunga majemuk, serta asesmen formatif-sumatif lengkap.",
-      "fileNotice": "Modul_Ajar_Eksponen_Logaritma_FaseE.pdf",
-      "downloadLink": "#",
-      "cp": "Menggeneralisasi sifat-sifat bilangan berpangkat dan menerapkan barisan/deret untuk memodelkan pertumbuhan & peluruhan.",
-      "atp": "Mengidentifikasi sifat perpangkatan, menyelesaikan masalah kontekstual, menggunakan logaritma.",
-      "diferensiasi": "Konten audio-visual, produk komik/video/infografis.",
-      "keywords": "eksponen logaritma fase e kelas 10 aljabar fungsi"
+        "id": "1",
+        "title": "Modul Ajar: Pemrograman Visual Scratch & Logika Algoritma",
+        "category": "modul-ajar",
+        "badge": "Modul Ajar • Informatika Fase E",
+        "fase": "Fase E (Kelas X)",
+        "snippet": "Panduan praktis bagi siswa mempelajari konsep algoritma percabangan dan perulangan secara visual melalui pembuatan aplikasi hitung luas segitiga dan mini games interaktif.",
+        "fileNotice": "Modul Scratch - Hitung Luas Segitiga.pdf",
+        "downloadLink": "#",
+        "cp": "Memahami konsep computational thinking dan merancang algoritma terstruktur dengan perkakas visual.",
+        "atp": "Pengenalan blok Scratch, variabel, kondisional if-else, perulangan, dan pemecahan masalah kontekstual.",
+        "diferensiasi": "Proyek bertingkat dari animasi cerita sederhana hingga pembuatan game interaktif.",
+        "keywords": "scratch algoritma pemrograman visual fase e informatika logika komputasi luas segitiga"
     },
     {
-      "id": "2",
-      "title": "LKPD Eksploratif: Vektor pada Ruang Berbantuan GeoGebra",
-      "category": "lkpd",
-      "badge": "LKPD Interaktif • Fase F (Kelas XI)",
-      "fase": "Fase F (Kelas XI)",
-      "snippet": "Lembar kerja siswa interaktif untuk mengkonstruksi konsep resultan gaya, perkalian titik (dot product), dan proyeksi ortogonal dengan barcode applet 3D.",
-      "fileNotice": "LKPD_Interaktif_Vektor_3D_GeoGebra.pdf",
-      "downloadLink": "#",
-      "cp": "Menyatakan vektor pada bidang dan ruang dimensi tiga serta menggunakannya untuk masalah fisika dan geometri.",
-      "atp": "Penemuan terbimbing rumus perkalian titik (Dot Product) dari sudut antara dua vektor ruang.",
-      "diferensiasi": "Flipped classroom dengan applet GeoGebra 3D 360 derajat.",
-      "keywords": "vektor geometri ruang fase f kelas 11 lkpd lembar kerja siswa"
+        "id": "2",
+        "title": "Handout Praktis: Pembuatan Game Edukatif Menggunakan Roblox Studio",
+        "category": "modul-ajar",
+        "badge": "Modul Ajar • Game Dev Fase E & F",
+        "fase": "Fase E & F (Kelas X - XII)",
+        "snippet": "Langkah demi langkah merancang lingkungan 3D, mekanik pemain, dan pemrograman skrip dasar Lua di Roblox Studio untuk pembelajaran gamifikasi.",
+        "fileNotice": "Handout_Roblox_Studio_Game_Dev.pdf",
+        "downloadLink": "#",
+        "cp": "Menerapkan pemikiran algoritmik dan mekanika ruang dalam pengembangan media simulasi interaktif.",
+        "atp": "Setup workspace Roblox Studio, manipulasi part 3D, scripting basic Lua, dan playtesting multiplayer.",
+        "diferensiasi": "Siswa dapat memilih peran programmer, level designer, atau asset creator.",
+        "keywords": "roblox studio game development lua 3d informatika smk telkom"
     },
     {
-      "id": "3",
-      "title": "Mastery Kit Penalaran Matematika UTBK-SNBT 2025",
-      "category": "bank-soal",
-      "badge": "Bank Soal • Kelas XII / Alumni",
-      "fase": "Kelas XII / Alumni",
-      "snippet": "Kompilasi 150 soal HOTS penalaran kuantitatif disertai metode pembahasan cepat sistematis dan peta kelemahan konsep.",
-      "fileNotice": "Mastery_Kit_UTBK_SNBT_Penalaran_Matematika_2025.pdf",
-      "downloadLink": "#",
-      "cp": "Standar Uji BPPP Kemendikbud: penalaran dalam situasi nyata kontekstual tanpa rumus rumit.",
-      "atp": "Penalaran Bilangan, Barisan, Geometri, dan Peluang.",
-      "diferensiasi": "Disertai catatan jebakan soal dan pembahasan terstruktur.",
-      "keywords": "snbt utbk penalaran matematika kuantitatif bank soal pembahasan"
+        "id": "3",
+        "title": "Panduan Praktis: Modul KIK - Inkubasi Bisnis & Live Commerce Siswa",
+        "category": "modul-ajar",
+        "badge": "Modul Ajar • KIK Fase F",
+        "fase": "Fase F (Kelas XI & XII)",
+        "snippet": "Panduan pembelajaran kewirausahaan digital berbasis proyek menggunakan platform Moklive untuk melatih siswa melakukan kataloging produk dan live selling dengan AI copywriting.",
+        "fileNotice": "Panduan_KIK_Kewirausahaan_Digital_Moklive.pdf",
+        "downloadLink": "#",
+        "cp": "Mengembangkan ide wirausaha digital yang layak jual dan memanfaatkan platform digital marketing.",
+        "atp": "Riset pasar produk, pembuatan copywriting produk dengan AI, setup streaming katalog, evaluasi omzet.",
+        "diferensiasi": "Pembagian role tim sesuai minat bisnis: marketing specialist, teknis stream, atau content creator.",
+        "keywords": "kik kewirausahaan digital moklive live commerce pemasaran digital ai smk"
     },
     {
-      "id": "4",
-      "title": "Slide Visual: Statistika Inferensial & Uji Hipotesis",
-      "category": "slide",
-      "badge": "Slide Presentasi • Fase F Tingkat Lanjut",
-      "fase": "Fase F Tingkat Lanjut",
-      "snippet": "Template presentasi menarik dan interaktif untuk menjelaskan distribusi normal, kurva lonceng Gauss, z-score, dan uji signifikansi data riil.",
-      "fileNotice": "Slide_Statistika_Inferensial_FaseF.pptx",
-      "downloadLink": "#",
-      "cp": "Memahami konsep kurva normal standar Gauss, nilai Z-score, dan taraf signifikansi.",
-      "atp": "Presentasi 42 slide interaktif visualisasi kurva.",
-      "diferensiasi": "Dapat diedit bebas di PowerPoint atau Canva for Education.",
-      "keywords": "statistika inferensial peluang distribusi normal presentasi slide canva powerpoint"
+        "id": "4",
+        "title": "LKPD Interaktif: Pemodelan Virtual Reality & Augmented Reality dengan Unity",
+        "category": "lkpd",
+        "badge": "LKPD Interaktif • Fase F Kejuruan",
+        "fase": "Fase F (Kelas XI / XII)",
+        "snippet": "Lembar kerja eksplorasi integrasi model 3D ke dalam aplikasi AR/VR untuk media promosi dan edukasi interaktif masa depan.",
+        "fileNotice": "LKPD_AR_VR_Unity_Development.pdf",
+        "downloadLink": "#",
+        "cp": "Merancang antarmuka imersif untuk menyajikan data dan objek visual secara kontekstual.",
+        "atp": "Import asset 3D, konfigurasi target image AR, build aplikasi mobile, dan pengujian interaktivitas.",
+        "diferensiasi": "Panduan visual step-by-step untuk siswa pemula dan tantangan coding C# untuk siswa mahir.",
+        "keywords": "ar vr unity augmented reality lkpd interaktif smk telkom virtual reality"
     },
     {
-      "id": "5",
-      "title": "Handout Praktis: Logika Pemrograman & Algoritma Python",
-      "category": "modul-ajar",
-      "badge": "Modul Ajar • Informatika Fase E",
-      "fase": "Informatika Fase E",
-      "snippet": "Panduan ramah pemula untuk siswa SMA belajar logika percabangan, perulangan, dan pemecahan masalah komputasi tanpa beban sintaks rumit.",
-      "fileNotice": "Handout_Python_SMA_FaseE.pdf",
-      "downloadLink": "#",
-      "cp": "Memahami berpikir komputasional, dekomposisi masalah, pengenalan pola, dan perancangan algoritma Python 3.",
-      "atp": "Dasar Python, Kondisional if-else, Perulangan, dan Proyek Mini.",
-      "diferensiasi": "Latihan interaktif di Google Colab tanpa instalasi lokal.",
-      "keywords": "informatika python computational thinking berpikir komputasional fase e coding"
+        "id": "5",
+        "title": "Slide Presentasi: Literasi Digital, Etika AI & Cyber Security Siswa",
+        "category": "slide",
+        "badge": "Slide Presentasi • Seluruh Jenjang",
+        "fase": "Semua Tingkat SMK",
+        "snippet": "Materi visual komprehensif mengenai privasi data, jejak digital, pemanfaatan GenAI secara bertanggung jawab, serta persiapan sertifikasi IC3 Digital Literacy.",
+        "fileNotice": "Slide_Literasi_Digital_Etika_AI.pptx",
+        "downloadLink": "#",
+        "cp": "Memahami aspek hukum, privasi, dan etika dalam pemanfaatan teknologi informasi dan kecerdasan buatan.",
+        "atp": "36 slide visual interaktif siap pakai untuk KBM Informatika maupun seminar siswa.",
+        "diferensiasi": "Dapat diedit bebas di PowerPoint atau Canva for Education.",
+        "keywords": "literasi digital etika ai cyber security presentasi canva pptx ic3"
     },
     {
-      "id": "6",
-      "title": "Modul P5: \"Rekayasa & Teknologi Cerdas Hemat Energi Sekolah\"",
-      "category": "modul-ajar",
-      "badge": "Modul Projek P5 • Seluruh Jenjang SMA",
-      "fase": "Semua Jenjang SMA",
-      "snippet": "Panduan lengkap fasilitator projek penguatan profil pelajar Pancasila tema Rekayasa Teknologi, dilengkapi rubrik asesmen dimensi bernalar kritis & kreatif.",
-      "fileNotice": "Panduan_Projek_P5_Rekayasa_Teknologi_SMA.pdf",
-      "downloadLink": "#",
-      "cp": "Dimensi P5: Bernalar Kritis, Gotong Royong, dan Kreatif.",
-      "atp": "Observasi konsumsi energi, riset solusi, pembuatan prototipe, expo karya.",
-      "diferensiasi": "Rubrik fasilitator projek dan lembar refleksi mandiri siswa.",
-      "keywords": "projek p5 rekayasa teknologi profil pelajar pancasila panduan fasilitator"
+        "id": "6",
+        "title": "Modul Projek P5: Rekayasa Teknologi IoT untuk Ketahanan Lingkungan",
+        "category": "modul-ajar",
+        "badge": "Modul Projek P5 • Fase E & F",
+        "fase": "Fase E & F (Seluruh Siswa)",
+        "snippet": "Panduan fasilitator P5 tema Rekayasa & Teknologi, studi kasus sistem telemetri sensor suhu, kelembaban, dan pakan otomatis peternakan cerdas (Be-Ternak).",
+        "fileNotice": "Modul_P5_Rekayasa_Teknologi_IoT.pdf",
+        "downloadLink": "#",
+        "cp": "Menganalisis permasalahan riil di masyarakat dan merancang solusi rekayasa teknologi hemat energi.",
+        "atp": "Identifikasi masalah lingkungan, perakitan mikrokontroler sensor, visualisasi dashboard, expo karya.",
+        "diferensiasi": "Rubrik penilaian komprehensif dimensi Bernalar Kritis, Mandiri, dan Kreatif.",
+        "keywords": "projek p5 rekayasa teknologi iot be-ternak smk kurikulum merdeka"
     }
-  ],
+],
   "prestasi": [
     {
       "id": "1792284295308",
@@ -518,96 +519,96 @@ const DB = (function () {
   ],
   "kompetensi": [
     {
-      "id": "1",
-      "tingkat": "Fase E & F (Kelas X, XI, XII)",
-      "judul": "Matematika Tingkat Lanjut & Wajib",
-      "desc": "Aljabar linear, geometri analitik, trigonometri lanjutan, kalkulus diferensial-integral, matriks, serta statistika inferensial dengan pendekatan pemecahan masalah kontekstual.",
-      "icon": "fa-square-root-variable",
-      "colorClass": "bg-blue-subtle text-blue",
-      "fiturList": [
-        "Visualisasi Geometri dengan GeoGebra 3D",
-        "Pemodelan Matematika Kasus Lingkungan & Bisnis",
-        "Bimbingan Tuntas UTBK-SNBT Skolastik"
-      ]
+        "id": "1",
+        "tingkat": "Fase E (Kelas X)",
+        "judul": "Informatika & Computational Thinking",
+        "desc": "Pemecahan masalah terstruktur dengan logika algoritma, pengenalan bahasa pemrograman (Python & Scratch), analisis data, serta literasi keamanan siber dan etika AI.",
+        "icon": "fa-code",
+        "colorClass": "bg-purple-subtle text-purple",
+        "fiturList": [
+            "Logika Komputasi & Pemrograman Dasar (Python/Scratch)",
+            "Analisis Data & Dashboard Spreadsheet",
+            "Etika Kecerdasan Buatan (AI) & Literasi Digital"
+        ]
     },
     {
-      "id": "2",
-      "tingkat": "Program Sukses Ujian",
-      "judul": "Literasi & Penalaran Numerasi (AKM & SNBT)",
-      "desc": "Pelatihan intensif membaca grafik, menafsirkan data tabel, logika kuantitatif, dan estimasi cerdas untuk persiapan Asesmen Nasional dan seleksi masuk perguruan tinggi negeri impian.",
-      "icon": "fa-calculator",
-      "colorClass": "bg-emerald-subtle text-emerald",
-      "fiturList": [
-        "Trik Cepat Nalar Matematis (Speed Math)",
-        "Simulasi Computer-Based Test (CBT) Mingguan",
-        "Bedah Tuntas Soal Asesmen Nasional HOTS"
-      ]
+        "id": "2",
+        "tingkat": "Fase F (Kelas XI & XII)",
+        "judul": "KIK & Pengembangan Produk Digital",
+        "desc": "Pembelajaran kewirausahaan digital modern berbasis proyek nyata, mulai dari ideasi produk digital, perancangan prototipe, UI/UX, hingga strategi pemasaran live commerce.",
+        "icon": "fa-lightbulb",
+        "colorClass": "bg-emerald-subtle text-emerald",
+        "fiturList": [
+            "Inkubasi Produk Digital & Startup Siswa",
+            "Praktik Live Selling & E-Commerce Digital (Moklive)",
+            "Penyusunan Business Plan & Hak Kekayaan Intelektual (HKI)"
+        ]
     },
     {
-      "id": "3",
-      "tingkat": "Fase E & Literasi Digital",
-      "judul": "Informatika & Computational Thinking",
-      "desc": "Pengenalan berpikir komputasional, algoritma dan pemrograman dasar menggunakan Python, etika kecerdasan buatan (AI), analisis data, dan cybersecurity awareness untuk remaja.",
-      "icon": "fa-code",
-      "colorClass": "bg-purple-subtle text-purple",
-      "fiturList": [
-        "Pemrograman Visual & Python Sederhana",
-        "Pengolahan Data Spreadsheet & Data Dashboard",
-        "Literasi Etika AI & Keamanan Data Siswa"
-      ]
+        "id": "3",
+        "tingkat": "Peminatan Kejuruan & Lab",
+        "judul": "Game Development & Immersive Tech (AR/VR)",
+        "desc": "Praktik rancang bangun dunia virtual dan interaktif menggunakan Roblox Studio dan Unity 3D, memadukan pemrograman skrip visual, mekanik gameplay, dan pemodelan spasial.",
+        "icon": "fa-vr-cardboard",
+        "colorClass": "bg-blue-subtle text-blue",
+        "fiturList": [
+            "KBM Virtual & Game Design Berbantuan Roblox Studio",
+            "Pembuatan Aplikasi Augmented Reality (AR) & VR",
+            "Penerapan Logika Fisika & Simulasi 3D Interaktif"
+        ]
     },
     {
-      "id": "4",
-      "tingkat": "Ekstrakurikuler & Pembinaan Bakat",
-      "judul": "Klub Olimpiade Sains (OSN Matematika)",
-      "desc": "Pendampingan intensif bagi siswa berbakat matematika dengan silabus olimpiade: Teori Bilangan, Aljabar Lanjut, Kombinatorika, dan Geometri Euklidean.",
-      "icon": "fa-award",
-      "colorClass": "bg-amber-subtle text-amber",
-      "fiturList": [
-        "Bank Soal OSN Kota, Provinsi, Nasional",
-        "Mentoring 1-on-1 & Pembahasan Bukti Matematis",
-        "Portofolio Prestasi Jalur Prestasi Mandiri PTN"
-      ]
+        "id": "4",
+        "tingkat": "Eksplorasi Kejuruan & Talenta",
+        "judul": "IoT, Otomasi & Drone Piloting",
+        "desc": "Integrasi perangkat keras cerdas, sensor telemetri untuk monitoring presisi (seperti proyek Be-Ternak), serta pembinaan navigasi dan pemanfaatan wahana nirawak (drone).",
+        "icon": "fa-satellite-dish",
+        "colorClass": "bg-amber-subtle text-amber",
+        "fiturList": [
+            "Perancangan Sensor Telemetri & IoT Pertanian/Peternakan",
+            "Pelatihan Lisensi Pilot Drone & Navigasi Udara",
+            "Bimbingan Lomba Inovasi Teknologi & LKS Web"
+        ]
     }
-  ],
+],
   "edtech": [
     {
-      "id": "1",
-      "name": "GeoGebra & Desmos",
-      "icon": "fa-solid fa-shapes",
-      "colorClass": "text-primary"
+        "id": "1",
+        "name": "Roblox Studio (Game Dev)",
+        "icon": "fa-solid fa-gamepad",
+        "colorClass": "text-danger"
     },
     {
-      "id": "2",
-      "name": "Google Classroom & Workspace",
-      "icon": "fa-brands fa-google",
-      "colorClass": "text-danger"
+        "id": "2",
+        "name": "Scratch & Python",
+        "icon": "fa-brands fa-python",
+        "colorClass": "text-primary"
     },
     {
-      "id": "3",
-      "name": "Canva for Education",
-      "icon": "fa-solid fa-palette",
-      "colorClass": "text-info"
+        "id": "3",
+        "name": "Unity 3D (AR/VR)",
+        "icon": "fa-solid fa-vr-cardboard",
+        "colorClass": "text-info"
     },
     {
-      "id": "4",
-      "name": "Quizizz & Kahoot Interaktif",
-      "icon": "fa-solid fa-gamepad",
-      "colorClass": "text-warning"
+        "id": "4",
+        "name": "Google Workspace for Education",
+        "icon": "fa-brands fa-google",
+        "colorClass": "text-warning"
     },
     {
-      "id": "5",
-      "name": "Python & Jupyter Notebook",
-      "icon": "fa-brands fa-python",
-      "colorClass": "text-primary"
+        "id": "5",
+        "name": "Canva for Education",
+        "icon": "fa-solid fa-palette",
+        "colorClass": "text-info"
     },
     {
-      "id": "6",
-      "name": "Miro & Padlet Kolaborasi",
-      "icon": "fa-solid fa-chalkboard",
-      "colorClass": "text-success"
+        "id": "6",
+        "name": "Figma & Miro (UI/UX Design)",
+        "icon": "fa-solid fa-chalkboard",
+        "colorClass": "text-success"
     }
-  ],
+],
   "timeline": [
     {
       "id": "4",
@@ -753,6 +754,11 @@ const DB = (function () {
         if (Array.isArray(d.prestasi) && !d.prestasi.some(p => (p.title || p.name || '').includes('Hello Moklet'))) return true;
         if (Array.isArray(d.karya) && d.karya.some(k => (k.title || '').includes('Portal Modul & OER Kurikulum Merdeka') || (k.link || '').includes('rahmathidayat.guru'))) return true;
         if (Array.isArray(d.galeri) && d.galeri.some(g => (g.imgUrl || '').includes('photo-1580582932707-520aed937b7b'))) return true;
+        // Cek materi modul dan kompetensi apakah masih materi matematika lama
+        if (Array.isArray(d.modul) && d.modul.some(m => (m.title || '').includes('Fungsi Eksponen') || (m.title || '').includes('Vektor pada Ruang') || (m.title || '').includes('Mastery Kit Penalaran'))) return true;
+        if (Array.isArray(d.kompetensi) && d.kompetensi.some(k => (k.judul || '').includes('Matematika Tingkat Lanjut') || (k.judul || '').includes('OSN Matematika') || (k.judul || '').includes('Aljabar Linear'))) return true;
+        if (Array.isArray(d.edtech) && d.edtech.some(e => (e.name || '').includes('GeoGebra') || (e.name || '').includes('Desmos'))) return true;
+        if (Array.isArray(d.timeline) && d.timeline.some(t => (t.institusi || '').includes('ITB') || (t.institusi || '').includes('SMAN 1 Harapan Bangsa'))) return true;
         return false;
       };
 
@@ -794,6 +800,30 @@ const DB = (function () {
           currentData = JSON.parse(JSON.stringify(DEFAULT_DATA));
           saveLocal();
           return;
+        }
+
+        // Sanitasi spesifik modul ajar jika masih berisi materi matematika
+        if (Array.isArray(currentData.modul) && (currentData.modul.length === 0 || currentData.modul.some(m => (m.title || '').includes('Fungsi Eksponen') || (m.title || '').includes('Vektor pada Ruang')))) {
+          console.log("Memperbarui modul ajar lama ke materi KIK & Informatika...");
+          currentData.modul = JSON.parse(JSON.stringify(DEFAULT_DATA.modul));
+        }
+
+        // Sanitasi spesifik kompetensi jika masih berisi materi matematika
+        if (Array.isArray(currentData.kompetensi) && (currentData.kompetensi.length === 0 || currentData.kompetensi.some(k => (k.judul || '').includes('Matematika Tingkat Lanjut') || (k.judul || '').includes('OSN Matematika')))) {
+          console.log("Memperbarui kompetensi lama ke silabus KIK & Informatika...");
+          currentData.kompetensi = JSON.parse(JSON.stringify(DEFAULT_DATA.kompetensi));
+        }
+
+        // Sanitasi spesifik edtech jika masih berisi GeoGebra
+        if (Array.isArray(currentData.edtech) && (currentData.edtech.length === 0 || currentData.edtech.some(e => (e.name || '').includes('GeoGebra')))) {
+          console.log("Memperbarui edtech lama ke perkakas EdTech SMK Telkom...");
+          currentData.edtech = JSON.parse(JSON.stringify(DEFAULT_DATA.edtech));
+        }
+
+        // Sanitasi spesifik timeline jika masih berisi ITB / SMA Harapan Bangsa
+        if (Array.isArray(currentData.timeline) && (currentData.timeline.length === 0 || currentData.timeline.some(t => (t.institusi || '').includes('ITB') || (t.institusi || '').includes('SMAN 1 Harapan Bangsa')))) {
+          console.log("Memperbarui timeline ke karir SMK Telkom & UM...");
+          currentData.timeline = JSON.parse(JSON.stringify(DEFAULT_DATA.timeline));
         }
 
         // Pastikan semua key ada (backward compatibility)
@@ -915,7 +945,7 @@ const DB = (function () {
 
   // URL Google Apps Script
   function getGASUrl() {
-    return localStorage.getItem(STORAGE_KEY_GAS_URL) || '';
+    return localStorage.getItem(STORAGE_KEY_GAS_URL) || DEFAULT_GAS_URL;
   }
 
   function setGASUrl(url) {
@@ -960,32 +990,46 @@ const DB = (function () {
         // Normalisasi data dari sheets
         const incoming = json.data;
         if (incoming.config) currentData.config = Object.assign({}, currentData.config, incoming.config);
+
+        // Modul Ajar (Validasi data riil vs dummy matematika)
         if (Array.isArray(incoming.modul) && incoming.modul.length) {
-          currentData.modul = incoming.modul.map(m => {
-            const existing = (currentData.modul || []).find(x => String(x.id) === String(m.ID || m.id));
-            let downloadLink = m.DownloadLink || m.downloadLink || '#';
-            let fileNotice = m.FileNotice || m.fileNotice || '';
-            // Pertahankan berkas lokal jika Google Sheets kosong atau referensi indexeddb
-            if ((!downloadLink || downloadLink === '#' || downloadLink.startsWith('indexeddb:')) && existing && existing.downloadLink && existing.downloadLink !== '#') {
-              downloadLink = existing.downloadLink;
-              fileNotice = existing.fileNotice || fileNotice;
-            }
-            return {
-              id: String(m.ID || m.id || ''),
-              title: m.Judul || m.title || '',
-              category: m.Kategori || m.category || 'modul-ajar',
-              badge: m.Badge || m.badge || '',
-              fase: m.Fase || m.fase || '',
-              snippet: m.Snippet || m.snippet || '',
-              fileNotice: fileNotice,
-              downloadLink: downloadLink,
-              cp: m.CP || m.cp || '',
-              atp: m.ATP || m.atp || '',
-              diferensiasi: m.Diferensiasi || m.diferensiasi || '',
-              keywords: m.Keywords || m.keywords || ''
-            };
+          const validModul = incoming.modul.filter(m => {
+            const t = (m.Judul || m.title || '');
+            return !t.includes('Fungsi Eksponen') && !t.includes('Vektor pada Ruang') && !t.includes('Mastery Kit Penalaran');
           });
+
+          if (validModul.length > 0) {
+            currentData.modul = validModul.map(m => {
+              const existing = (currentData.modul || []).find(x => String(x.id) === String(m.ID || m.id));
+              let downloadLink = m.DownloadLink || m.downloadLink || '#';
+              let fileNotice = m.FileNotice || m.fileNotice || '';
+              // Pertahankan berkas lokal jika Google Sheets kosong atau referensi indexeddb
+              if ((!downloadLink || downloadLink === '#' || downloadLink.startsWith('indexeddb:')) && existing && existing.downloadLink && existing.downloadLink !== '#') {
+                downloadLink = existing.downloadLink;
+                fileNotice = existing.fileNotice || fileNotice;
+              }
+              return {
+                id: String(m.ID || m.id || ''),
+                title: m.Judul || m.title || '',
+                category: m.Kategori || m.category || 'modul-ajar',
+                badge: m.Badge || m.badge || '',
+                fase: m.Fase || m.fase || '',
+                snippet: m.Snippet || m.snippet || '',
+                fileNotice: fileNotice,
+                downloadLink: downloadLink,
+                cp: m.CP || m.cp || '',
+                atp: m.ATP || m.atp || '',
+                diferensiasi: m.Diferensiasi || m.diferensiasi || '',
+                keywords: m.Keywords || m.keywords || ''
+              };
+            });
+          } else {
+            currentData.modul = JSON.parse(JSON.stringify(DEFAULT_DATA.modul));
+          }
+        } else if (!currentData.modul || currentData.modul.length === 0) {
+          currentData.modul = JSON.parse(JSON.stringify(DEFAULT_DATA.modul));
         }
+
         if (Array.isArray(incoming.prestasi) && incoming.prestasi.length) {
           currentData.prestasi = incoming.prestasi.map(p => {
             const existing = (currentData.prestasi || []).find(x => String(x.id) === String(p.ID || p.id));
@@ -1040,6 +1084,21 @@ const DB = (function () {
             link: k.Link || k.link || '#',
             thumbnail: k.Thumbnail || k.thumbnail || k.ImgUrl || ''
           }));
+        } else if (url) {
+          // Fallback fetch karya terpisah jika sheet Karya belum masuk di getAll
+          try {
+            const karyaRes = await fetch(url + (url.includes('?') ? '&' : '?') + 'action=getSection&section=Karya');
+            const karyaJson = await karyaRes.json();
+            if (karyaJson && Array.isArray(karyaJson.data) && karyaJson.data.length) {
+              currentData.karya = karyaJson.data.map(k => ({
+                id: String(k.ID || k.id || ''),
+                title: k.NamaWebsite || k.title || k.Nama || '',
+                desc: k.Deskripsi || k.desc || '',
+                link: k.Link || k.link || '#',
+                thumbnail: k.Thumbnail || k.thumbnail || k.ImgUrl || ''
+              }));
+            }
+          } catch (e) {}
         }
         if (Array.isArray(incoming.testimoni) && incoming.testimoni.length) {
           currentData.testimoni = incoming.testimoni.map(t => ({
@@ -1051,34 +1110,74 @@ const DB = (function () {
             rating: Number(t.Rating || t.rating || 5)
           }));
         }
+
+        // Kompetensi (Validasi data riil KIK & Informatika vs dummy matematika)
         if (Array.isArray(incoming.kompetensi) && incoming.kompetensi.length) {
-          currentData.kompetensi = incoming.kompetensi.map(k => ({
-            id: String(k.ID || k.id || ''),
-            tingkat: k.Tingkat || k.tingkat || '',
-            judul: k.Judul || k.judul || '',
-            desc: k.Deskripsi || k.desc || '',
-            icon: k.Icon || k.icon || 'fa-book',
-            colorClass: k.ColorClass || k.colorClass || 'bg-blue-subtle text-blue',
-            fiturList: typeof k.FiturList === 'string' ? k.FiturList.split('|') : (k.fiturList || [])
-          }));
+          const validKomp = incoming.kompetensi.filter(k => {
+            const j = (k.Judul || k.judul || '');
+            return !j.includes('Matematika Tingkat Lanjut') && !j.includes('OSN Matematika') && !j.includes('Aljabar Linear');
+          });
+
+          if (validKomp.length > 0) {
+            currentData.kompetensi = validKomp.map(k => ({
+              id: String(k.ID || k.id || ''),
+              tingkat: k.Tingkat || k.tingkat || '',
+              judul: k.Judul || k.judul || '',
+              desc: k.Deskripsi || k.desc || '',
+              icon: k.Icon || k.icon || 'fa-book',
+              colorClass: k.ColorClass || k.colorClass || 'bg-blue-subtle text-blue',
+              fiturList: typeof k.FiturList === 'string' ? k.FiturList.split('|') : (k.fiturList || [])
+            }));
+          } else {
+            currentData.kompetensi = JSON.parse(JSON.stringify(DEFAULT_DATA.kompetensi));
+          }
+        } else if (!currentData.kompetensi || currentData.kompetensi.length === 0) {
+          currentData.kompetensi = JSON.parse(JSON.stringify(DEFAULT_DATA.kompetensi));
         }
+
+        // EdTech (Validasi tools kekinian vs GeoGebra matematika lama)
         if (Array.isArray(incoming.edtech) && incoming.edtech.length) {
-          currentData.edtech = incoming.edtech.map(e => ({
-            id: String(e.ID || e.id || ''),
-            name: e.Nama || e.name || '',
-            icon: e.Icon || e.icon || 'fa-solid fa-shapes',
-            colorClass: e.ColorClass || e.colorClass || 'text-primary'
-          }));
+          const validEdtech = incoming.edtech.filter(e => {
+            const n = (e.Nama || e.name || '');
+            return !n.includes('GeoGebra') && !n.includes('Desmos');
+          });
+
+          if (validEdtech.length > 0) {
+            currentData.edtech = validEdtech.map(e => ({
+              id: String(e.ID || e.id || ''),
+              name: e.Nama || e.name || '',
+              icon: e.Icon || e.icon || 'fa-solid fa-shapes',
+              colorClass: e.ColorClass || e.colorClass || 'text-primary'
+            }));
+          } else {
+            currentData.edtech = JSON.parse(JSON.stringify(DEFAULT_DATA.edtech));
+          }
+        } else if (!currentData.edtech || currentData.edtech.length === 0) {
+          currentData.edtech = JSON.parse(JSON.stringify(DEFAULT_DATA.edtech));
         }
+
+        // Timeline (Validasi karir SMK Telkom & UM vs ITB Bandung)
         if (Array.isArray(incoming.timeline) && incoming.timeline.length) {
-          currentData.timeline = incoming.timeline.map(tl => ({
-            id: String(tl.ID || tl.id || ''),
-            year: tl.Tahun || tl.year || '',
-            judul: tl.Judul || tl.judul || '',
-            institusi: tl.Institusi || tl.institusi || '',
-            desc: tl.Deskripsi || tl.desc || ''
-          }));
+          const validTimeline = incoming.timeline.filter(tl => {
+            const inst = (tl.Institusi || tl.institusi || '');
+            return !inst.includes('ITB') && !inst.includes('SMAN 1 Harapan Bangsa');
+          });
+
+          if (validTimeline.length > 0) {
+            currentData.timeline = validTimeline.map(tl => ({
+              id: String(tl.ID || tl.id || ''),
+              year: tl.Tahun || tl.year || '',
+              judul: tl.Judul || tl.judul || '',
+              institusi: tl.Institusi || tl.institusi || '',
+              desc: tl.Deskripsi || tl.desc || ''
+            }));
+          } else {
+            currentData.timeline = JSON.parse(JSON.stringify(DEFAULT_DATA.timeline));
+          }
+        } else if (!currentData.timeline || currentData.timeline.length === 0) {
+          currentData.timeline = JSON.parse(JSON.stringify(DEFAULT_DATA.timeline));
         }
+
         if (Array.isArray(incoming.faq) && incoming.faq.length) {
           currentData.faq = incoming.faq.map(f => ({
             id: String(f.ID || f.id || ''),
@@ -1127,7 +1226,32 @@ const DB = (function () {
             if (safeLink.startsWith('data:') && safeLink.length > 500) {
               safeLink = 'indexeddb:modul_' + m.id;
             }
-            return Object.assign({}, m, { downloadLink: safeLink });
+            return {
+              ID: m.id,
+              id: m.id,
+              Judul: m.title,
+              title: m.title,
+              Kategori: m.category,
+              category: m.category,
+              Badge: m.badge,
+              badge: m.badge,
+              Fase: m.fase,
+              fase: m.fase,
+              Snippet: m.snippet,
+              snippet: m.snippet,
+              FileNotice: m.fileNotice,
+              fileNotice: m.fileNotice,
+              DownloadLink: safeLink,
+              downloadLink: safeLink,
+              CP: m.cp,
+              cp: m.cp,
+              ATP: m.atp,
+              atp: m.atp,
+              Diferensiasi: m.diferensiasi,
+              diferensiasi: m.diferensiasi,
+              Keywords: m.keywords,
+              keywords: m.keywords
+            };
           }),
           prestasi: (currentData.prestasi || []).map(p => {
             let safePdfUrl = p.pdfUrl || '';
@@ -1158,7 +1282,20 @@ const DB = (function () {
             };
           }),
           jadwal: currentData.jadwal,
-          galeri: currentData.galeri,
+          galeri: (currentData.galeri || []).map(g => ({
+            ID: g.id || '',
+            id: g.id || '',
+            Judul: g.title,
+            title: g.title,
+            Kategori: g.category,
+            category: g.category,
+            KategoriLabel: g.categoryLabel,
+            categoryLabel: g.categoryLabel,
+            ImgUrl: (g.imgUrl || '').startsWith('data:') && g.imgUrl.length > 500 ? 'assets/galeri-default.jpg' : (g.imgUrl || ''),
+            imgUrl: (g.imgUrl || '').startsWith('data:') && g.imgUrl.length > 500 ? 'assets/galeri-default.jpg' : (g.imgUrl || ''),
+            Deskripsi: g.desc || '',
+            desc: g.desc || ''
+          })),
           karya: (currentData.karya || []).map(k => ({
             ID: k.id,
             id: k.id,
@@ -1172,17 +1309,44 @@ const DB = (function () {
             thumbnail: k.thumbnail
           })),
           testimoni: currentData.testimoni,
-          kompetensi: currentData.kompetensi.map(k => ({
+          kompetensi: (currentData.kompetensi || []).map(k => ({
             ID: k.id,
+            id: k.id,
             Tingkat: k.tingkat,
+            tingkat: k.tingkat,
             Judul: k.judul,
+            judul: k.judul,
             Deskripsi: k.desc,
+            desc: k.desc,
             Icon: k.icon,
+            icon: k.icon,
             ColorClass: k.colorClass,
-            FiturList: Array.isArray(k.fiturList) ? k.fiturList.join('|') : k.fiturList
+            colorClass: k.colorClass,
+            FiturList: Array.isArray(k.fiturList) ? k.fiturList.join('|') : (k.fiturList || ''),
+            fiturList: Array.isArray(k.fiturList) ? k.fiturList.join('|') : (k.fiturList || '')
           })),
-          edtech: currentData.edtech,
-          timeline: currentData.timeline,
+          edtech: (currentData.edtech || []).map(e => ({
+            ID: e.id,
+            id: e.id,
+            Nama: e.name,
+            name: e.name,
+            Icon: e.icon,
+            icon: e.icon,
+            ColorClass: e.colorClass,
+            colorClass: e.colorClass
+          })),
+          timeline: (currentData.timeline || []).map(tl => ({
+            ID: tl.id,
+            id: tl.id,
+            Tahun: tl.year,
+            year: tl.year,
+            Judul: tl.judul,
+            judul: tl.judul,
+            Institusi: tl.institusi,
+            institusi: tl.institusi,
+            Deskripsi: tl.desc,
+            desc: tl.desc
+          })),
           faq: currentData.faq
         }
       };

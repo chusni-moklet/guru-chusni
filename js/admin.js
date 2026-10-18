@@ -234,12 +234,13 @@ const AdminApp = (function () {
         if (syncIcon) syncIcon.classList.add('fa-spin');
 
         try {
-          // Sinkronisasi data dari Google Spreadsheet
-          const res = await DB.syncFromGoogleSheets();
+          // Kirim semua data terbaru dari laptop ke Google Spreadsheet
+          showToast('Mengirim seluruh data laptop ke Google Spreadsheet...', 'info', 2500);
+          const res = await DB.syncToGoogleSheets();
           if (res.success) {
-            showToast('Sinkronisasi Berhasil: ' + res.message, 'success');
-            renderAllViews();
+            showToast('✅ Berhasil disinkronkan ke Cloud! Seluruh perangkat (HP, tablet, laptop lain) akan otomatis terupdate.', 'success', 5000);
             updateConnectionStatusUI(true);
+            renderAllViews();
           } else {
             showToast('Sinkronisasi Gagal: ' + res.message, 'error');
             updateConnectionStatusUI(false);
