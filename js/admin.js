@@ -21,11 +21,14 @@ const AdminApp = (function () {
     initSyncAndStatus();
     initProfileConfig();
     initBadgesConfig();
+    initNavMenusCRUD();
+    initPendampinganConfig();
     initModulCRUD();
     initPrestasiCRUD();
     initGaleriCRUD();
     initKaryaCRUD();
     initKompetensiCRUD();
+    initPelatihanCRUD();
     initTimelineCRUD();
     initInbox();
     initSettings();
@@ -168,13 +171,16 @@ const AdminApp = (function () {
 
     const viewTitles = {
       'view-overview': { title: 'Ikhtisar & Status Database', sub: 'Ringkasan data profil pendidik dan status sinkronisasi Google Sheets.' },
+      'view-nav-menus': { title: 'Kelola Menu Navigasi Website', sub: 'Atur label, ikon, tautan anchor, urutan posisi, dan status aktif/sembunyi setiap menu pada navbar website.' },
       'view-profile': { title: 'Profil & Identitas Pendidik', sub: 'Ubah biodata resmi, NIP, NUPTK, foto profil, dan teks halaman depan.' },
+      'view-pendampingan': { title: 'Pendampingan & Filosofi Pendidik', sub: 'Ubah teks judul, filosofi Ki Hajar Dewantara, bio narasi, dan 3 pilar pendampingan siswa.' },
       'view-badges': { title: 'Kelola Badge & Label Hero Foto', sub: 'Ubah teks judul, subjudul, ikon, warna, dan status tampil badge melayang di foto profil guru.' },
       'view-modul': { title: 'Kelola Modul Ajar & Sumber Belajar', sub: 'Tambah, ubah, dan hapus modul kurikulum merdeka, LKPD, serta bank soal.' },
       'view-prestasi': { title: 'Kelola Prestasi & Penghargaan', sub: 'Daftar piagam kejuaraan, sertifikasi profesi, dan publikasi buku pendidik.' },
       'view-galeri': { title: 'Kelola Galeri Dokumentasi', sub: 'Kelola dokumentasi foto aktivitas kelas, gelar karya P5, dan workshop.' },
       'view-karya': { title: 'Kelola Portofolio Karya Website', sub: 'Kumpulan website dan aplikasi yang pernah dibuat lengkap dengan deskripsi, link, dan screenshot thumbnail.' },
       'view-kompetensi': { title: 'Mata Pelajaran & Ekosistem EdTech', sub: 'Rincian bidang ajar dan perangkat lunak pembelajaran interaktif.' },
+      'view-pelatihan': { title: 'Pengembangan Diri & Sertifikasi', sub: 'Daftar diklat industri, sertifikasi global, workshop AI, dan pelatihan kepemimpinan guru.' },
       'view-timeline': { title: 'Linimasa Pendidikan & Karir', sub: 'Riwayat studi sarjana/magister dan tonggak kepemimpinan guru penggerak.' },
       'view-inbox': { title: 'Kotak Masuk Formulir Website', sub: 'Pesan pertanyaan dan permintaan konsultasi yang dikirim pengunjung web.' },
       'view-settings': { title: 'Pengaturan Database & Spreadsheet', sub: 'Koneksi API Google Apps Script, ubah password, dan backup JSON.' }
@@ -319,11 +325,14 @@ const AdminApp = (function () {
     renderOverviewStats();
     populateProfileForm();
     populateBadgesForm();
+    renderNavMenusTable();
+    populatePendampinganForm();
     renderModulTable();
     renderPrestasiTable();
     renderGaleriTable();
     renderKaryaTable();
     renderKompetensiTables();
+    renderPelatihanTable();
     renderTimelineTable();
     renderInboxTable();
   }
@@ -340,6 +349,12 @@ const AdminApp = (function () {
     document.getElementById('stat-count-galeri').textContent = db.galeri ? db.galeri.length : 0;
     const statKarya = document.getElementById('stat-count-karya');
     if (statKarya) statKarya.textContent = db.karya ? db.karya.length : 0;
+
+    const statNav = document.getElementById('stat-count-nav-menus');
+    if (statNav) statNav.textContent = db.nav_menus ? db.nav_menus.length : 0;
+
+    const statPelatihan = document.getElementById('stat-count-pelatihan');
+    if (statPelatihan) statPelatihan.textContent = db.pelatihan ? db.pelatihan.length : 0;
     
     const inboxCount = db.pesanMasuk ? db.pesanMasuk.length : 0;
     document.getElementById('stat-count-inbox').textContent = inboxCount;
@@ -598,6 +613,144 @@ const AdminApp = (function () {
     }
     if (schoolLiveEl) {
       schoolLiveEl.textContent = heroTagSub || 'SMK Telkom Malang';
+    }
+  }
+
+  /* --------------------------------------------------
+     7A. MENU NAVIGASI WEBSITE (CRUD & LIVE PREVIEW)
+     -------------------------------------------------- */
+  function initNavMenusCRUD() {
+    const btnAdd = document.getElementById('btn-add-nav-menu');
+    if (btnAdd) {
+      btnAdd.addEventListener('click', () => {
+        openCrudModal('nav_menus', null);
+      });
+    }
+  }
+
+  function renderNavMenusTable() {
+    const tbody = document.getElementById('table-nav-menus-body');
+    const previewEl = document.getElementById('nav-menus-live-preview');
+    let items = DB.getSection('nav_menus') || [];
+    
+    // Urutkan berdasarkan urutan / order
+    items = items.slice().sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
+
+    // Update Live Navbar Preview
+    if (previewEl) {
+      const activeItems = items.filter(m => m.is_active !== false);
+      if (!activeItems.length) {
+        previewEl.innerHTML = `<span style="font-size: 0.8rem; color: var(--admin-text-muted);">Tidak ada menu aktif yang ditampilkan.</span>`;
+      } else {
+        previewEl.innerHTML = activeItems.map(m => `
+          <span style="background: var(--color-primary-subtle); color: var(--color-primary); font-size: 0.8rem; font-weight: 600; padding: 0.35rem 0.75rem; border-radius: 999px; display: inline-flex; align-items: center; gap: 0.4rem; border: 1px solid var(--color-primary);">
+            <i class="${escapeHtml(m.icon || 'fa-solid fa-link')}"></i>
+            <span>${escapeHtml(m.label)}</span>
+            <small style="opacity: 0.7; font-size: 0.7rem;">(${escapeHtml(m.href)})</small>
+          </span>
+        `).join('');
+      }
+    }
+
+    if (!tbody) return;
+
+    if (!items.length) {
+      tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--admin-text-muted); padding: 2rem;">Belum ada menu navigasi. Klik "Tambah Menu Baru".</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = items.map((m, index) => {
+      const isActive = m.is_active !== false;
+      return `
+        <tr>
+          <td>
+            <div style="display: flex; align-items: center; gap: 0.35rem;">
+              <span class="table-badge" style="background: var(--admin-bg-base); border: 1px solid var(--admin-card-border); font-weight: 700; min-width: 26px; text-align: center;">${m.order || (index + 1)}</span>
+              <button type="button" class="btn-action move" onclick="AdminApp.moveItem('nav_menus', '${m.id}', 'up')" title="Pindah Naik" ${index === 0 ? 'disabled' : ''}>
+                <i class="fa-solid fa-arrow-up"></i>
+              </button>
+              <button type="button" class="btn-action move" onclick="AdminApp.moveItem('nav_menus', '${m.id}', 'down')" title="Pindah Turun" ${index === items.length - 1 ? 'disabled' : ''}>
+                <i class="fa-solid fa-arrow-down"></i>
+              </button>
+            </div>
+          </td>
+          <td style="font-size: 1.15rem; color: var(--color-primary); text-align: center;">
+            <i class="${escapeHtml(m.icon || 'fa-solid fa-link')}"></i>
+          </td>
+          <td><strong>${escapeHtml(m.label)}</strong></td>
+          <td><code>${escapeHtml(m.href)}</code></td>
+          <td>
+            <button type="button" class="table-badge ${isActive ? 'bg-success text-white' : 'bg-secondary text-white'}" onclick="AdminApp.toggleNavMenuStatus('${m.id}')" style="cursor: pointer; border: none; font-size: 0.75rem; padding: 0.35rem 0.65rem;" title="Klik untuk beralih aktif/sembunyi">
+              <i class="fa-solid ${isActive ? 'fa-check' : 'fa-eye-slash'}"></i> ${isActive ? 'Aktif' : 'Disembunyikan'}
+            </button>
+          </td>
+          <td>
+            <div class="table-actions">
+              <button type="button" class="btn-action edit" onclick="AdminApp.editItem('nav_menus', '${m.id}')" title="Ubah Menu">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button type="button" class="btn-action delete" onclick="AdminApp.deleteItem('nav_menus', '${m.id}')" title="Hapus Menu">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function toggleNavMenuStatus(id) {
+    let items = DB.getSection('nav_menus') || [];
+    const item = items.find(x => String(x.id) === String(id));
+    if (!item) return;
+
+    item.is_active = !item.is_active;
+    DB.setSection('nav_menus', items);
+    renderNavMenusTable();
+    showToast(`Status menu "${item.label}" sekarang ${item.is_active ? 'Aktif' : 'Disembunyikan'}!`, 'info', 2000);
+
+    if (DB.getGASUrl()) {
+      DB.syncToGoogleSheets().catch(err => console.warn('Sync error:', err));
+    }
+  }
+
+  /* --------------------------------------------------
+     7B. PENDAMPINGAN & FILOSOFI PENDIDIKAN (CONFIG)
+     -------------------------------------------------- */
+  function initPendampinganConfig() {
+    const form = document.getElementById('form-pendampingan-config');
+    if (!form) return;
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const updatedConfig = Object.assign({}, DB.getSection('config'));
+
+      formData.forEach((val, key) => {
+        updatedConfig[key] = val.trim();
+      });
+
+      DB.setSection('config', updatedConfig);
+      showToast('Teks & pilar pendampingan berhasil disimpan!', 'success');
+
+      if (DB.getGASUrl()) {
+        DB.syncToGoogleSheets().then(res => {
+          if (res.success) showToast('Perubahan pendampingan berhasil disimpan ke Google Sheets!', 'success');
+        });
+      }
+    });
+  }
+
+  function populatePendampinganForm() {
+    const form = document.getElementById('form-pendampingan-config');
+    const config = DB.getSection('config');
+    if (!form || !config) return;
+
+    for (const key in config) {
+      const input = form.elements[key];
+      if (input) {
+        input.value = config[key] || '';
+      }
     }
   }
 
@@ -894,6 +1047,96 @@ const AdminApp = (function () {
         </tr>
       `).join('');
     }
+  }
+
+  /* --------------------------------------------------
+     13B. PENGEMBANGAN DIRI & SERTIFIKASI (CRUD)
+     -------------------------------------------------- */
+  function initPelatihanCRUD() {
+    const btnAdd = document.getElementById('btn-add-pelatihan');
+    if (btnAdd) {
+      btnAdd.addEventListener('click', () => {
+        openCrudModal('pelatihan', null);
+      });
+    }
+
+    const searchInput = document.getElementById('search-pelatihan-admin');
+    const catSelect = document.getElementById('filter-pelatihan-category-admin');
+    if (searchInput) {
+      searchInput.addEventListener('input', () => renderPelatihanTable());
+    }
+    if (catSelect) {
+      catSelect.addEventListener('change', () => renderPelatihanTable());
+    }
+  }
+
+  function renderPelatihanTable() {
+    const tbody = document.getElementById('table-pelatihan-body');
+    if (!tbody) return;
+
+    let items = DB.getSection('pelatihan') || [];
+
+    const searchInput = document.getElementById('search-pelatihan-admin');
+    const catSelect = document.getElementById('filter-pelatihan-category-admin');
+    const q = searchInput ? searchInput.value.toLowerCase().trim() : '';
+    const cat = catSelect ? catSelect.value : 'all';
+
+    if (cat !== 'all') {
+      items = items.filter(x => (x.category || '').toLowerCase() === cat.toLowerCase());
+    }
+    if (q) {
+      items = items.filter(x => 
+        (x.title || '').toLowerCase().includes(q) ||
+        (x.organizer || '').toLowerCase().includes(q) ||
+        (x.desc || '').toLowerCase().includes(q) ||
+        (Array.isArray(x.skills) ? x.skills.join(' ') : (x.skills || '')).toLowerCase().includes(q)
+      );
+    }
+
+    if (!items.length) {
+      tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--admin-text-muted); padding: 2rem;">Belum ada riwayat pelatihan/sertifikasi yang cocok.</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = items.map((p, index) => {
+      const skills = Array.isArray(p.skills) ? p.skills : (typeof p.skills === 'string' ? p.skills.split('|') : []);
+      const skillsBadges = skills.map(s => `<span class="table-badge" style="background: var(--admin-bg-base); border: 1px solid var(--admin-card-border); font-size: 0.725rem; margin: 2px;">${escapeHtml(s)}</span>`).join('');
+      
+      const hasCert = p.certificateUrl && p.certificateUrl !== '#';
+      const certDisplay = hasCert 
+        ? `<button type="button" class="btn-topbar-action" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;" onclick="AdminApp.viewPdf('${escapeHtml(p.certificateUrl)}', '${escapeHtml(p.certificateFile || p.title)}')"><i class="fa-solid fa-file-pdf text-danger"></i> Lihat</button>`
+        : `<span style="color: var(--admin-text-muted); font-size: 0.75rem;">-</span>`;
+
+      return `
+        <tr>
+          <td><span class="table-badge" style="background: var(--color-primary-subtle); color: var(--color-primary);">${escapeHtml(p.period || '-')}</span></td>
+          <td>
+            <strong>${escapeHtml(p.title)}</strong><br>
+            <small style="color: var(--admin-text-muted);"><i class="fa-solid fa-building-columns"></i> ${escapeHtml(p.organizer || '-')}</small>
+          </td>
+          <td><span class="table-badge" style="background: var(--color-purple-subtle); color: var(--color-purple);">${escapeHtml(p.category || 'diklat')}</span></td>
+          <td><strong>${escapeHtml(p.jp || '-')}</strong></td>
+          <td style="max-width: 200px;">${skillsBadges || '-'}</td>
+          <td>${certDisplay}</td>
+          <td>
+            <div class="table-actions">
+              <button type="button" class="btn-action move" onclick="AdminApp.moveItem('pelatihan', '${p.id}', 'up')" title="Pindah Naik" ${index === 0 ? 'disabled' : ''}>
+                <i class="fa-solid fa-arrow-up"></i>
+              </button>
+              <button type="button" class="btn-action move" onclick="AdminApp.moveItem('pelatihan', '${p.id}', 'down')" title="Pindah Turun" ${index === items.length - 1 ? 'disabled' : ''}>
+                <i class="fa-solid fa-arrow-down"></i>
+              </button>
+              <button type="button" class="btn-action edit" onclick="AdminApp.editItem('pelatihan', '${p.id}')" title="Ubah Pelatihan">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button type="button" class="btn-action delete" onclick="AdminApp.deleteItem('pelatihan', '${p.id}')" title="Hapus Pelatihan">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
   }
 
   /* --------------------------------------------------
@@ -1591,6 +1834,99 @@ const AdminApp = (function () {
           <div class="form-group">
             <label class="form-label">Deskripsi Aktivitas & Pencapaian</label>
             <textarea class="form-control" name="desc" rows="3" required>${escapeHtml(item ? item.desc : '')}</textarea>
+          </div>
+        `;
+        break;
+
+      case 'nav_menus':
+        modalTitleText = isEdit ? 'Ubah Menu Navigasi' : 'Tambah Menu Navigasi Baru';
+        formHtml = `
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Label Nama Menu</label>
+              <input type="text" class="form-control" name="label" placeholder="Contoh: Beranda, Modul Ajar" value="${escapeHtml(item ? item.label : '')}" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tautan / Target Anchor</label>
+              <input type="text" class="form-control" name="href" placeholder="#beranda atau https://..." value="${escapeHtml(item ? item.href : '#')}" required>
+              <small style="color: var(--admin-text-muted); font-size: 0.75rem;">Saran: #beranda, #pendampingan, #kompetensi, #modul, #portofolio, #pelatihan, #kontak</small>
+            </div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Ikon FontAwesome</label>
+              <input type="text" class="form-control" name="icon" placeholder="fa-solid fa-house" value="${escapeHtml(item ? item.icon : 'fa-solid fa-link')}" required>
+              <small style="color: var(--admin-text-muted); font-size: 0.75rem;">Gunakan class FontAwesome 6 (fa-solid fa-...)</small>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Urutan Tampil (Nomor)</label>
+              <input type="number" class="form-control" name="order" min="1" max="99" value="${item ? item.order : items.length + 1}" required>
+            </div>
+          </div>
+          <div class="form-group" style="margin-top: 0.5rem; background: var(--admin-bg-base); padding: 0.75rem; border-radius: 0.5rem; border: 1px solid var(--admin-card-border);">
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin: 0;">
+              <input type="checkbox" name="is_active" value="true" ${!item || item.is_active !== false ? 'checked' : ''} style="width: 18px; height: 18px;">
+              <span style="font-weight: 600; color: var(--admin-text-main);">Tampilkan menu ini di website publik (Status Aktif)</span>
+            </label>
+          </div>
+        `;
+        break;
+
+      case 'pelatihan':
+        modalTitleText = isEdit ? 'Ubah Riwayat Pelatihan & Sertifikasi' : 'Tambah Pelatihan Baru';
+        const skillsString = item && Array.isArray(item.skills) ? item.skills.join(', ') : (item && item.skills ? item.skills : '');
+        formHtml = `
+          <div class="form-group">
+            <label class="form-label">Nama Pelatihan / Sertifikasi / Workshop</label>
+            <input type="text" class="form-control" name="title" placeholder="Contoh: Pendidikan Guru Penggerak (PPGP)" value="${escapeHtml(item ? item.title : '')}" required>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Kategori</label>
+              <select class="form-control" name="category" required>
+                <option value="kepemimpinan" ${item && item.category === 'kepemimpinan' ? 'selected' : ''}>Kepemimpinan Guru / Penggerak</option>
+                <option value="sertifikasi" ${item && item.category === 'sertifikasi' ? 'selected' : ''}>Sertifikasi Global & Industri</option>
+                <option value="diklat" ${item && item.category === 'diklat' ? 'selected' : ''}>Diklat Teknis Vokasi</option>
+                <option value="ai" ${item && item.category === 'ai' ? 'selected' : ''}>Kurikulum, AI & EdTech</option>
+                <option value="workshop" ${item && item.category === 'workshop' ? 'selected' : ''}>Workshop / Seminar</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Penyelenggara / Lembaga</label>
+              <input type="text" class="form-control" name="organizer" placeholder="Contoh: Kemendikbudristek RI / Google" value="${escapeHtml(item ? item.organizer : '')}" required>
+            </div>
+          </div>
+          <div class="form-grid-3">
+            <div class="form-group">
+              <label class="form-label">Tahun / Periode</label>
+              <input type="text" class="form-control" name="period" placeholder="2023 - 2024 atau 2024" value="${escapeHtml(item ? item.period : '')}" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Beban Jam Pelajaran (JP)</label>
+              <input type="text" class="form-control" name="jp" placeholder="310 JP atau 36 JP" value="${escapeHtml(item ? item.jp : '')}">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Label Status / Badge</label>
+              <input type="text" class="form-control" name="badge" placeholder="Kemendikbudristek" value="${escapeHtml(item ? item.badge : '')}">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Deskripsi Ringkas Materi & Dampak Pembelajaran</label>
+            <textarea class="form-control" name="desc" rows="3" placeholder="Uraikan fokus pelatihan dan kompetensi yang diperoleh..." required>${escapeHtml(item ? item.desc : '')}</textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Keterampilan / Topik Utama (Pisahkan dengan tanda koma)</label>
+            <input type="text" class="form-control" name="skills" placeholder="Coaching TIRTA, Budaya Positif, Pembelajaran Berdiferensiasi" value="${escapeHtml(skillsString)}">
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Nama Berkas Sertifikat</label>
+              <input type="text" class="form-control" name="certificateFile" placeholder="Sertifikat_Pelatihan.pdf" value="${escapeHtml(item ? item.certificateFile : '')}">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tautan Berkas (Link Drive / URL / Direct)</label>
+              <input type="text" class="form-control" name="certificateUrl" placeholder="https://drive.google.com/... atau #" value="${escapeHtml(item ? item.certificateUrl : '#')}">
+            </div>
           </div>
         `;
         break;
@@ -2341,12 +2677,30 @@ const AdminApp = (function () {
       newItem.fileNotice = finalNotice || (newItem.title ? `${newItem.title}.pdf` : 'Modul_Ajar.pdf');
     }
 
+    // Penanganan khusus Menu Navigasi
+    if (type === 'nav_menus') {
+      newItem.is_active = (formData.get('is_active') === 'true' || formData.get('is_active') === 'on');
+      newItem.order = Number(formData.get('order') || (items.length + 1));
+    }
+
+    // Penanganan khusus Pelatihan & Sertifikasi
+    if (type === 'pelatihan') {
+      const skillsRaw = formData.get('skills') || '';
+      newItem.skills = skillsRaw.split(/[,|]/).map(s => s.trim()).filter(Boolean);
+      newItem.certificateUrl = (formData.get('certificateUrl') || '#').trim();
+      newItem.certificateFile = (formData.get('certificateFile') || '').trim();
+    }
+
     if (isEdit) {
       items = items.map(x => x.id === id ? Object.assign({}, x, newItem) : x);
       showToast('Data berhasil diperbarui!', 'success');
     } else {
       items.push(newItem);
       showToast('Data baru berhasil ditambahkan!', 'success');
+    }
+
+    if (type === 'nav_menus') {
+      items.sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
     }
 
     DB.setSection(type, items);
@@ -2383,6 +2737,13 @@ const AdminApp = (function () {
       items[index + 1] = temp;
     } else {
       return;
+    }
+
+    // Jika menu navigasi, sinkronkan nilai order numerik
+    if (type === 'nav_menus') {
+      items.forEach((m, idx) => {
+        m.order = idx + 1;
+      });
     }
 
     DB.setSection(type, items);
@@ -2474,19 +2835,37 @@ const AdminApp = (function () {
     return cleaned;
   }
 
-  function viewPdf(id) {
-    const items = DB.getSection('prestasi') || [];
-    const item = items.find(x => x.id === id);
-    if (!item || !item.pdfUrl) {
-      showToast('Berkas sertifikat belum tersedia atau belum diunggah untuk prestasi ini.', 'warning');
+  function viewPdf(targetOrId, customName) {
+    if (!targetOrId) {
+      showToast('Berkas dokumen belum tersedia.', 'warning');
       return;
     }
-    const isImg = (item.pdfFileName && /\.(jpe?g|png|webp|gif|bmp|svg)$/i.test(item.pdfFileName)) || (item.pdfUrl && item.pdfUrl.startsWith('data:image/'));
-    const defaultName = isImg ? `${item.title || 'Sertifikat'}.jpg` : `${item.title || 'Sertifikat'}.pdf`;
+    let url = targetOrId;
+    let name = customName || 'Dokumen';
+
+    // Jika targetOrId adalah ID dari prestasi
+    if (!targetOrId.startsWith('data:') && !targetOrId.startsWith('indexeddb:') && !targetOrId.startsWith('http') && targetOrId !== '#') {
+      const items = DB.getSection('prestasi') || [];
+      const item = items.find(x => x.id === targetOrId);
+      if (!item || !item.pdfUrl) {
+        showToast('Berkas sertifikat belum tersedia atau belum diunggah untuk data ini.', 'warning');
+        return;
+      }
+      url = item.pdfUrl;
+      const isImg = (item.pdfFileName && /\.(jpe?g|png|webp|gif|bmp|svg)$/i.test(item.pdfFileName)) || (item.pdfUrl && item.pdfUrl.startsWith('data:image/'));
+      const defaultName = isImg ? `${item.title || 'Sertifikat'}.jpg` : `${item.title || 'Sertifikat'}.pdf`;
+      name = item.pdfFileName || defaultName;
+    }
+
+    if (url === '#') {
+      showToast('Tautan berkas belum diisi.', 'info');
+      return;
+    }
+
     if (window.openPdfDocument) {
-      window.openPdfDocument(item.pdfUrl, item.pdfFileName || defaultName);
+      window.openPdfDocument(url, name);
     } else {
-      window.open(item.pdfUrl, '_blank');
+      window.open(url, '_blank');
     }
   }
 
@@ -2495,6 +2874,7 @@ const AdminApp = (function () {
     editItem,
     moveItem,
     deleteItem,
+    toggleNavMenuStatus,
     toggleMessageRead,
     deleteMessageItem,
     showToast,

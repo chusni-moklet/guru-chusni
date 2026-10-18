@@ -55,12 +55,14 @@ function applyDynamicData() {
   const db = DB.getAll();
   if (!db) return;
 
+  try { renderDynamicNav(db.nav_menus); } catch (e) { console.error("Error renderDynamicNav:", e); }
   try { renderDynamicConfig(db.config); } catch (e) { console.error("Error renderDynamicConfig:", e); }
   try { renderDynamicModul(db.modul); } catch (e) { console.error("Error renderDynamicModul:", e); }
   try { renderDynamicPrestasi(db.prestasi); } catch (e) { console.error("Error renderDynamicPrestasi:", e); }
   try { renderDynamicKarya(db.karya); } catch (e) { console.error("Error renderDynamicKarya:", e); }
   try { renderDynamicGaleri(db.galeri); } catch (e) { console.error("Error renderDynamicGaleri:", e); }
   try { renderDynamicKompetensi(db.kompetensi, db.edtech); } catch (e) { console.error("Error renderDynamicKompetensi:", e); }
+  try { renderDynamicPelatihan(db.pelatihan); } catch (e) { console.error("Error renderDynamicPelatihan:", e); }
   try { renderDynamicTimeline(db.timeline); } catch (e) { console.error("Error renderDynamicTimeline:", e); }
 
   // Inisialisasi ulang interaksi yang bergantung pada DOM baru
@@ -186,14 +188,76 @@ function renderDynamicConfig(cfg) {
     if (cfg.stat_certs) statNumbers[3].textContent = cfg.stat_certs;
   }
 
-  // About Section Bio & Quotes
-  const aboutQuote = document.querySelector('.about-section .section-desc em');
-  if (aboutQuote && cfg.philosophy_quote) aboutQuote.textContent = `"${cfg.philosophy_quote}"`;
+  // Pendampingan Section Subtitle, Title, Desc & Quotes
+  const pendampinganSub = document.querySelector('#pendampingan .section-subtitle');
+  if (pendampinganSub && cfg.pendampingan_subtitle) {
+    pendampinganSub.innerHTML = `<i class="fa-solid fa-people-arrows"></i> ${escapeHtml(cfg.pendampingan_subtitle)}`;
+  }
+
+  const pendampinganTitle = document.querySelector('#pendampingan .section-title');
+  if (pendampinganTitle && cfg.pendampingan_title) {
+    pendampinganTitle.textContent = cfg.pendampingan_title;
+  }
+
+  const pendampinganDesc = document.querySelector('#pendampingan .section-desc');
+  if (pendampinganDesc) {
+    if (cfg.pendampingan_desc) {
+      pendampinganDesc.textContent = cfg.pendampingan_desc;
+    } else if (cfg.philosophy_quote) {
+      pendampinganDesc.innerHTML = `Mewujudkan filosofi Ki Hajar Dewantara: <em>"${escapeHtml(cfg.philosophy_quote)}"</em> melalui pendampingan akademik personal, pembinaan bakat talenta murid, dan kepemimpinan pembelajaran Guru Penggerak.`;
+    }
+  }
 
   const bioTexts = document.querySelectorAll('.bio-card .bio-text');
   if (bioTexts.length >= 2) {
     if (cfg.bio_text1) bioTexts[0].textContent = cfg.bio_text1;
     if (cfg.bio_text2) bioTexts[1].textContent = cfg.bio_text2;
+  }
+
+  // 3 Pilar Utama di Section Pendampingan
+  const pillarItems = document.querySelectorAll('#pendampingan .pillars-list .pillar-item');
+  if (pillarItems.length >= 3) {
+    // Pilar 1
+    if (cfg.pillar1_title) {
+      const h4 = pillarItems[0].querySelector('h4');
+      if (h4) h4.textContent = cfg.pillar1_title;
+    }
+    if (cfg.pillar1_desc) {
+      const p = pillarItems[0].querySelector('p');
+      if (p) p.textContent = cfg.pillar1_desc;
+    }
+    if (cfg.pillar1_icon) {
+      const icon = pillarItems[0].querySelector('.pillar-icon i');
+      if (icon) icon.className = cfg.pillar1_icon;
+    }
+
+    // Pilar 2
+    if (cfg.pillar2_title) {
+      const h4 = pillarItems[1].querySelector('h4');
+      if (h4) h4.textContent = cfg.pillar2_title;
+    }
+    if (cfg.pillar2_desc) {
+      const p = pillarItems[1].querySelector('p');
+      if (p) p.textContent = cfg.pillar2_desc;
+    }
+    if (cfg.pillar2_icon) {
+      const icon = pillarItems[1].querySelector('.pillar-icon i');
+      if (icon) icon.className = cfg.pillar2_icon;
+    }
+
+    // Pilar 3
+    if (cfg.pillar3_title) {
+      const h4 = pillarItems[2].querySelector('h4');
+      if (h4) h4.textContent = cfg.pillar3_title;
+    }
+    if (cfg.pillar3_desc) {
+      const p = pillarItems[2].querySelector('p');
+      if (p) p.textContent = cfg.pillar3_desc;
+    }
+    if (cfg.pillar3_icon) {
+      const icon = pillarItems[2].querySelector('.pillar-icon i');
+      if (icon) icon.className = cfg.pillar3_icon;
+    }
   }
 
   // Biodata Table
@@ -669,6 +733,110 @@ function renderDynamicTimeline(timelineList) {
   `).join('');
 }
 
+function renderDynamicNav(navMenus) {
+  if (!navMenus || !navMenus.length) return;
+
+  const activeMenus = navMenus
+    .filter(m => m.is_active !== false)
+    .sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
+
+  if (!activeMenus.length) return;
+
+  // 1. Desktop & Mobile Drawer Navbar
+  const navList = document.querySelector('#nav-menu .nav-list');
+  if (navList) {
+    const currentActiveLink = navList.querySelector('.nav-link.active');
+    const currentHref = currentActiveLink ? currentActiveLink.getAttribute('href') : '#beranda';
+
+    navList.innerHTML = activeMenus.map((m, idx) => {
+      const isActive = m.href === currentHref || (!currentActiveLink && idx === 0);
+      return `
+        <li>
+          <a href="${escapeHtml(m.href)}" class="nav-link ${isActive ? 'active' : ''}">
+            <i class="${escapeHtml(m.icon || 'fa-solid fa-link')}"></i> ${escapeHtml(m.label)}
+          </a>
+        </li>
+      `;
+    }).join('');
+  }
+
+  // 2. Footer Nav List
+  const footerList = document.getElementById('footer-nav-list');
+  if (footerList) {
+    footerList.innerHTML = activeMenus.map(m => `
+      <li>
+        <a href="${escapeHtml(m.href)}">
+          <i class="fa-solid fa-chevron-right"></i> ${escapeHtml(m.label)}
+        </a>
+      </li>
+    `).join('');
+  }
+}
+
+function renderDynamicPelatihan(pelatihanList) {
+  const container = document.getElementById('training-grid');
+  if (!container || !pelatihanList || !pelatihanList.length) return;
+
+  const categoryColorMap = {
+    'kepemimpinan': { iconBg: 'bg-purple-subtle text-purple', icon: 'fa-solid fa-user-graduate', badgeClass: 'badge-status badge-verified' },
+    'sertifikasi': { iconBg: 'bg-blue-subtle text-blue', icon: 'fa-solid fa-id-card-clip', badgeClass: 'badge-status badge-gold' },
+    'diklat': { iconBg: 'bg-emerald-subtle text-emerald', icon: 'fa-solid fa-chalkboard-user', badgeClass: 'badge-status badge-emerald' },
+    'ai': { iconBg: 'bg-cyan-subtle text-cyan', icon: 'fa-solid fa-wand-magic-sparkles', badgeClass: 'badge-status badge-cyan' },
+    'workshop': { iconBg: 'bg-amber-subtle text-amber', icon: 'fa-solid fa-users', badgeClass: 'badge-status badge-gold' }
+  };
+
+  container.innerHTML = pelatihanList.map(p => {
+    const cat = (p.category || 'diklat').toLowerCase();
+    const style = categoryColorMap[cat] || { iconBg: 'bg-blue-subtle text-blue', icon: 'fa-solid fa-certificate', badgeClass: 'badge-status badge-verified' };
+    
+    const skills = Array.isArray(p.skills) ? p.skills : (typeof p.skills === 'string' ? p.skills.split('|') : []);
+    const skillsHtml = skills.map(s => `<span class="skill-pill">${escapeHtml(s.trim())}</span>`).join('');
+
+    const hasCert = p.certificateUrl && p.certificateUrl !== '#';
+    const certBtn = hasCert ? `
+      <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px dashed var(--border-light);">
+        <button type="button" class="btn btn-sm btn-outline-primary" style="font-size: 0.775rem; padding: 0.3rem 0.7rem; border-radius: 999px; cursor: pointer;" onclick="window.openPdfDocument ? window.openPdfDocument('${escapeHtml(p.certificateUrl)}', '${escapeHtml(p.certificateFile || p.title)}') : window.open('${escapeHtml(p.certificateUrl)}', '_blank')">
+          <i class="fa-solid fa-file-pdf text-danger"></i> Unduh / Buka Sertifikat
+        </button>
+      </div>
+    ` : '';
+
+    return `
+      <article class="training-card" data-category="${escapeHtml(cat)}">
+        <div class="training-card-header">
+          <div class="training-icon-box ${style.iconBg}">
+            <i class="${style.icon}"></i>
+          </div>
+          <div class="training-badge-box">
+            <span class="${style.badgeClass}"><i class="fa-solid fa-circle-check"></i> ${escapeHtml(p.badge || 'Kompetensi')}</span>
+            <span class="training-year"><i class="fa-regular fa-calendar"></i> ${escapeHtml(p.period || '-')}</span>
+          </div>
+        </div>
+        <div class="training-card-body">
+          <div class="training-meta-tags">
+            ${p.jp ? `<span class="training-tag"><i class="fa-solid fa-clock"></i> ${escapeHtml(p.jp)}</span>` : ''}
+            ${p.organizer ? `<span class="training-tag"><i class="fa-solid fa-building-columns"></i> ${escapeHtml(p.organizer)}</span>` : ''}
+          </div>
+          <h3 class="training-title">${escapeHtml(p.title)}</h3>
+          <p class="training-organizer">${escapeHtml(p.organizer || '')}</p>
+          <p class="training-desc">
+            ${escapeHtml(p.desc || '')}
+          </p>
+        </div>
+        <div class="training-card-footer">
+          <div class="training-skills">
+            ${skillsHtml}
+          </div>
+          ${certBtn}
+        </div>
+      </article>
+    `;
+  }).join('');
+
+  // Re-inisialisasi filter kategori pelatihan
+  initTrainingFilters();
+}
+
 /* --------------------------------------------------
    1. DARK / LIGHT THEME TOGGLE
    -------------------------------------------------- */
@@ -696,7 +864,6 @@ function initMobileNav() {
   const toggleBtn = document.getElementById('mobile-toggle');
   const navMenu = document.getElementById('nav-menu');
   const overlay = document.getElementById('mobile-overlay');
-  const navLinks = document.querySelectorAll('.nav-link');
 
   if (!toggleBtn || !navMenu || !overlay) return;
 
@@ -712,12 +879,11 @@ function initMobileNav() {
   toggleBtn.addEventListener('click', () => toggleMenu());
   overlay.addEventListener('click', () => toggleMenu(false));
 
-  navLinks.forEach(link => {
-    link.addEventListener('click', () => {
-      if (navMenu.classList.contains('open')) {
-        toggleMenu(false);
-      }
-    });
+  // Event delegation untuk link navigasi (menutup drawer saat link diklik)
+  navMenu.addEventListener('click', (e) => {
+    if (e.target.closest('.nav-link') && navMenu.classList.contains('open')) {
+      toggleMenu(false);
+    }
   });
 }
 

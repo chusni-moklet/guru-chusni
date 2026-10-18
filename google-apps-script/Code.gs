@@ -26,6 +26,8 @@ var SHEETS = {
   TIMELINE: "Timeline",
   FAQ: "FAQ",
   PESAN_MASUK: "PesanMasuk",
+  NAV_MENUS: "NavMenus",
+  PELATIHAN: "Pelatihan",
   USERS: "Users"
 };
 
@@ -271,6 +273,37 @@ function setupDatabase() {
     ]);
   }
 
+  // 13. Sheet NavMenus (Menu Navigasi Website)
+  var sheetNav = getOrCreateSheet(ss, SHEETS.NAV_MENUS);
+  if (sheetNav.getLastRow() <= 1) {
+    sheetNav.clear();
+    sheetNav.appendRow(["ID", "Label", "Href", "Icon", "IsActive", "Order"]);
+    var defaultNav = [
+      ["nav-1", "Beranda", "#beranda", "fa-solid fa-house", "TRUE", 1],
+      ["nav-2", "Pendampingan", "#pendampingan", "fa-solid fa-people-arrows", "TRUE", 2],
+      ["nav-3", "Kompetensi", "#kompetensi", "fa-solid fa-chalkboard-user", "TRUE", 3],
+      ["nav-4", "Modul Ajar", "#modul", "fa-solid fa-book-open", "TRUE", 4],
+      ["nav-5", "Portofolio", "#portofolio", "fa-solid fa-briefcase", "TRUE", 5],
+      ["nav-6", "Pengembangan Diri", "#pengembangan-diri", "fa-solid fa-graduation-cap", "TRUE", 6],
+      ["nav-7", "Kontak", "#kontak", "fa-solid fa-envelope", "TRUE", 7]
+    ];
+    defaultNav.forEach(function(row) { sheetNav.appendRow(row); });
+  }
+
+  // 14. Sheet Pelatihan (Riwayat Pengembangan Diri & Sertifikasi)
+  var sheetPelatihan = getOrCreateSheet(ss, SHEETS.PELATIHAN);
+  if (sheetPelatihan.getLastRow() <= 1) {
+    sheetPelatihan.clear();
+    sheetPelatihan.appendRow(["ID", "Judul", "Kategori", "Penyelenggara", "Periode", "JP", "Badge", "Deskripsi", "Skills", "CertificateUrl", "CertificateFile"]);
+    var defaultPelatihan = [
+      ["tr-1", "Pendidikan Guru Penggerak (PPGP) Angkatan 9", "kepemimpinan", "Kementerian Pendidikan, Kebudayaan, Riset, dan Teknologi RI", "2023 - 2024", "310 JP", "Kemendikbudristek", "Program kepemimpinan pembelajaran berpusat pada murid, coaching alur TIRTA, dan budaya positif.", "Coaching TIRTA|Budaya Positif|Pembelajaran Berdiferensiasi", "#", "Sertifikat_PPGP_Angkatan9.pdf"],
+      ["tr-2", "IC3 Digital Literacy Global Certification", "sertifikasi", "Certiport - A Pearson VUE Business", "Lisensi Aktif", "Global Credential", "Sertifikasi Global", "Standar internasional kecakapan komputasi dasar, komputasi awan, dan etika digital global.", "Computing Fundamentals|Key Applications|Living Online", "#", "Sertifikat_IC3_Digital_Literacy.pdf"],
+      ["tr-3", "Diklat Upskilling & Reskilling Guru SMK Berstandar Industri", "diklat", "BBPPMPV BMTI Kemendikbudristek", "2023", "90 JP", "Industri Standard", "Pelatihan kejuruan teknologi informasi tingkat lanjut dan penyelarasan kurikulum vokasi masa depan.", "Vokasi Teknologi|Penyelarasan Kurikulum|Standard Industri", "#", "Sertifikat_Upskilling_BMTI.pdf"],
+      ["tr-4", "Pemanfaatan Generative AI dalam Efisiensi Bahan Ajar & Asesmen HOTS", "ai", "Google for Education Partner & Komunitas Guru Inovatif", "2024", "36 JP", "Tren Teknologi", "Penerapan prompt engineering untuk diferensiasi konten KBM dan perancangan asesmen HOTS.", "Prompt Engineering|Asesmen HOTS|Automasi Guru", "#", "Sertifikat_Generative_AI.pdf"]
+    ];
+    defaultPelatihan.forEach(function(row) { sheetPelatihan.appendRow(row); });
+  }
+
   return "Setup Berhasil! Semua sheet database telah dibuat.";
 }
 
@@ -300,6 +333,8 @@ function doGet(e) {
         edtech: getSheetDataAsObjects(ss, SHEETS.EDTECH),
         timeline: getSheetDataAsObjects(ss, SHEETS.TIMELINE),
         faq: getSheetDataAsObjects(ss, SHEETS.FAQ),
+        nav_menus: getSheetDataAsObjects(ss, SHEETS.NAV_MENUS),
+        pelatihan: getSheetDataAsObjects(ss, SHEETS.PELATIHAN),
         pesanMasuk: getSheetDataAsObjects(ss, SHEETS.PESAN_MASUK)
       };
 
@@ -454,6 +489,8 @@ function doPost(e) {
       if (allData.edtech) saveSectionData(ss, SHEETS.EDTECH, allData.edtech);
       if (allData.timeline) saveSectionData(ss, SHEETS.TIMELINE, allData.timeline);
       if (allData.faq) saveSectionData(ss, SHEETS.FAQ, allData.faq);
+      if (allData.nav_menus) saveSectionData(ss, SHEETS.NAV_MENUS, allData.nav_menus);
+      if (allData.pelatihan) saveSectionData(ss, SHEETS.PELATIHAN, allData.pelatihan);
 
       return jsonResponse({ status: "success", message: "Seluruh data profil & database berhasil disimpan ke Spreadsheet!" });
     }
