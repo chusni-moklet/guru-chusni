@@ -16,6 +16,7 @@ function initApp() {
   initContactForm();
   initDiscreetAdminAccess();
   initPortfolioTabs();
+  initKaryaToolbarEvents();
   initTrainingFilters();
 
   // Integrasi Dynamic Database (LocalStorage + Google Apps Script)
@@ -70,6 +71,7 @@ function applyDynamicData() {
   try { initResourceModal(); } catch (e) {}
   try { initGalleryFilterAndLightbox(); } catch (e) {}
   try { initPortfolioTabs(); } catch (e) {}
+  try { initKaryaToolbarEvents(); } catch (e) {}
 }
 
 function renderDynamicConfig(cfg) {
@@ -462,105 +464,280 @@ function renderAwardsToggleButton(toggleWrap, total, limit) {
 
 let isKaryaExpanded = false;
 
-function renderDynamicKarya(karyaList) {
-  const container = document.getElementById('karya-grid');
-  if (!container) return;
-  if (!karyaList || !karyaList.length) {
-    karyaList = (window.DB && DB.getSection('karya')) || [];
+let currentKaryaCategory = 'all';
+let currentKaryaSearch = '';
+let karyaDataCache = [];
+
+function buildKaryaCardHTML(item, isFeatured = false) {
+  const colorClass = item.colorClass || 'blue';
+  const featuredClass = isFeatured ? 'karya-card-featured' : '';
+  
+  // Creators avatar stack
+  let creatorsHTML = '';
+  if (Array.isArray(item.creators)) {
+    creatorsHTML = item.creators.map(c => {
+      if (c.type === 'avatar' && c.img) {
+        return `<img src="${escapeHtml(c.img)}" alt="${escapeHtml(c.name || 'Siswa')}" class="karya-avatar-img" title="${escapeHtml(c.name || '')}" loading="lazy">`;
+      } else if (c.type === 'badge' && c.text) {
+        const badgeSlug = (c.text || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+        return `<span class="karya-badge-circle badge-${badgeSlug}">${escapeHtml(c.text)}</span>`;
+      } else if (c.type === 'count' && c.text) {
+        return `<span class="karya-avatar-count">${escapeHtml(c.text)}</span>`;
+      }
+      return '';
+    }).join('');
   }
-  if (!karyaList || !karyaList.length) return;
 
-  const LIMIT = 6;
-  const total = karyaList.length;
-  const hasMore = total > LIMIT;
-
-  container.innerHTML = karyaList.map((item, index) => {
-    const isExtra = index >= LIMIT;
-    const cardStyle = (isExtra && !isKaryaExpanded) ? 'display: none;' : '';
-    const extraClass = isExtra ? 'project-card-extra' : '';
-
-    return `
-    <article class="project-card ${extraClass}" ${cardStyle ? `style="${cardStyle}"` : ''}>
-      <div class="project-thumb-box">
-        <img src="${escapeHtml(item.thumbnail || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80')}" alt="${escapeHtml(item.title || 'Website')}" loading="lazy">
-        <div class="project-thumb-badge"><i class="fa-solid fa-globe"></i> Website</div>
+  return `
+    <article class="karya-card accent-${colorClass} ${featuredClass}" data-id="${item.id || ''}">
+      <div>
+        <span class="karya-category-pill pill-${colorClass}">${escapeHtml(item.category || 'Karya Siswa')}</span>
+        <h3 class="karya-card-title">${escapeHtml(item.title || '')}</h3>
+        <p class="karya-card-desc">${escapeHtml(item.desc || '')}</p>
       </div>
-      <div class="project-body">
-        <h3 class="project-title">${escapeHtml(item.title || 'Nama Website')}</h3>
-        <p class="project-desc">${escapeHtml(item.desc || '')}</p>
-        <div class="project-footer">
-          <a href="${escapeHtml(item.link || '#')}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-primary project-visit-btn">
-            <span>Kunjungi Website</span> <i class="fa-solid fa-arrow-up-right-from-square"></i>
-          </a>
+      <div class="karya-card-footer">
+        <div class="karya-avatar-stack">
+          ${creatorsHTML}
         </div>
+        <button type="button" class="karya-detail-btn" data-id="${item.id || ''}" aria-label="Lihat detail ${escapeHtml(item.title || '')}">
+          <span>Lihat detail</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
       </div>
     </article>
-    `;
-  }).join('');
-
-  // Handle Kontainer Tombol Toggle Karya (Minimize / Maximize)
-  let toggleWrap = document.getElementById('karya-toggle-wrap');
-  if (!toggleWrap) {
-    toggleWrap = document.createElement('div');
-    toggleWrap.id = 'karya-toggle-wrap';
-    toggleWrap.className = 'karya-toggle-wrap text-center';
-    container.parentNode.insertBefore(toggleWrap, container.nextSibling);
-  }
-
-  if (hasMore) {
-    toggleWrap.style.display = 'flex';
-    renderKaryaToggleButton(toggleWrap, total, LIMIT);
-  } else {
-    toggleWrap.style.display = 'none';
-    toggleWrap.innerHTML = '';
-  }
+  `;
 }
 
-function renderKaryaToggleButton(toggleWrap, total, limit) {
-  const extraCount = total - limit;
-  toggleWrap.innerHTML = `
-    <button type="button" class="btn btn-toggle-karya ${isKaryaExpanded ? 'is-expanded' : ''}" id="btn-toggle-karya" aria-expanded="${isKaryaExpanded ? 'true' : 'false'}">
-      <span class="btn-toggle-icon"><i class="fa-solid ${isKaryaExpanded ? 'fa-chevron-up' : 'fa-chevron-down'}"></i></span>
-      <span class="btn-toggle-text">${isKaryaExpanded ? 'Tampilkan Lebih Sedikit (Minimize)' : `Lihat Lebih Banyak (${extraCount} Karya Lainnya)`}</span>
-    </button>
-  `;
+function renderDynamicKarya(karyaList) {
+  if (karyaList && Array.isArray(karyaList) && karyaList.length) {
+    karyaDataCache = karyaList;
+  } else if (!karyaDataCache.length) {
+    karyaDataCache = (window.DB && DB.getSection('karya')) || [];
+  }
 
-  const btn = toggleWrap.querySelector('#btn-toggle-karya');
-  if (btn) {
-    btn.onclick = () => {
-      isKaryaExpanded = !isKaryaExpanded;
-      const extraCards = document.querySelectorAll('.project-card-extra');
+  const featuredContainer = document.getElementById('karya-featured-container');
+  const gridContainer = document.getElementById('karya-grid');
+  const counterEl = document.getElementById('karya-counter-text');
+  const emptyState = document.getElementById('karya-empty-state');
 
-      if (isKaryaExpanded) {
-        extraCards.forEach(card => {
-          card.style.display = 'flex';
-        });
-        btn.classList.add('is-expanded');
-        btn.setAttribute('aria-expanded', 'true');
-        const icon = btn.querySelector('.btn-toggle-icon i');
-        if (icon) icon.className = 'fa-solid fa-chevron-up';
-        const text = btn.querySelector('.btn-toggle-text');
-        if (text) text.textContent = 'Tampilkan Lebih Sedikit (Minimize)';
+  if (!featuredContainer && !gridContainer) return;
+
+  const totalAll = karyaDataCache.length;
+
+  // Filter based on category & search query
+  const query = (currentKaryaSearch || '').toLowerCase().trim();
+  const cat = currentKaryaCategory || 'all';
+
+  const filtered = karyaDataCache.filter(item => {
+    // 1. Category filter
+    let matchCat = true;
+    if (cat !== 'all') {
+      const slug = (item.categorySlug || '').toLowerCase();
+      const name = (item.category || '').toLowerCase();
+      if (cat === 'seni-budaya') {
+        matchCat = slug.includes('seni') || name.includes('seni');
+      } else if (cat === 'teknologi-tepat-guna') {
+        matchCat = slug.includes('teknologi') || name.includes('teknologi');
+      } else if (cat === 'produk-seni-budaya') {
+        matchCat = slug === 'produk-seni-budaya' || name.includes('produk seni');
+      } else if (cat === 'produk-kreatif') {
+        matchCat = slug.includes('kreatif') || name.includes('kreatif');
       } else {
-        extraCards.forEach(card => {
-          card.style.display = 'none';
-        });
-        btn.classList.remove('is-expanded');
-        btn.setAttribute('aria-expanded', 'false');
-        const icon = btn.querySelector('.btn-toggle-icon i');
-        if (icon) icon.className = 'fa-solid fa-chevron-down';
-        const text = btn.querySelector('.btn-toggle-text');
-        if (text) text.textContent = `Lihat Lebih Banyak (${extraCount} Karya Lainnya)`;
+        matchCat = slug === cat || name === cat;
+      }
+    }
 
-        const karyaSection = document.getElementById('karya');
-        if (karyaSection) {
-          const navHeight = 80;
-          const targetY = karyaSection.getBoundingClientRect().top + window.pageYOffset - navHeight;
-          window.scrollTo({ top: targetY, behavior: 'smooth' });
+    // 2. Search query filter
+    let matchSearch = true;
+    if (query) {
+      const t = (item.title || '').toLowerCase();
+      const d = (item.desc || '').toLowerCase();
+      const c = (item.category || '').toLowerCase();
+      matchSearch = t.includes(query) || d.includes(query) || c.includes(query);
+    }
+
+    return matchCat && matchSearch;
+  });
+
+  // Update Counter
+  if (counterEl) {
+    counterEl.textContent = `Menampilkan ${filtered.length} dari ${totalAll} karya`;
+  }
+
+  // Handle Empty State
+  if (filtered.length === 0) {
+    if (featuredContainer) {
+      featuredContainer.innerHTML = '';
+      featuredContainer.style.display = 'none';
+    }
+    if (gridContainer) {
+      gridContainer.innerHTML = '';
+      gridContainer.style.display = 'none';
+    }
+    if (emptyState) {
+      emptyState.style.display = 'block';
+    }
+    return;
+  }
+
+  if (emptyState) {
+    emptyState.style.display = 'none';
+  }
+
+  // Determine top featured card vs grid cards
+  let featuredItem = null;
+  let gridItems = [];
+
+  const featuredIndex = filtered.findIndex(k => k.featured);
+  if (featuredIndex !== -1) {
+    featuredItem = filtered[featuredIndex];
+    gridItems = filtered.filter((_, idx) => idx !== featuredIndex);
+  } else {
+    featuredItem = filtered[0];
+    gridItems = filtered.slice(1);
+  }
+
+  if (featuredContainer) {
+    featuredContainer.style.display = 'block';
+    featuredContainer.innerHTML = buildKaryaCardHTML(featuredItem, true);
+  }
+
+  if (gridContainer) {
+    gridContainer.style.display = gridItems.length ? 'grid' : 'none';
+    gridContainer.innerHTML = gridItems.map(item => buildKaryaCardHTML(item, false)).join('');
+  }
+
+  // Attach Detail Modal triggers
+  attachKaryaDetailEvents();
+}
+
+function attachKaryaDetailEvents() {
+  const detailBtns = document.querySelectorAll('.karya-detail-btn');
+  const modal = document.getElementById('karya-detail-modal');
+  if (!modal || !detailBtns.length) return;
+
+  const modalCategory = document.getElementById('modal-karya-category');
+  const modalTitle = document.getElementById('modal-karya-title');
+  const modalDesc = document.getElementById('modal-karya-desc');
+  const modalAvatarStack = document.getElementById('modal-karya-avatar-stack');
+  const modalLink = document.getElementById('modal-karya-link');
+
+  detailBtns.forEach(btn => {
+    btn.onclick = (e) => {
+      e.preventDefault();
+      const id = btn.getAttribute('data-id');
+      const item = karyaDataCache.find(k => String(k.id) === String(id));
+      if (!item) return;
+
+      const colorClass = item.colorClass || 'blue';
+      if (modalCategory) {
+        modalCategory.textContent = item.category || 'Karya Siswa';
+        modalCategory.className = `karya-category-pill pill-${colorClass}`;
+      }
+      if (modalTitle) modalTitle.textContent = item.title || '';
+      if (modalDesc) modalDesc.textContent = item.desc || '';
+      if (modalLink) {
+        modalLink.href = item.link || '#';
+        if (item.link && item.link !== '#') {
+          modalLink.style.display = 'inline-flex';
+        } else {
+          modalLink.style.display = 'none';
         }
       }
+
+      if (modalAvatarStack) {
+        let creatorsHTML = '';
+        if (Array.isArray(item.creators)) {
+          creatorsHTML = item.creators.map(c => {
+            if (c.type === 'avatar' && c.img) {
+              return `<img src="${escapeHtml(c.img)}" alt="${escapeHtml(c.name || 'Siswa')}" class="karya-avatar-img" title="${escapeHtml(c.name || '')}">`;
+            } else if (c.type === 'badge' && c.text) {
+              const badgeSlug = (c.text || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+              return `<span class="karya-badge-circle badge-${badgeSlug}">${escapeHtml(c.text)}</span>`;
+            } else if (c.type === 'count' && c.text) {
+              return `<span class="karya-avatar-count">${escapeHtml(c.text)}</span>`;
+            }
+            return '';
+          }).join('');
+        }
+        modalAvatarStack.innerHTML = creatorsHTML;
+      }
+
+      modal.classList.add('is-active');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    };
+  });
+}
+
+function initKaryaToolbarEvents() {
+  const tabBtns = document.querySelectorAll('.karya-tab-btn');
+  const searchInput = document.getElementById('karya-search-input');
+  const resetBtn = document.getElementById('btn-reset-karya-filter');
+  const modal = document.getElementById('karya-detail-modal');
+  const closeBtn = document.getElementById('btn-close-karya-modal');
+  const backdrop = document.getElementById('karya-modal-backdrop');
+
+  // Category Tabs
+  tabBtns.forEach(btn => {
+    btn.onclick = (e) => {
+      e.preventDefault();
+      const filter = btn.getAttribute('data-filter') || 'all';
+      currentKaryaCategory = filter;
+
+      tabBtns.forEach(b => {
+        const isMatch = b === btn;
+        b.classList.toggle('active', isMatch);
+        b.setAttribute('aria-selected', isMatch ? 'true' : 'false');
+      });
+
+      renderDynamicKarya();
+    };
+  });
+
+  // Search input with debounce
+  if (searchInput) {
+    let debounceTimer = null;
+    searchInput.oninput = () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        currentKaryaSearch = searchInput.value || '';
+        renderDynamicKarya();
+      }, 200);
     };
   }
+
+  // Reset button
+  if (resetBtn) {
+    resetBtn.onclick = () => {
+      currentKaryaCategory = 'all';
+      currentKaryaSearch = '';
+      if (searchInput) searchInput.value = '';
+      tabBtns.forEach((b, idx) => {
+        b.classList.toggle('active', idx === 0);
+        b.setAttribute('aria-selected', idx === 0 ? 'true' : 'false');
+      });
+      renderDynamicKarya();
+    };
+  }
+
+  // Modal Close
+  function closeModal() {
+    if (modal) {
+      modal.classList.remove('is-active');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+  }
+
+  if (closeBtn) closeBtn.onclick = closeModal;
+  if (backdrop) backdrop.onclick = closeModal;
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal && modal.classList.contains('is-active')) {
+      closeModal();
+    }
+  });
 }
 
 let isGaleriExpanded = false;
