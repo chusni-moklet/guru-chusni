@@ -3561,11 +3561,15 @@ button {
     top: 72px;
     left: 0;
     width: 100%;
+    max-height: calc(100dvh - 72px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     background-color: var(--bg-card);
     border-bottom: 2px solid var(--border-color);
-    padding: 1.5rem;
+    padding: 1.25rem 1.25rem 2.25rem;
     display: none;
     box-shadow: var(--shadow-xl);
+    z-index: 999;
   }
 
   .nav-menu.open {
@@ -3610,7 +3614,7 @@ button {
   }
 
   .floating-badge {
-    display: none; /* Hide floating badge overlays on tablet to prevent clutter */
+    display: none; /* Hide floating badge overlays on tablet/mobile to prevent clutter */
   }
 
   .portfolio-layout {
@@ -3650,12 +3654,153 @@ button {
   }
 }
 
-@media (max-width: 640px) {
+/* Tablet & Phablet (max-width: 768px) */
+@media (max-width: 768px) {
   .section {
-    padding: 3.75rem 0;
+    padding: 3.5rem 0;
   }
 
-  .stats-container,
+  .section-header {
+    margin-bottom: 2rem;
+  }
+
+  .section-title {
+    font-size: clamp(1.65rem, 5vw, 2.25rem);
+  }
+
+  .section-subtitle {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  /* Card paddings across sections */
+  .about-card,
+  .education-milestones,
+  .subject-card,
+  .edtech-stack,
+  .resource-card,
+  .award-card,
+  .project-body,
+  .testimonial-card,
+  .contact-info-card,
+  .contact-form-card,
+  .training-card,
+  .portfolio-sidebar-inner {
+    padding: 1.35rem 1.15rem;
+  }
+
+  .portfolio-layout {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  /* Filter categories become a single-column, easy-tap list */
+  .portfolio-filter-menu {
+    grid-template-columns: 1fr;
+    gap: 0.65rem;
+  }
+
+  .portfolio-nav-item {
+    padding: 0.85rem 1rem;
+  }
+
+  /* Native-like horizontal scroll chip bars for all filters */
+  .category-pills,
+  .gallery-filters,
+  .day-tabs,
+  .training-filters {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    justify-content: flex-start;
+    padding: 0.25rem 0.25rem 0.65rem 0.25rem;
+    gap: 0.5rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .category-pills::-webkit-scrollbar,
+  .gallery-filters::-webkit-scrollbar,
+  .day-tabs::-webkit-scrollbar,
+  .training-filters::-webkit-scrollbar {
+    display: none;
+  }
+
+  .pill-btn,
+  .gallery-filter-btn,
+  .training-filter-btn {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    padding: 0.45rem 1.1rem;
+    font-size: 0.85rem;
+  }
+
+  .day-tab {
+    flex: 0 0 auto;
+    min-width: 85px;
+    white-space: nowrap;
+    padding: 0.65rem 0.85rem;
+    font-size: 0.85rem;
+    text-align: center;
+  }
+
+  .tools-grid {
+    gap: 0.6rem;
+  }
+
+  .tool-pill {
+    padding: 0.45rem 0.85rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Mobile Screens (max-width: 640px) */
+@media (max-width: 640px) {
+  .container {
+    padding-left: 1.15rem;
+    padding-right: 1.15rem;
+  }
+
+  .section {
+    padding: 3rem 0;
+  }
+
+  /* KPI Statistics Dashboard: Clean 2x2 Grid */
+  .stats-strip {
+    margin-top: 2rem;
+  }
+
+  .stats-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.65rem;
+  }
+
+  .stat-card {
+    padding: 0.85rem 0.75rem;
+    gap: 0.65rem;
+    border-radius: var(--radius-md);
+  }
+
+  .stat-icon-wrap {
+    width: 38px;
+    height: 38px;
+    font-size: 1.1rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .stat-number {
+    font-size: 1.35rem;
+  }
+
+  .stat-desc {
+    font-size: 0.75rem;
+    line-height: 1.3;
+    margin-top: 0.15rem;
+  }
+
+  /* Single Column Card Grids */
   .resources-grid,
   .awards-grid,
   .projects-grid,
@@ -3664,31 +3809,290 @@ button {
   .testimonials-grid,
   .footer-container {
     grid-template-columns: 1fr;
+    gap: 1.25rem;
   }
 
-  .form-row,
-  .form-buttons,
-  .resource-actions {
+  .form-row {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
 
-  .day-tabs {
-    flex-wrap: wrap;
+  .filter-controls-wrap {
+    gap: 0.85rem;
+    margin-bottom: 1.5rem;
   }
 
-  .day-tab {
-    flex: 1 1 30%;
+  .search-box input {
+    padding: 0.8rem 2.5rem 0.8rem 2.75rem;
+    font-size: 0.9rem;
+  }
+
+  .search-icon {
+    left: 1rem;
+    font-size: 0.95rem;
+  }
+
+  .btn-clear-search {
+    right: 1rem;
+    font-size: 1rem;
   }
 
   .floating-controls {
     bottom: 1.25rem;
     right: 1.25rem;
+    gap: 0.65rem;
   }
 
   .float-btn {
-    width: 46px;
-    height: 46px;
+    width: 44px;
+    height: 44px;
+    font-size: 1.15rem;
+  }
+
+  /* Modal Dialog Responsive */
+  .modal-overlay {
+    padding: 0.75rem;
+  }
+
+  .modal-dialog {
+    max-width: 100%;
+    max-height: 88vh;
+    border-radius: var(--radius-md);
+  }
+
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding: 1rem;
+  }
+
+  .modal-footer {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .modal-footer .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Small Smartphone (max-width: 576px) */
+@media (max-width: 576px) {
+  .hero-section {
+    padding: 2.75rem 0 2rem;
+  }
+
+  .hero-container {
+    gap: 2.25rem;
+  }
+
+  .visual-wrapper {
+    max-width: 290px;
+  }
+
+  .hero-title {
+    font-size: clamp(1.85rem, 6.5vw, 2.35rem);
+    line-height: 1.2;
+    margin-bottom: 1rem;
+  }
+
+  .hero-description {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1.35rem;
+  }
+
+  .hero-meta-pills {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .meta-pill {
+    justify-content: center;
+    text-align: center;
+    padding: 0.5rem 0.85rem;
+    font-size: 0.8rem;
+  }
+
+  /* Full width action buttons for mobile touch ease */
+  .hero-buttons {
+    flex-direction: column;
+    width: 100%;
+    gap: 0.65rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .hero-buttons .btn {
+    width: 100%;
+    justify-content: center;
+    padding: 0.85rem 1.25rem;
+  }
+
+  .resource-actions {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .resource-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .form-buttons {
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .form-buttons .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hero-socials {
+    flex-direction: column;
+    gap: 0.65rem;
+    text-align: center;
+  }
+
+  /* Header brand & action sizing */
+  .brand-name {
+    font-size: 0.95rem;
+  }
+
+  .brand-sub {
+    font-size: 0.68rem;
+  }
+
+  .brand-logo-img,
+  .brand-logo-fallback {
+    width: 36px;
+    height: 36px;
+    font-size: 1.15rem;
+  }
+
+  .navbar-actions {
+    gap: 0.45rem;
+  }
+
+  .btn-theme-toggle {
+    width: 36px;
+    height: 36px;
+    font-size: 0.95rem;
+  }
+
+  .btn-mobile-toggle {
+    width: 36px;
+    height: 36px;
+  }
+
+  /* Biodata Table */
+  .biodata-table th {
+    width: 42%;
+    font-size: 0.82rem;
+    padding: 0.65rem 0.35rem;
+  }
+
+  .biodata-table td {
+    font-size: 0.85rem;
+    padding: 0.65rem 0.35rem;
+  }
+
+  /* Lightbox Controls */
+  .lightbox-overlay {
+    padding: 0.5rem;
+  }
+
+  .lightbox-content {
+    max-width: 96vw;
+    max-height: 78vh;
+  }
+
+  .lightbox-nav {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+
+  .lightbox-prev {
+    left: 0.5rem;
+  }
+
+  .lightbox-next {
+    right: 0.5rem;
+  }
+
+  .btn-lightbox-close {
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 36px;
+    height: 36px;
     font-size: 1.25rem;
+  }
+}
+
+/* Extra Small Devices (max-width: 380px) */
+@media (max-width: 380px) {
+  .container {
+    padding-left: 0.85rem;
+    padding-right: 0.85rem;
+  }
+
+  .brand-sub {
+    display: none; /* Sembunyikan subteks pada layar sangat sempit agar nama tidak terpotong */
+  }
+
+  .brand-name {
+    font-size: 0.9rem;
+  }
+
+  .hero-title {
+    font-size: 1.65rem;
+  }
+
+  .hero-tag {
+    gap: 0.35rem;
+  }
+
+  .tag-badge {
+    font-size: 0.72rem;
+    padding: 0.3rem 0.65rem;
+  }
+
+  .tag-sub {
+    font-size: 0.75rem;
+  }
+
+  .stat-card {
+    padding: 0.65rem 0.45rem;
+    gap: 0.45rem;
+  }
+
+  .stat-icon-wrap {
+    width: 34px;
+    height: 34px;
+    font-size: 1rem;
+  }
+
+  .stat-number {
+    font-size: 1.25rem;
+  }
+
+  .stat-desc {
+    font-size: 0.7rem;
+  }
+
+  .floating-controls {
+    bottom: 1rem;
+    right: 1rem;
+  }
+
+  .float-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
   }
 }
 
