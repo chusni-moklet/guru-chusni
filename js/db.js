@@ -8,14 +8,14 @@
  */
 
 const DB = (function () {
-  const STORAGE_KEY_DATA = 'profilku_data_v2';
+  const STORAGE_KEY_DATA = 'profilku_data_v3';
   const STORAGE_KEY_GAS_URL = 'profilku_gas_url';
   const STORAGE_KEY_SESSION = 'profilku_admin_session';
 
   // Data Default Bawaan Lengkap
   const DEFAULT_DATA = {
   "config": {
-    "site_title": "Profil Pendidik | Bpk. Rahmat Hidayat, S.Pd., M.Pd. - Guru Penggerak",
+    "site_title": "Profil Pendidik | Bpk. Muhammad Chusni Agus, M. Pd., Gr. - Guru Penggerak",
     "teacher_name": "Muhammad Chusni Agus",
     "teacher_degrees": "M. Pd., Gr.",
     "teacher_tagline": "Guru Penggerak",
@@ -494,25 +494,25 @@ const DB = (function () {
     {
       "id": "1",
       "name": "Farhan Alamsyah",
-      "role": "Alumni SMAN 1 • Mahasiswa STEI ITB (Peraih Medali OSN)",
+      "role": "Alumni • Mahasiswa STEI ITB (Peraih Medali)",
       "photo": "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=150&q=80",
-      "quote": "Dulu saya sangat takut dan trauma dengan matematika karena merasa rumusnya hafalan semua. Di kelas Pak Rahmat, kami diajak memahami alasan logis di balik rumus lewat visualisasi GeoGebra. Skor UTBK matematika saya naik drastis dan alhamdulillah diterima di STEI ITB!",
+      "quote": "Di kelas Pak Chusni, kami diajak berpikir komputasional dan kreatif memecahkan masalah. Pendekatan belajar berbasis proyek teknologi membuka wawasan baru bagi kami!",
       "rating": 5
     },
     {
       "id": "2",
       "name": "Dra. Hj. Nurjanah, M.M.",
-      "role": "Kepala Sekolah SMAN 1 Harapan Bangsa",
+      "role": "Pendidik & Rekan Sejawat",
       "photo": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80",
-      "quote": "Pak Rahmat adalah figur pendidik penggerak sejati. Inisiatif beliau membagikan modul ajar berdiferensiasi dan melatih rekan-rekan guru menggunakan platform digital telah mengangkat kualitas pembelajaran di sekolah kami secara nyata.",
+      "quote": "Pak Chusni adalah figur pendidik penggerak sejati. Inisiatif beliau membagikan modul ajar berdiferensiasi dan melatih rekan-rekan guru menggunakan platform digital telah mengangkat kualitas pembelajaran secara nyata.",
       "rating": 5
     },
     {
       "id": "3",
       "name": "Ibu Ratna Dewi, S.E.",
-      "role": "Orang Tua Murid Kelas XI MIPA 1",
+      "role": "Orang Tua Murid",
       "photo": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=150&q=80",
-      "quote": "Komunikasi Pak Rahmat dengan kami para orang tua sangat transparan dan hangat. Beliau tidak hanya fokus pada nilai rapor, tetapi sangat peduli pada kesehatan mental dan minat belajar anak saya. Terima kasih banyak Pak Guru!",
+      "quote": "Komunikasi Pak Chusni dengan kami para orang tua sangat transparan dan hangat. Beliau tidak hanya fokus pada nilai akademik, tetapi sangat peduli pada minat dan karakter murid. Terima kasih banyak Pak Guru!",
       "rating": 5
     }
   ],
@@ -672,8 +672,8 @@ const DB = (function () {
     },
     {
       "id": "3",
-      "question": "Apakah Pak Rahmat bersedia diundang sebagai narasumber workshop Kurikulum Merdeka?",
-      "answer": "Tentu. Saya siap berkolaborasi sebagai pemateri lokakarya guru seputar Pembelajaran Berdiferensiasi, Pemanfaatan EdTech Geogebra/Python, maupun Asesmen Kurikulum Merdeka. Silakan kirimkan surat permohonan via email resmi."
+      "question": "Apakah Bpk. Muhammad Chusni Agus bersedia diundang sebagai narasumber workshop Kurikulum Merdeka?",
+      "answer": "Tentu. Saya siap berkolaborasi sebagai pemateri lokakarya guru seputar Pembelajaran Berdiferensiasi, Pemanfaatan EdTech, Roblox/Informatika, maupun Asesmen Kurikulum Merdeka. Silakan kirimkan surat permohonan via email resmi."
     }
   ],
   "pesanMasuk": [
@@ -685,7 +685,7 @@ const DB = (function () {
       "email": "budi@example.com",
       "whatsapp": 81234567890,
       "topik": "Konsultasi Belajar",
-      "pesan": "Halo Pak Rahmat, terima kasih atas modul ajar eksponennya. Sangat membantu tugas kelompok kami!",
+      "pesan": "Halo Pak Chusni, terima kasih atas modul ajar dan bimbingannya. Sangat membantu tugas kelompok kami!",
       "status": "Dibaca"
     }
   ],
@@ -742,26 +742,66 @@ const DB = (function () {
   // Inisialisasi: Muat dari localStorage atau default
   function init() {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY_DATA);
+      let stored = localStorage.getItem(STORAGE_KEY_DATA);
+
+      // Helper untuk mendeteksi apakah data masih mengandung dummy lama
+      const isDataDummy = function(d) {
+        if (!d || !d.config) return true;
+        if (d.config.teacher_name === 'Rahmat Hidayat') return true;
+        if (d.config.hero_image && d.config.hero_image.includes('images.unsplash.com')) return true;
+        if (Array.isArray(d.prestasi) && d.prestasi.some(p => (p.title || p.name || '').includes('Guru Inovatif SMA Tingkat Provinsi'))) return true;
+        if (Array.isArray(d.prestasi) && !d.prestasi.some(p => (p.title || p.name || '').includes('Hello Moklet'))) return true;
+        if (Array.isArray(d.karya) && d.karya.some(k => (k.title || '').includes('Portal Modul & OER Kurikulum Merdeka') || (k.link || '').includes('rahmathidayat.guru'))) return true;
+        if (Array.isArray(d.galeri) && d.galeri.some(g => (g.imgUrl || '').includes('photo-1580582932707-520aed937b7b'))) return true;
+        return false;
+      };
+
+      // 1. Jika data v3 belum ada di perangkat ini, periksa versi lama (v2 atau v1)
+      if (!stored) {
+        const oldStored = localStorage.getItem('profilku_data_v2') || localStorage.getItem('profilku_data');
+        if (oldStored) {
+          try {
+            const oldData = JSON.parse(oldStored);
+            if (isDataDummy(oldData)) {
+              console.log("Ditemukan data dummy versi lama di penyimpanan lokal. Membersihkan dan memuat data riil...");
+              localStorage.removeItem('profilku_data_v2');
+              localStorage.removeItem('profilku_data');
+              stored = null;
+            } else {
+              // Jika ini adalah data kustom valid milik pengguna
+              console.log("Memigrasi data kustom pengguna ke penyimpanan v3...");
+              currentData = oldData;
+              if (currentData.config) {
+                currentData.config.hero_image = 'assets/hero-chusni.jpg';
+              }
+              for (const k in DEFAULT_DATA) {
+                if (!currentData[k]) currentData[k] = JSON.parse(JSON.stringify(DEFAULT_DATA[k]));
+              }
+              saveLocal();
+              return;
+            }
+          } catch (e) {
+            stored = null;
+          }
+        }
+      }
+
+      // 2. Jika data v3 ada
       if (stored) {
         currentData = JSON.parse(stored);
+        if (isDataDummy(currentData)) {
+          console.log("Data tersimpan masih terdeteksi data dummy. Memperbarui otomatis ke data riil Bpk. Muhammad Chusni Agus...");
+          currentData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+          saveLocal();
+          return;
+        }
+
         // Pastikan semua key ada (backward compatibility)
         for (const k in DEFAULT_DATA) {
-          if (!currentData[k]) currentData[k] = DEFAULT_DATA[k];
+          if (!currentData[k]) currentData[k] = JSON.parse(JSON.stringify(DEFAULT_DATA[k]));
         }
-        // Migrasi otomatis: jika di perangkat ini tersimpan data lama dengan foto unsplash atau nama placeholder lama
-        if (currentData.config && (!currentData.config.hero_image || currentData.config.hero_image.includes('images.unsplash.com') || currentData.config.teacher_name === 'Rahmat Hidayat')) {
+        if (currentData.config && (!currentData.config.hero_image || currentData.config.hero_image.includes('images.unsplash.com'))) {
           currentData.config.hero_image = 'assets/hero-chusni.jpg';
-          if (currentData.config.teacher_name === 'Rahmat Hidayat') {
-            currentData.config.teacher_name = 'Muhammad Chusni Agus';
-          }
-          if (!currentData.karya || currentData.karya.length === 0) {
-            currentData.karya = JSON.parse(JSON.stringify(DEFAULT_DATA.karya));
-          }
-          if (!currentData.galeri || currentData.galeri.length === 0) {
-            currentData.galeri = JSON.parse(JSON.stringify(DEFAULT_DATA.galeri));
-          }
-          saveLocal();
         }
         if (Array.isArray(currentData.prestasi)) {
           currentData.prestasi.forEach(p => {
@@ -775,7 +815,9 @@ const DB = (function () {
             }
           });
         }
+        saveLocal();
       } else {
+        // Inisialisasi awal dengan DEFAULT_DATA lengkap riil
         currentData = JSON.parse(JSON.stringify(DEFAULT_DATA));
         saveLocal();
       }
@@ -826,7 +868,7 @@ const DB = (function () {
   }
 
   // Sinkronisasi otomatis antar-tab saat localStorage berubah di tab lain (misal di admin.html)
-  if (typeof window !== 'undefined') {
+  if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
     window.addEventListener('storage', (e) => {
       if (e.key === STORAGE_KEY_DATA && e.newValue) {
         try {
@@ -1302,7 +1344,7 @@ const DB = (function () {
     if (u === savedLocalAdmin.username && p === savedLocalAdmin.password) {
       const session = {
         username: u,
-        name: "Bpk. Rahmat Hidayat",
+        name: "Bpk. Muhammad Chusni Agus",
         role: "Administrator (Mode Lokal)",
         token: 'local_session_' + Date.now(),
         loginTime: Date.now()

@@ -79,7 +79,7 @@ function renderDynamicConfig(cfg) {
   // 2. Brand Name & Sub
   const brandNames = document.querySelectorAll('.brand-name');
   const brandSubs = document.querySelectorAll('.brand-sub');
-  brandNames.forEach(el => el.textContent = cfg.teacher_name || 'Rahmat Hidayat');
+  brandNames.forEach(el => el.textContent = cfg.teacher_name || 'Muhammad Chusni Agus');
   brandSubs.forEach(el => el.textContent = (cfg.teacher_degrees ? cfg.teacher_degrees + ' • ' : '') + (cfg.teacher_tagline || 'Guru Penggerak'));
 
   // 3. Hero Section
@@ -1030,7 +1030,7 @@ function initContactForm() {
     const subject = document.getElementById('form-subject')?.value || 'Konsultasi Belajar';
     const message = document.getElementById('form-message')?.value.trim() || '-';
 
-    const teacherName = (window.DB && DB.getSection('config')?.teacher_name) || 'Rahmat Hidayat, S.Pd., M.Pd.';
+    const teacherName = (window.DB && DB.getSection('config')?.teacher_name) || 'Muhammad Chusni Agus, M. Pd., Gr.';
 
     const text = 
       `*Halo Bpk. ${teacherName}*\n` +
