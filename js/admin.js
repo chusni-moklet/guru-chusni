@@ -892,7 +892,7 @@ const AdminApp = (function () {
     tbody.innerHTML = items.map((g, index) => `
       <tr>
         <td>
-          <img src="${escapeHtml(g.imgUrl)}" alt="" style="width: 50px; height: 50px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--admin-border);">
+          <img src="${escapeHtml(g.imgUrl || 'assets/galeri-default.jpg')}" alt="" loading="lazy" onerror="this.onerror=null; this.src='assets/galeri-default.jpg';" style="width: 50px; height: 50px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--admin-border);">
         </td>
         <td><strong>${escapeHtml(g.title)}</strong></td>
         <td><span class="table-badge" style="background: var(--color-purple-subtle); color: var(--color-purple);">${escapeHtml(g.categoryLabel || g.category)}</span></td>
@@ -942,7 +942,7 @@ const AdminApp = (function () {
     tbody.innerHTML = items.map((k, index) => `
       <tr>
         <td>
-          <img src="${escapeHtml(k.thumbnail)}" alt="" style="width: 72px; height: 48px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--admin-border); box-shadow: var(--shadow-sm);">
+          <img src="${escapeHtml(k.thumbnail || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80')}" alt="" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80';" style="width: 72px; height: 48px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--admin-border); box-shadow: var(--shadow-sm);">
         </td>
         <td><strong>${escapeHtml(k.title)}</strong></td>
         <td><small style="display: block; max-width: 320px; line-height: 1.4;">${escapeHtml(k.desc)}</small></td>

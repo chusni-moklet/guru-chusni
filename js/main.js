@@ -482,7 +482,7 @@ function renderDynamicKarya(karyaList) {
     return `
     <article class="project-card ${extraClass}" ${cardStyle ? `style="${cardStyle}"` : ''}>
       <div class="project-thumb-box">
-        <img src="${escapeHtml(item.thumbnail || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80')}" alt="${escapeHtml(item.title || 'Website')}" loading="lazy">
+        <img src="${escapeHtml(item.thumbnail || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80')}" alt="${escapeHtml(item.title || 'Website')}" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80';">
         <div class="project-thumb-badge"><i class="fa-solid fa-globe"></i> Website</div>
       </div>
       <div class="project-body">
@@ -570,10 +570,22 @@ function renderDynamicGaleri(galeriList) {
   const container = document.getElementById('gallery-grid');
   if (!container || !galeriList || !galeriList.length) return;
 
-  container.innerHTML = galeriList.map(g => `
+  const defaultGaleri = (window.DB && window.DB.DEFAULT_DATA && window.DB.DEFAULT_DATA.galeri) || [];
+
+  container.innerHTML = galeriList.map((g, idx) => {
+    let img = g.imgUrl || '';
+    if (!img || img === 'assets/galeri-default.jpg' || img.includes('photo-1580582932707-520aed937b7b')) {
+      const def = defaultGaleri.find(d => d.title && d.title.trim().toLowerCase() === (g.title || '').trim().toLowerCase()) || defaultGaleri[idx];
+      if (def && def.imgUrl) {
+        img = def.imgUrl;
+      } else {
+        img = 'assets/galeri-default.jpg';
+      }
+    }
+    return `
     <div class="gallery-item" data-category="${escapeHtml(g.category || 'kelas')}">
       <div class="gallery-thumb">
-        <img src="${escapeHtml(g.imgUrl)}" alt="${escapeHtml(g.title)}" loading="lazy">
+        <img src="${escapeHtml(img)}" alt="${escapeHtml(g.title)}" loading="lazy" onerror="this.onerror=null; this.src='assets/galeri-default.jpg';">
         <div class="gallery-overlay">
           <div class="gallery-caption">
             <span class="gallery-tag">${escapeHtml(g.categoryLabel || g.category)}</span>
@@ -584,7 +596,8 @@ function renderDynamicGaleri(galeriList) {
         </div>
       </div>
     </div>
-  `).join('');
+  `;
+  }).join('');
 
   // Update total badge di filter "Semua Foto"
   const allFilterBtn = document.querySelector('#gallery-filters .gallery-filter-btn[data-filter="all"]');
@@ -1144,11 +1157,13 @@ function initGalleryFilterAndLightbox() {
     };
   });
 
-  galleryItems.forEach(item => {
-    const thumb = item.querySelector('.gallery-thumb');
-    if (!thumb) return;
+  // Event delegation untuk klik galeri / zoom lightbox (mendukung item dinamis)
+  const galleryGrid = document.getElementById('gallery-grid');
+  if (galleryGrid) {
+    galleryGrid.addEventListener('click', (e) => {
+      const thumb = e.target.closest('.gallery-thumb');
+      if (!thumb) return;
 
-    thumb.onclick = () => {
       const img = thumb.querySelector('img');
       const title = thumb.querySelector('h4')?.textContent || '';
       const desc = thumb.querySelector('p')?.textContent || '';
@@ -1163,8 +1178,8 @@ function initGalleryFilterAndLightbox() {
         lightbox.setAttribute('aria-hidden', 'false');
         document.body.style.overflow = 'hidden';
       }
-    };
-  });
+    });
+  }
 
   function closeLightbox() {
     if (!lightbox) return;

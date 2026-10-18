@@ -966,6 +966,41 @@ const DB = (function () {
           currentData.timeline = JSON.parse(JSON.stringify(DEFAULT_DATA.timeline));
         }
 
+        // Sanitasi spesifik galeri jika foto hilang, dummy, atau mengarah ke path tanpa data riil
+        if (Array.isArray(currentData.galeri)) {
+          const isBrokenGaleri = currentData.galeri.length === 0 || currentData.galeri.some(g => !g.imgUrl || g.imgUrl === 'assets/galeri-default.jpg' || g.imgUrl.includes('photo-1580582932707-520aed937b7b'));
+          if (isBrokenGaleri) {
+            console.log("Memperbarui galeri dari DEFAULT_DATA (memulihkan foto asli dokumentasi)...");
+            currentData.galeri = currentData.galeri.map((g, idx) => {
+              const def = DEFAULT_DATA.galeri.find(d => d.title && d.title.trim().toLowerCase() === (g.title || '').trim().toLowerCase()) || DEFAULT_DATA.galeri[idx];
+              const isInvalidImg = !g.imgUrl || g.imgUrl === 'assets/galeri-default.jpg' || g.imgUrl.includes('photo-1580582932707-520aed937b7b');
+              return {
+                ...g,
+                imgUrl: isInvalidImg ? (def && def.imgUrl ? def.imgUrl : 'assets/galeri-default.jpg') : g.imgUrl
+              };
+            });
+            if (currentData.galeri.length < DEFAULT_DATA.galeri.length) {
+              currentData.galeri = JSON.parse(JSON.stringify(DEFAULT_DATA.galeri));
+            }
+          }
+        }
+
+        // Sanitasi spesifik karya jika thumbnail kosong atau dummy
+        if (Array.isArray(currentData.karya)) {
+          const isBrokenKarya = currentData.karya.some(k => !k.thumbnail || k.thumbnail.includes('photo-1580582932707-520aed937b7b'));
+          if (isBrokenKarya) {
+            console.log("Memperbarui thumbnail karya dari DEFAULT_DATA...");
+            currentData.karya = currentData.karya.map((k, idx) => {
+              const def = DEFAULT_DATA.karya.find(d => d.title && d.title.trim().toLowerCase() === (k.title || '').trim().toLowerCase()) || DEFAULT_DATA.karya[idx];
+              const isInvalidThumb = !k.thumbnail || k.thumbnail.includes('photo-1580582932707-520aed937b7b');
+              return {
+                ...k,
+                thumbnail: isInvalidThumb ? (def && def.thumbnail ? def.thumbnail : 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80') : k.thumbnail
+              };
+            });
+          }
+        }
+
         // Pastikan semua key ada (backward compatibility)
         for (const k in DEFAULT_DATA) {
           if (!currentData[k]) currentData[k] = JSON.parse(JSON.stringify(DEFAULT_DATA[k]));
@@ -1220,36 +1255,72 @@ const DB = (function () {
           }));
         }
         if (Array.isArray(incoming.galeri) && incoming.galeri.length) {
-          currentData.galeri = incoming.galeri.map(g => ({
-            id: String(g.ID || g.id || ''),
-            title: g.Judul || g.title || '',
-            category: (g.Kategori || g.category || 'kelas').toLowerCase(),
-            categoryLabel: g.KategoriLabel || g.categoryLabel || '',
-            imgUrl: g.ImgUrl || g.imgUrl || '',
-            desc: g.Deskripsi || g.desc || ''
-          }));
+          currentData.galeri = incoming.galeri.map((g, idx) => {
+            let imgUrl = g.ImgUrl || g.imgUrl || '';
+            // Jika imgUrl dari Google Sheets adalah assets/galeri-default.jpg, kosong, atau dummy, pulihkan foto asli
+            if (!imgUrl || imgUrl === 'assets/galeri-default.jpg' || imgUrl.includes('photo-1580582932707-520aed937b7b')) {
+              const def = DEFAULT_DATA.galeri.find(d => d.title && d.title.trim().toLowerCase() === (g.Judul || g.title || '').trim().toLowerCase()) || DEFAULT_DATA.galeri[idx];
+              const existing = (currentData.galeri || []).find(e => e.title && e.title.trim().toLowerCase() === (g.Judul || g.title || '').trim().toLowerCase()) || (currentData.galeri || [])[idx];
+              if (existing && existing.imgUrl && existing.imgUrl.startsWith('data:') && existing.imgUrl.length > 500) {
+                imgUrl = existing.imgUrl;
+              } else if (def && def.imgUrl) {
+                imgUrl = def.imgUrl;
+              } else {
+                imgUrl = 'assets/galeri-default.jpg';
+              }
+            }
+            return {
+              id: String(g.ID || g.id || ''),
+              title: g.Judul || g.title || '',
+              category: (g.Kategori || g.category || 'kelas').toLowerCase(),
+              categoryLabel: g.KategoriLabel || g.categoryLabel || '',
+              imgUrl: imgUrl,
+              desc: g.Deskripsi || g.desc || ''
+            };
+          });
         }
         if (Array.isArray(incoming.karya) && incoming.karya.length) {
-          currentData.karya = incoming.karya.map(k => ({
-            id: String(k.ID || k.id || ''),
-            title: k.NamaWebsite || k.title || k.Nama || '',
-            desc: k.Deskripsi || k.desc || '',
-            link: k.Link || k.link || '#',
-            thumbnail: k.Thumbnail || k.thumbnail || k.ImgUrl || ''
-          }));
+          currentData.karya = incoming.karya.map((k, idx) => {
+            let thumb = k.Thumbnail || k.thumbnail || k.ImgUrl || '';
+            if (!thumb || thumb.includes('photo-1580582932707-520aed937b7b')) {
+              const def = DEFAULT_DATA.karya.find(d => d.title && d.title.trim().toLowerCase() === (k.NamaWebsite || k.title || k.Nama || '').trim().toLowerCase()) || DEFAULT_DATA.karya[idx];
+              const existing = (currentData.karya || []).find(e => e.title && e.title.trim().toLowerCase() === (k.NamaWebsite || k.title || k.Nama || '').trim().toLowerCase()) || (currentData.karya || [])[idx];
+              if (existing && existing.thumbnail && existing.thumbnail.startsWith('data:') && existing.thumbnail.length > 500) {
+                thumb = existing.thumbnail;
+              } else if (def && def.thumbnail) {
+                thumb = def.thumbnail;
+              } else {
+                thumb = 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80';
+              }
+            }
+            return {
+              id: String(k.ID || k.id || ''),
+              title: k.NamaWebsite || k.title || k.Nama || '',
+              desc: k.Deskripsi || k.desc || '',
+              link: k.Link || k.link || '#',
+              thumbnail: thumb
+            };
+          });
         } else if (url) {
           // Fallback fetch karya terpisah jika sheet Karya belum masuk di getAll
           try {
             const karyaRes = await fetch(url + (url.includes('?') ? '&' : '?') + 'action=getSection&section=Karya');
             const karyaJson = await karyaRes.json();
             if (karyaJson && Array.isArray(karyaJson.data) && karyaJson.data.length) {
-              currentData.karya = karyaJson.data.map(k => ({
-                id: String(k.ID || k.id || ''),
-                title: k.NamaWebsite || k.title || k.Nama || '',
-                desc: k.Deskripsi || k.desc || '',
-                link: k.Link || k.link || '#',
-                thumbnail: k.Thumbnail || k.thumbnail || k.ImgUrl || ''
-              }));
+              currentData.karya = karyaJson.data.map((k, idx) => {
+                let thumb = k.Thumbnail || k.thumbnail || k.ImgUrl || '';
+                if (!thumb || thumb.includes('photo-1580582932707-520aed937b7b')) {
+                  const def = DEFAULT_DATA.karya.find(d => d.title && d.title.trim().toLowerCase() === (k.NamaWebsite || k.title || k.Nama || '').trim().toLowerCase()) || DEFAULT_DATA.karya[idx];
+                  thumb = (def && def.thumbnail) ? def.thumbnail : 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80';
+                }
+                return {
+                  id: String(k.ID || k.id || ''),
+                  title: k.NamaWebsite || k.title || k.Nama || '',
+                  desc: k.Deskripsi || k.desc || '',
+                  link: k.Link || k.link || '#',
+                  thumbnail: thumb
+                };
+              });
             }
           } catch (e) {}
         }
