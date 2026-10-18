@@ -229,26 +229,36 @@ function renderDynamicModul(modulList) {
   }).join('');
 }
 
+let isPrestasiExpanded = false;
+
 function renderDynamicPrestasi(prestasiList) {
   const container = document.querySelector('.awards-grid');
   if (!container || !prestasiList || !prestasiList.length) return;
 
-  container.innerHTML = prestasiList.map(p => `
-    <div class="award-card ${p.highlight ? 'highlight-award' : ''}">
+  const LIMIT = 6;
+  const total = prestasiList.length;
+  const hasMore = total > LIMIT;
+
+  container.innerHTML = prestasiList.map((p, index) => {
+    const isExtra = index >= LIMIT;
+    const isImg = (p.pdfFileName && /\.(jpe?g|png|webp|gif|bmp|svg)$/i.test(p.pdfFileName)) || 
+                  (p.pdfUrl && (p.pdfUrl.startsWith('data:image/') || /\.(jpe?g|png|webp)(\?|$)/i.test(p.pdfUrl)));
+    const btnClass = isImg ? 'award-pdf-btn is-image' : 'award-pdf-btn';
+    const iconClass = isImg ? 'fa-solid fa-file-image' : 'fa-solid fa-file-pdf';
+    const titleText = isImg ? 'Lihat Berkas / Sertifikat (Gambar)' : 'Lihat Berkas / Sertifikat (PDF)';
+    const defaultName = isImg ? 'Sertifikat.jpg' : 'Sertifikat.pdf';
+    const defaultLabel = isImg ? 'Lihat Sertifikat (Gambar)' : 'Lihat Sertifikat (PDF)';
+    const cardStyle = (isExtra && !isPrestasiExpanded) ? 'display: none;' : '';
+    const extraClass = isExtra ? 'award-card-extra' : '';
+
+    return `
+    <div class="award-card ${p.highlight ? 'highlight-award' : ''} ${extraClass}" ${cardStyle ? `style="${cardStyle}"` : ''}>
       <div class="award-year-badge">${escapeHtml(p.year)}</div>
       <div class="award-icon"><i class="fa-solid ${escapeHtml(p.icon || 'fa-trophy')}"></i></div>
       <h3 class="award-name">${escapeHtml(p.title)}</h3>
       <p class="award-issuer">${escapeHtml(p.issuer)}</p>
       <p class="award-desc">${escapeHtml(p.desc)}</p>
-      ${p.pdfUrl ? (() => {
-        const isImg = (p.pdfFileName && /\.(jpe?g|png|webp|gif|bmp|svg)$/i.test(p.pdfFileName)) || 
-                      (p.pdfUrl && (p.pdfUrl.startsWith('data:image/') || /\.(jpe?g|png|webp)(\?|$)/i.test(p.pdfUrl)));
-        const btnClass = isImg ? 'award-pdf-btn is-image' : 'award-pdf-btn';
-        const iconClass = isImg ? 'fa-solid fa-file-image' : 'fa-solid fa-file-pdf';
-        const titleText = isImg ? 'Lihat Berkas / Sertifikat (Gambar)' : 'Lihat Berkas / Sertifikat (PDF)';
-        const defaultName = isImg ? 'Sertifikat.jpg' : 'Sertifikat.pdf';
-        const defaultLabel = isImg ? 'Lihat Sertifikat (Gambar)' : 'Lihat Sertifikat (PDF)';
-        return `
+      ${p.pdfUrl ? `
         <div class="award-pdf-wrap">
           <button type="button" class="${btnClass}" onclick="window.openPdfDocument('${escapeHtml(p.pdfUrl)}', '${escapeHtml(p.pdfFileName || defaultName)}')" title="${titleText}">
             <i class="${iconClass}"></i>
@@ -256,10 +266,74 @@ function renderDynamicPrestasi(prestasiList) {
             <i class="fa-solid fa-arrow-up-right-from-square award-pdf-ext"></i>
           </button>
         </div>
-        `;
-      })() : ''}
+      ` : ''}
     </div>
-  `).join('');
+    `;
+  }).join('');
+
+  // Handle Kontainer Tombol Toggle (Minimize / Maximize)
+  let toggleWrap = document.getElementById('awards-toggle-wrap');
+  if (!toggleWrap) {
+    toggleWrap = document.createElement('div');
+    toggleWrap.id = 'awards-toggle-wrap';
+    toggleWrap.className = 'awards-toggle-wrap text-center';
+    container.parentNode.insertBefore(toggleWrap, container.nextSibling);
+  }
+
+  if (hasMore) {
+    toggleWrap.style.display = 'flex';
+    renderAwardsToggleButton(toggleWrap, total, LIMIT);
+  } else {
+    toggleWrap.style.display = 'none';
+    toggleWrap.innerHTML = '';
+  }
+}
+
+function renderAwardsToggleButton(toggleWrap, total, limit) {
+  const extraCount = total - limit;
+  toggleWrap.innerHTML = `
+    <button type="button" class="btn btn-toggle-awards ${isPrestasiExpanded ? 'is-expanded' : ''}" id="btn-toggle-awards" aria-expanded="${isPrestasiExpanded ? 'true' : 'false'}">
+      <span class="btn-toggle-awards-icon"><i class="fa-solid ${isPrestasiExpanded ? 'fa-chevron-up' : 'fa-chevron-down'}"></i></span>
+      <span class="btn-toggle-awards-text">${isPrestasiExpanded ? 'Tampilkan Lebih Sedikit (Minimize)' : `Lihat Lebih Banyak (${extraCount} Prestasi Lainnya)`}</span>
+    </button>
+  `;
+
+  const btn = toggleWrap.querySelector('#btn-toggle-awards');
+  if (btn) {
+    btn.onclick = () => {
+      isPrestasiExpanded = !isPrestasiExpanded;
+      const extraCards = document.querySelectorAll('.award-card-extra');
+
+      if (isPrestasiExpanded) {
+        extraCards.forEach(card => {
+          card.style.display = 'flex';
+        });
+        btn.classList.add('is-expanded');
+        btn.setAttribute('aria-expanded', 'true');
+        const icon = btn.querySelector('.btn-toggle-awards-icon i');
+        if (icon) icon.className = 'fa-solid fa-chevron-up';
+        const text = btn.querySelector('.btn-toggle-awards-text');
+        if (text) text.textContent = 'Tampilkan Lebih Sedikit (Minimize)';
+      } else {
+        extraCards.forEach(card => {
+          card.style.display = 'none';
+        });
+        btn.classList.remove('is-expanded');
+        btn.setAttribute('aria-expanded', 'false');
+        const icon = btn.querySelector('.btn-toggle-awards-icon i');
+        if (icon) icon.className = 'fa-solid fa-chevron-down';
+        const text = btn.querySelector('.btn-toggle-awards-text');
+        if (text) text.textContent = `Lihat Lebih Banyak (${extraCount} Prestasi Lainnya)`;
+
+        const awardsSection = document.getElementById('prestasi');
+        if (awardsSection) {
+          const navHeight = 80;
+          const targetY = awardsSection.getBoundingClientRect().top + window.pageYOffset - navHeight;
+          window.scrollTo({ top: targetY, behavior: 'smooth' });
+        }
+      }
+    };
+  }
 }
 
 function renderDynamicKarya(karyaList) {

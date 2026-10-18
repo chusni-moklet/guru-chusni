@@ -1718,6 +1718,105 @@ button {
 }
 
 /* --------------------------------------------------
+   11-TOGGLE. TOMBOL LIHAT LEBIH BANYAK (MINIMIZE / MAXIMIZE)
+   -------------------------------------------------- */
+.awards-toggle-wrap {
+  margin-top: 2.75rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-toggle-awards {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.85rem;
+  border-radius: var(--radius-full);
+  background: var(--bg-card);
+  border: 1.5px solid var(--brand-primary);
+  color: var(--brand-primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  box-shadow: var(--shadow-sm);
+  text-decoration: none;
+}
+
+.btn-toggle-awards:hover {
+  background: var(--brand-primary);
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -6px rgba(37, 99, 235, 0.35);
+}
+
+.btn-toggle-awards .btn-toggle-awards-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--brand-light);
+  color: var(--brand-primary);
+  font-size: 0.825rem;
+  transition: all var(--transition-normal);
+}
+
+.btn-toggle-awards:hover .btn-toggle-awards-icon {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+.btn-toggle-awards.is-expanded {
+  border-color: var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+}
+
+.btn-toggle-awards.is-expanded:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: var(--brand-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-toggle-awards.is-expanded .btn-toggle-awards-icon {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+
+.btn-toggle-awards.is-expanded:hover .btn-toggle-awards-icon {
+  background: var(--brand-light);
+  color: var(--brand-primary);
+}
+
+.award-card.award-card-extra {
+  animation: awardFadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes awardFadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 576px) {
+  .btn-toggle-awards {
+    width: 100%;
+    justify-content: center;
+    padding: 0.8rem 1.25rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* --------------------------------------------------
    11b. SECTION: PORTOFOLIO KARYA WEBSITE
    -------------------------------------------------- */
 .karya-section {
