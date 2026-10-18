@@ -15,6 +15,8 @@ function initApp() {
   initBackToTop();
   initContactForm();
   initDiscreetAdminAccess();
+  initPortfolioTabs();
+  initTrainingFilters();
 
   // Integrasi Dynamic Database (LocalStorage + Google Apps Script)
   if (window.DB) {
@@ -65,6 +67,7 @@ function applyDynamicData() {
   try { initResourceFilterAndSearch(); } catch (e) {}
   try { initResourceModal(); } catch (e) {}
   try { initGalleryFilterAndLightbox(); } catch (e) {}
+  try { initPortfolioTabs(); } catch (e) {}
 }
 
 function renderDynamicConfig(cfg) {
@@ -1195,5 +1198,88 @@ function initDiscreetAdminAccess() {
       window.location.href = 'admin.html';
     });
   }
+}
+
+/* --------------------------------------------------
+   13. PORTOFOLIO TABS NAVIGATION (UNIFIED PORTFOLIO)
+   -------------------------------------------------- */
+function initPortfolioTabs() {
+  const tabBtns = document.querySelectorAll('.portfolio-tab-btn');
+  const groups = document.querySelectorAll('.portfolio-group');
+
+  if (!tabBtns.length || !groups.length) return;
+
+  function switchTab(target) {
+    tabBtns.forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-tab') === target);
+    });
+
+    groups.forEach(grp => {
+      const grpType = grp.getAttribute('data-group');
+      if (target === 'all' || target === grpType) {
+        grp.classList.remove('is-hidden');
+      } else {
+        grp.classList.add('is-hidden');
+      }
+    });
+  }
+
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const tab = btn.getAttribute('data-tab');
+      switchTab(tab);
+    });
+  });
+
+  // Handle hash deep-linking (e.g. #karya, #prestasi, #galeri)
+  function checkHash() {
+    const hash = window.location.hash.replace('#', '');
+    if (['karya', 'prestasi', 'galeri'].includes(hash)) {
+      switchTab(hash);
+      const targetEl = document.getElementById(hash);
+      if (targetEl) {
+        setTimeout(() => {
+          targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      }
+    } else if (hash === 'portofolio') {
+      switchTab('all');
+    }
+  }
+
+  window.addEventListener('hashchange', checkHash);
+  if (window.location.hash) {
+    checkHash();
+  }
+}
+
+/* --------------------------------------------------
+   14. PENGEMBANGAN DIRI & PELATIHAN (CATEGORY FILTERS)
+   -------------------------------------------------- */
+function initTrainingFilters() {
+  const filterBtns = document.querySelectorAll('.training-filter-btn');
+  const cards = document.querySelectorAll('.training-card');
+
+  if (!filterBtns.length || !cards.length) return;
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const category = btn.getAttribute('data-category');
+
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      cards.forEach(card => {
+        const cardCat = card.getAttribute('data-category');
+        if (category === 'all' || cardCat === category) {
+          card.classList.remove('is-hidden');
+        } else {
+          card.classList.add('is-hidden');
+        }
+      });
+    });
+  });
 }
 
