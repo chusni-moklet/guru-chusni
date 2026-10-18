@@ -1,4 +1,4 @@
-# 🎓 Website Profil Guru & Pendidik Indonesia Modern
+# 🎓 Website Profil Guru & Pendidik Indonesia Modern 
 
 Website profil profesional dan interaktif untuk guru / pendidik Indonesia. Didesain secara elegan, modern, responsif, dan siap disesuaikan (*customizable*) untuk portofolio digital, apresiasi Guru Penggerak, media berbagi Modul Ajar Kurikulum Merdeka, serta kanal komunikasi siswa dan orang tua.
 
