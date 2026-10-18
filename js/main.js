@@ -1201,17 +1201,21 @@ function initDiscreetAdminAccess() {
 }
 
 /* --------------------------------------------------
-   13. PORTOFOLIO TABS NAVIGATION (UNIFIED PORTFOLIO)
+   13. PORTOFOLIO TABS NAVIGATION (SIDEBAR FILTER)
    -------------------------------------------------- */
 function initPortfolioTabs() {
-  const tabBtns = document.querySelectorAll('.portfolio-tab-btn');
+  const tabBtns = document.querySelectorAll('.portfolio-nav-item, .portfolio-tab-btn');
   const groups = document.querySelectorAll('.portfolio-group');
 
   if (!tabBtns.length || !groups.length) return;
 
-  function switchTab(target) {
+  function switchTab(target, shouldScroll = false) {
+    if (!target) target = 'prestasi';
+
     tabBtns.forEach(btn => {
-      btn.classList.toggle('active', btn.getAttribute('data-tab') === target);
+      const isMatch = btn.getAttribute('data-tab') === target;
+      btn.classList.toggle('active', isMatch);
+      btn.setAttribute('aria-selected', isMatch ? 'true' : 'false');
     });
 
     groups.forEach(grp => {
@@ -1222,13 +1226,24 @@ function initPortfolioTabs() {
         grp.classList.add('is-hidden');
       }
     });
+
+    if (shouldScroll) {
+      const section = document.getElementById('portofolio');
+      if (section) {
+        const top = section.offsetTop - 80;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    }
   }
 
   tabBtns.forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
       const tab = btn.getAttribute('data-tab');
-      switchTab(tab);
+      switchTab(tab, false);
+      if (history.pushState) {
+        history.pushState(null, null, `#${tab === 'all' ? 'portofolio' : tab}`);
+      }
     });
   });
 
@@ -1236,22 +1251,36 @@ function initPortfolioTabs() {
   function checkHash() {
     const hash = window.location.hash.replace('#', '');
     if (['karya', 'prestasi', 'galeri'].includes(hash)) {
-      switchTab(hash);
-      const targetEl = document.getElementById(hash);
-      if (targetEl) {
-        setTimeout(() => {
-          targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
-      }
+      switchTab(hash, false);
     } else if (hash === 'portofolio') {
-      switchTab('all');
+      // Default to 'prestasi' so content is compact and does not stretch long downwards
+      switchTab('prestasi', false);
+    } else {
+      const activeBtn = document.querySelector('.portfolio-nav-item.active, .portfolio-tab-btn.active');
+      const currentTab = activeBtn ? activeBtn.getAttribute('data-tab') : 'prestasi';
+      switchTab(currentTab, false);
     }
   }
 
   window.addEventListener('hashchange', checkHash);
-  if (window.location.hash) {
-    checkHash();
-  }
+  checkHash();
+  updatePortfolioSidebarCounts();
+}
+
+function updatePortfolioSidebarCounts() {
+  const countPrestasi = document.querySelectorAll('#prestasi .award-card').length;
+  const countKarya = document.querySelectorAll('#karya .project-card').length;
+  const countGaleri = document.querySelectorAll('#galeri .gallery-item').length;
+
+  const elP = document.getElementById('sidebar-count-prestasi');
+  const elK = document.getElementById('sidebar-count-karya');
+  const elG = document.getElementById('sidebar-count-galeri');
+  const elA = document.getElementById('sidebar-count-all');
+
+  if (elP && countPrestasi) elP.textContent = countPrestasi;
+  if (elK && countKarya) elK.textContent = countKarya;
+  if (elG && countGaleri) elG.textContent = countGaleri;
+  if (elA) elA.textContent = (countPrestasi || 8) + (countKarya || 2) + (countGaleri || 8);
 }
 
 /* --------------------------------------------------

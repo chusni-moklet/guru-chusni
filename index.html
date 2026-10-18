@@ -682,23 +682,101 @@
         <p class="section-desc">Eksplorasi karya aplikasi digital, piagam kejuaraan & hak kekayaan intelektual (HKI), serta dokumentasi kegiatan pembelajaran nyata.</p>
       </div>
 
-      <!-- Portfolio Tabs Filter -->
-      <div class="portfolio-tabs-wrap">
-        <div class="portfolio-tabs-nav" id="portfolio-tabs">
-          <button type="button" class="portfolio-tab-btn active" data-tab="all">
-            <i class="fa-solid fa-layer-group"></i> Semua Portofolio
-          </button>
-          <button type="button" class="portfolio-tab-btn" data-tab="karya">
-            <i class="fa-solid fa-laptop-code"></i> Karya Digital (<span id="tab-count-karya">2</span>)
-          </button>
-          <button type="button" class="portfolio-tab-btn" data-tab="prestasi">
-            <i class="fa-solid fa-trophy"></i> Prestasi & HKI (<span id="tab-count-prestasi">8</span>)
-          </button>
-          <button type="button" class="portfolio-tab-btn" data-tab="galeri">
-            <i class="fa-solid fa-images"></i> Galeri Dokumentasi (<span id="tab-count-galeri">8</span>)
-          </button>
-        </div>
-      </div>
+      <!-- PORTFOLIO TWO-COLUMN LAYOUT WITH SIDEBAR FILTER -->
+      <div class="portfolio-layout">
+        <!-- SIDEBAR FILTER (DI SEBELAH KIRI) -->
+        <aside class="portfolio-sidebar" id="portfolio-sidebar">
+          <div class="portfolio-sidebar-inner">
+            <div class="sidebar-header">
+              <span class="sidebar-badge"><i class="fa-solid fa-sliders"></i> Filter Portofolio</span>
+              <h3 class="sidebar-title">Pilih Kategori</h3>
+              <p class="sidebar-subtitle">Pilih kategori untuk fokus pada portofolio tertentu agar tampilan lebih ringkas dan tidak panjang ke bawah.</p>
+            </div>
+
+            <nav class="portfolio-filter-menu" role="tablist" aria-label="Kategori Portofolio">
+              <!-- 1. Prestasi & HKI -->
+              <button type="button" class="portfolio-nav-item active" data-tab="prestasi" role="tab" aria-selected="true">
+                <div class="nav-item-icon bg-amber-subtle text-amber">
+                  <i class="fa-solid fa-trophy"></i>
+                </div>
+                <div class="nav-item-info">
+                  <div class="nav-item-head">
+                    <span class="nav-item-title">Prestasi & HKI</span>
+                    <span class="nav-item-count" id="sidebar-count-prestasi">8</span>
+                  </div>
+                  <span class="nav-item-desc">Penghargaan lomba & paten karya</span>
+                </div>
+                <i class="fa-solid fa-chevron-right nav-item-arrow"></i>
+              </button>
+
+              <!-- 2. Inovasi Digital (Karya Siswa) -->
+              <button type="button" class="portfolio-nav-item" data-tab="karya" role="tab" aria-selected="false">
+                <div class="nav-item-icon bg-blue-subtle text-blue">
+                  <i class="fa-solid fa-laptop-code"></i>
+                </div>
+                <div class="nav-item-info">
+                  <div class="nav-item-head">
+                    <span class="nav-item-title">Inovasi Digital</span>
+                    <span class="nav-item-count" id="sidebar-count-karya">2</span>
+                  </div>
+                  <span class="nav-item-desc">Website & platform edukasi digital</span>
+                </div>
+                <i class="fa-solid fa-chevron-right nav-item-arrow"></i>
+              </button>
+
+              <!-- 3. Galeri Pembelajaran -->
+              <button type="button" class="portfolio-nav-item" data-tab="galeri" role="tab" aria-selected="false">
+                <div class="nav-item-icon bg-emerald-subtle text-emerald">
+                  <i class="fa-solid fa-images"></i>
+                </div>
+                <div class="nav-item-info">
+                  <div class="nav-item-head">
+                    <span class="nav-item-title">Galeri Dokumentasi</span>
+                    <span class="nav-item-count" id="sidebar-count-galeri">8</span>
+                  </div>
+                  <span class="nav-item-desc">Aksi nyata, kelas & workshop</span>
+                </div>
+                <i class="fa-solid fa-chevron-right nav-item-arrow"></i>
+              </button>
+
+              <!-- 4. Semua Portofolio -->
+              <button type="button" class="portfolio-nav-item nav-item-all" data-tab="all" role="tab" aria-selected="false">
+                <div class="nav-item-icon bg-purple-subtle text-purple">
+                  <i class="fa-solid fa-layer-group"></i>
+                </div>
+                <div class="nav-item-info">
+                  <div class="nav-item-head">
+                    <span class="nav-item-title">Semua Portofolio</span>
+                    <span class="nav-item-count" id="sidebar-count-all">18</span>
+                  </div>
+                  <span class="nav-item-desc">Tampilkan seluruh portofolio</span>
+                </div>
+                <i class="fa-solid fa-chevron-right nav-item-arrow"></i>
+              </button>
+            </nav>
+
+            <!-- Sidebar Info Snippet -->
+            <div class="portfolio-sidebar-meta">
+              <div class="sidebar-meta-item">
+                <i class="fa-solid fa-award text-amber"></i>
+                <div>
+                  <strong>Terverifikasi</strong>
+                  <span>Karya Nyata Siswa & Guru</span>
+                </div>
+              </div>
+              <div class="sidebar-meta-item">
+                <i class="fa-solid fa-graduation-cap text-blue"></i>
+                <div>
+                  <strong>Kurikulum Merdeka</strong>
+                  <span>Berbasis Projek P5 & Vokasi</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- CONTENT AREA DI SEBELAH KANAN -->
+        <div class="portfolio-content-area">
 
       <!-- Portfolio Group 1: Prestasi & Penghargaan -->
       <div class="portfolio-group" id="prestasi" data-group="prestasi">
@@ -787,7 +865,7 @@
     </div> <!-- /portfolio-group prestasi -->
 
     <!-- Portfolio Group 2: Karya Website & Inovasi Digital -->
-    <div class="portfolio-group" id="karya" data-group="karya">
+    <div class="portfolio-group is-hidden" id="karya" data-group="karya">
       <div class="portfolio-group-header">
         <div class="group-title-box">
           <span class="group-badge bg-primary-subtle text-primary"><i class="fa-solid fa-laptop-code"></i> Inovasi Digital</span>
@@ -898,7 +976,7 @@
     </div> <!-- /portfolio-group karya -->
 
     <!-- Portfolio Group 3: Galeri Kegiatan Pembelajaran -->
-    <div class="portfolio-group" id="galeri" data-group="galeri">
+    <div class="portfolio-group is-hidden" id="galeri" data-group="galeri">
       <div class="portfolio-group-header">
         <div class="group-title-box">
           <span class="group-badge bg-emerald-subtle text-emerald"><i class="fa-solid fa-camera-retro"></i> Dokumentasi Aktivitas</span>
@@ -1064,6 +1142,8 @@
       <!-- Tombol Lihat Lebih Banyak / Minimize Galeri (Muncul dinamis jika data > 6) -->
       <div class="gallery-toggle-wrap text-center" id="gallery-toggle-wrap" style="display: none;"></div>
     </div> <!-- /portfolio-group galeri -->
+        </div> <!-- /portfolio-content-area -->
+      </div> <!-- /portfolio-layout -->
   </div> <!-- /container -->
 </section> <!-- /portfolio-section -->
 
