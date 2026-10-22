@@ -10,6 +10,7 @@
 function initApp() {
   initThemeToggle();
   initMobileNav();
+  initNavbarScroll();
   initScrollSpy();
   initAccordion();
   initBackToTop();
@@ -898,6 +899,25 @@ function initMobileNav() {
       toggleMenu(false);
     }
   });
+}
+
+/* --------------------------------------------------
+   2.1. NAVBAR SCROLL ELEVATION
+   -------------------------------------------------- */
+function initNavbarScroll() {
+  const header = document.getElementById('main-header');
+  if (!header) return;
+
+  const onScroll = () => {
+    if (window.pageYOffset > 15) {
+      header.classList.add('is-scrolled');
+    } else {
+      header.classList.remove('is-scrolled');
+    }
+  };
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
 }
 
 /* --------------------------------------------------

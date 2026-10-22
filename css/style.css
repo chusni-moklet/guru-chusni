@@ -120,7 +120,7 @@ html {
   -webkit-text-size-adjust: 100%;
   width: 100%;
   max-width: 100vw;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 body {
@@ -130,7 +130,7 @@ body {
   line-height: 1.65;
   width: 100%;
   max-width: 100vw;
-  overflow-x: hidden;
+  overflow-x: clip;
   position: relative;
   transition: background-color var(--transition-normal), color var(--transition-normal);
 }
@@ -439,14 +439,25 @@ button {
    5. NAVBAR & HEADER
    -------------------------------------------------- */
 .navbar-wrapper {
+  position: -webkit-sticky;
   position: sticky;
   top: 0;
   z-index: 1000;
+  width: 100%;
   background-color: var(--bg-nav);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border-color);
   transition: all var(--transition-normal);
+}
+
+.navbar-wrapper.is-scrolled {
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.1);
+  border-bottom-color: var(--border-color);
+}
+
+[data-theme="dark"] .navbar-wrapper.is-scrolled {
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.45);
 }
 
 .navbar-container {
@@ -3579,8 +3590,8 @@ button {
 
 @media (max-width: 1040px) {
   .nav-menu {
-    position: fixed;
-    top: 72px;
+    position: absolute;
+    top: 100%;
     left: 0;
     width: 100%;
     max-height: calc(100dvh - 72px);
