@@ -162,12 +162,15 @@ function setupDatabase() {
     sheetGaleri.clear();
     sheetGaleri.appendRow(["ID", "Judul", "Kategori", "KategoriLabel", "ImgUrl", "Deskripsi"]);
     var defaultGaleri = [
-      ["1", "Pembelajaran Matematika Kontekstual Berkelompok", "kelas", "Suasana Kelas", "https://images.unsplash.com/photo-1580582932707-520aed937b7b?auto=format&fit=crop&w=800&q=80", "Diskusi seru pemecahan masalah model matematika menggunakan papan interaktif."],
-      ["2", "Gelar Karya P5: Rekayasa Prototipe Lampu Surya", "projek", "Projek P5", "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80", "Siswa mempresentasikan hasil rakitan sensor otomatis hemat energi."],
-      ["3", "Lokakarya Berbagi Praktik Baik Kurikulum Merdeka", "pelatihan", "Workshop Guru", "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800&q=80", "Menjadi narasumber modul ajar berdiferensiasi bersama 60 guru SMA se-Kabupaten."],
-      ["4", "Praktikum Pemrograman Algoritma Python", "kelas", "Suasana Kelas", "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=800&q=80", "Membimbing siswa merancang simulasi perhitungan statistik mandiri di lab komputer."],
-      ["5", "Bimbingan Intensif Kontingen OSN Matematika", "projek", "Projek & Ekstrakurikuler", "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&q=80", "Sesi telaah teorema geometri lanjutan dan latihan simulasi kompetisi nasional."],
-      ["6", "Penganugerahan Pendidik Berprestasi & Inovatif", "pelatihan", "Prestasi & Pengakuan", "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=800&q=80", "Momentum penerimaan piagam penghargaan apresiasi guru teladan dari Dinas Pendidikan."]
+      ["1793276000621", "Pelatihan STEM Elevate Class - HAFECS", "projek", "Pelatihan", "assets/galeri/stem-hafecs.jpg", "Stem"],
+      ["1793236788126", "Anugerah Guru dan Kepala Sekolah Prima 2026", "pelatihan", "Kompetisi Guru", "assets/galeri/anugerah-guru-prima-2026.jpg", "First Time Second Place"],
+      ["1792285437237", "Pembelajaran Game menggunakan Roblox Studio", "pelatihan", "Workshop Daring", "assets/galeri/roblox-studio.jpg", "Kegiatan sharing best practice di lingkungan Yayasan Pendidikan Telkom"],
+      ["1792285615864", "Pitching Day - Lomba PT. Telkom Indonesia", "projek", "Pitching Day", "assets/galeri/pitching-day.jpg", "Finalis Lomba Ayo Bikin Nyata"],
+      ["1792287837065", "Lokakarya Guru Penggerak", "kelas", "Guru Penggerak", "assets/galeri/lokakarya-gp.jpg", "Program Guru Penggerak Angkatan ke-9"],
+      ["1792287920088", "Pembimbing Lomba Business Plan", "kelas", "Lomba", "assets/galeri/business-plan.jpg", "Pembimbing lomba"],
+      ["1792288023372", "LKS Web Technologies", "kelas", "Lomba", "assets/galeri/lks-web.jpg", "Lomba LKS Tingkat Kota Malang"],
+      ["1792288141777", "Hari Nasional", "kelas", "Pakaian Adat", "assets/galeri/hari-nasional.jpg", "Hari Pakaian Adat"],
+      ["1792289134049", "Drone Piloting - Malaysia", "kelas", "Lomba Internasional", "assets/galeri/drone-malaysia.jpg", "Lomba Drone Tingkat ASEAN"]
     ];
     defaultGaleri.forEach(function(row) { sheetGaleri.appendRow(row); });
   }

@@ -573,25 +573,35 @@ function renderDynamicGaleri(galeriList) {
 
   const defaultGaleri = (window.DB && window.DB.DEFAULT_DATA && window.DB.DEFAULT_DATA.galeri) || [];
 
-  container.innerHTML = galeriList.map((g, idx) => {
-    let img = g.imgUrl || '';
+  container.innerHTML = galeriList.map(g => {
+    const gId = String(g.id || g.ID || '');
+    const gTitle = (g.title || g.Judul || '').trim().toLowerCase();
+    let img = g.imgUrl || g.ImgUrl || '';
+
+    const def = defaultGaleri.find(d => 
+      (d.id && String(d.id) === gId) || 
+      (d.title && gTitle && d.title.trim().toLowerCase() === gTitle)
+    );
+
     if (!img || img === 'assets/galeri-default.jpg' || img.includes('photo-1580582932707-520aed937b7b')) {
-      const def = defaultGaleri.find(d => d.title && d.title.trim().toLowerCase() === (g.title || '').trim().toLowerCase()) || defaultGaleri[idx];
       if (def && def.imgUrl) {
         img = def.imgUrl;
       } else {
         img = 'assets/galeri-default.jpg';
       }
+    } else if (def && def.imgUrl && def.imgUrl.startsWith('assets/galeri/') && img.startsWith('data:')) {
+      img = def.imgUrl;
     }
+
     return `
-    <div class="gallery-item" data-category="${escapeHtml(g.category || 'kelas')}">
+    <div class="gallery-item" data-category="${escapeHtml((g.category || 'kelas').toLowerCase())}">
       <div class="gallery-thumb">
-        <img src="${escapeHtml(img)}" alt="${escapeHtml(g.title)}" loading="lazy" onerror="this.onerror=null; this.src='assets/galeri-default.jpg';">
+        <img src="${escapeHtml(img)}" alt="${escapeHtml(g.title || '')}" loading="lazy" onerror="this.onerror=null; this.src='assets/galeri-default.jpg';">
         <div class="gallery-overlay">
           <div class="gallery-caption">
-            <span class="gallery-tag">${escapeHtml(g.categoryLabel || g.category)}</span>
-            <h4>${escapeHtml(g.title)}</h4>
-            <p>${escapeHtml(g.desc)}</p>
+            <span class="gallery-tag">${escapeHtml(g.categoryLabel || g.category || 'Galeri')}</span>
+            <h4>${escapeHtml(g.title || '')}</h4>
+            <p>${escapeHtml(g.desc || '')}</p>
           </div>
           <button class="btn-zoom" aria-label="Perbesar Foto"><i class="fa-solid fa-maximize"></i></button>
         </div>
