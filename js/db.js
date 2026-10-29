@@ -166,7 +166,7 @@ const DB = (function () {
     {
       "id": "1793275660253",
       "year": "2026",
-      "title": "Anugerah Guru dan Kepala Sekolah Prima 2026",
+      "title": "Juara 2 - Anugerah Guru dan Kepala Sekolah Prima 2026",
       "issuer": "PGRI",
       "category": "Juara 2 Kota",
       "icon": "fa-trophy",
@@ -1034,14 +1034,40 @@ const DB = (function () {
           currentData.pelatihan = JSON.parse(JSON.stringify(DEFAULT_DATA.pelatihan));
         }
         if (Array.isArray(currentData.prestasi)) {
-          currentData.prestasi.forEach(p => {
-            if (p.pdfUrl === undefined) {
-              const def = DEFAULT_DATA.prestasi.find(x => x.id === p.id);
-              p.pdfUrl = (def && def.pdfUrl) || '';
+          // 1. Pastikan item baru dari DEFAULT_DATA (seperti Juara 2 AGP) dimasukkan jika belum ada di localStorage
+          DEFAULT_DATA.prestasi.forEach(def => {
+            const defId = String(def.id || '');
+            const defTitle = (def.title || '').toLowerCase().trim();
+            const exists = currentData.prestasi.some(p => 
+              String(p.id) === defId || 
+              (p.title && defTitle && (
+                p.title.toLowerCase().trim() === defTitle ||
+                p.title.toLowerCase().includes(defTitle) ||
+                defTitle.includes(p.title.toLowerCase().trim())
+              ))
+            );
+            if (!exists) {
+              currentData.prestasi.unshift(JSON.parse(JSON.stringify(def)));
             }
-            if (p.pdfFileName === undefined) {
-              const def = DEFAULT_DATA.prestasi.find(x => x.id === p.id);
-              p.pdfFileName = (def && def.pdfFileName) || '';
+          });
+
+          // 2. Pulihkan URL berkas dari DEFAULT_DATA jika kosong atau referensi indexeddb lokal
+          currentData.prestasi.forEach(p => {
+            const pId = String(p.id || p.ID || '');
+            const pTitle = (p.title || p.Judul || '').toLowerCase().trim();
+            const def = DEFAULT_DATA.prestasi.find(x => 
+              String(x.id) === pId || 
+              (x.title && pTitle && (
+                x.title.toLowerCase().trim() === pTitle ||
+                x.title.toLowerCase().includes(pTitle) || 
+                pTitle.includes(x.title.toLowerCase().trim())
+              ))
+            );
+            if (def && def.pdfUrl) {
+              if (!p.pdfUrl || p.pdfUrl.startsWith('indexeddb:')) {
+                p.pdfUrl = def.pdfUrl;
+                p.pdfFileName = def.pdfFileName || p.pdfFileName || '';
+              }
             }
           });
         }
@@ -2032,6 +2058,9 @@ const DB = (function () {
       return;
     }
 
+    const isImageFile = (fileName && /\.(jpe?g|png|webp|gif|bmp|svg)$/i.test(fileName)) ||
+                        (pdfUrl && (pdfUrl.startsWith('data:image/') || /\.(jpe?g|png|webp)(\?|$)/i.test(pdfUrl)));
+
     // 1. Jika disimpan di IndexedDB (indexeddb:id_dokumen)
     if (pdfUrl.startsWith('indexeddb:')) {
       const id = pdfUrl.replace('indexeddb:', '').trim();
@@ -2041,12 +2070,36 @@ const DB = (function () {
           openPdfDocument(record.dataUrl, record.fileName || fileName);
           return;
         } else {
+          // Fallback ke DEFAULT_DATA jika id cocok
+          const def = (DEFAULT_DATA.prestasi || []).find(d => String(d.id) === id || pdfUrl.includes(String(d.id)));
+          if (def && def.pdfUrl && !def.pdfUrl.startsWith('indexeddb:')) {
+            openPdfDocument(def.pdfUrl, def.pdfFileName || fileName);
+            return;
+          }
           alert('Berkas di penyimpanan lokal tidak ditemukan atau telah dibersihkan oleh browser.');
           return;
         }
       } catch (err) {
         console.error('Error membaca berkas dari IndexedDB:', err);
         alert('Gagal memuat berkas dari penyimpanan browser.');
+        return;
+      }
+    }
+
+    // Jika berkas berupa gambar dan halaman memiliki lightbox modal (seperti di index.html), buka via Lightbox Modal
+    if (isImageFile && typeof document !== 'undefined') {
+      const lightbox = document.getElementById('lightbox-modal');
+      const lightboxImg = document.getElementById('lightbox-img');
+      const lightboxCaption = document.getElementById('lightbox-caption');
+      if (lightbox && lightboxImg) {
+        lightboxImg.src = pdfUrl;
+        lightboxImg.alt = fileName || 'Sertifikat Gambar';
+        if (lightboxCaption) {
+          lightboxCaption.innerHTML = `<strong>${fileName || 'Pratinjau Sertifikat / Berkas'}</strong><br><a href="${encodeURI(pdfUrl)}" download="${fileName || 'Dokumen.jpg'}" style="display:inline-block; margin-top:0.5rem; color:#fff; border:1px solid #94a3b8; padding:0.3rem 0.8rem; border-radius:6px; text-decoration:none; font-size:0.85rem;"><i class="fa-solid fa-download"></i> Unduh Berkas</a>`;
+        }
+        lightbox.classList.add('active');
+        lightbox.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
         return;
       }
     }
