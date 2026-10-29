@@ -1,7 +1,7 @@
 # 📊 Panduan Integrasi Google Spreadsheet & Google Apps Script
 ### Database Gratis & Real-Time untuk Website Profil Pendidik (`profilku`)
 
-Website profil ini telah dilengkapi dengan integrasi database **Google Spreadsheet** melalui **Google Apps Script (GAS)** REST API. Anda dapat mengubah data profil, modul ajar, prestasi, foto galeri, linimasa karir, hingga melihat pesan masuk formulir langsung dari **Dashboard Admin (`admin.html`)** maupun dari Spreadsheet Google Anda!
+Website profil ini telah dilengkapi dengan integrasi database **Google Spreadsheet** melalui **Google Apps Script (GAS)** REST API. Anda dapat mengubah data profil, modul ajar, prestasi, foto galeri, linimasa karir, hingga melihat pesan masuk formulir langsung dari **Dashboard Admin (`admin-panel-secret-x9v2.html`)** maupun dari Spreadsheet Google Anda!
 
 ---
 
@@ -70,7 +70,7 @@ Website profil ini telah dilengkapi dengan integrasi database **Google Spreadshe
 ---
 
 ### Langkah 6: Hubungkan ke Dashboard Admin Website
-1. Buka file `admin.html` di browser Anda (atau klik tombol **Admin** di navbar website).
+1. Buka file `admin-panel-secret-x9v2.html` di browser Anda (URL disembunyikan untuk keamanan).
 2. Masuk menggunakan akun admin:
    - **Username:** `admin`
    - **Password:** `password` (atau `admin123`)
@@ -87,7 +87,7 @@ Website profil ini telah dilengkapi dengan integrasi database **Google Spreadshe
 ## 🔒 Manajemen Keamanan & Kredensial
 
 1. **Ubah Kata Sandi:**
-   Anda dapat mengubah kata sandi administrator kapan saja melalui menu **Pengaturan & Keamanan** di `admin.html`. Perubahan password akan otomatis disinkronkan ke sheet `Users` di spreadsheet Anda.
+   Anda dapat mengubah kata sandi administrator kapan saja melalui menu **Pengaturan & Keamanan** di `admin-panel-secret-x9v2.html`. Perubahan password akan otomatis disinkronkan ke sheet `Users` di spreadsheet Anda.
 2. **Backup Mandiri (JSON):**
    Pada tab Pengaturan, terdapat tombol **Ekspor Backup JSON**. Anda dapat mengunduh salinan cadangan seluruh database dalam 1 file JSON kapan pun dibutuhkan.
 3. **Penyimpanan Lokal Otomatis (Offline-First):**
@@ -99,7 +99,7 @@ Website profil ini telah dilengkapi dengan integrasi database **Google Spreadshe
 
 | Pertanyaan / Kendala | Solusi |
 |---|---|
-| **Data tidak berubah setelah diedit di spreadsheet?** | Buka `admin.html` lalu klik tombol **Sinkronkan** di header atas, atau muat ulang halaman dengan menekan `Ctrl + F5` / `Cmd + Shift + R`. |
+| **Data tidak berubah setelah diedit di spreadsheet?** | Buka `admin-panel-secret-x9v2.html` lalu klik tombol **Sinkronkan** di header atas, atau muat ulang halaman dengan menekan `Ctrl + F5` / `Cmd + Shift + R`. |
 | **Koneksi bertuliskan "CORS Error" atau gagal ping?** | Pastikan saat melakukan Deploy Apps Script, opsi **Who has access** diatur ke **Anyone (Siapa saja)**, bukan *Only Myself*. Jika baru saja mengubah pengaturan, lakukan Deploy ulang via *Manage deployments* &rarr; *New version*. |
 | **Pesan form kontak tidak masuk ke WhatsApp?** | Pastikan nomor WhatsApp di menu Profil & Identitas diawali dengan kode negara **62** tanpa spasi atau tanda plus (contoh: `6281234567890`). |
 | **Bagaimana jika lupa password?** | Buka Google Spreadsheet Anda, buka sheet `Users`, lalu ubah kolom `Password` pada baris user `admin`. Atau gunakan kredensial lokal bawaan: `admin` / `password`. |

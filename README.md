@@ -46,7 +46,7 @@ Website profil profesional dan interaktif untuk guru / pendidik Indonesia. Dides
 profilku/
 │
 ├── index.html                 # Halaman utama profil pendidik
-├── admin.html                 # Dashboard Admin & manajemen data
+├── admin-panel-secret-x9v2.html # Dashboard Admin & manajemen data (URL Rahasia)
 ├── css/
 │   ├── style.css              # Styling halaman utama (light/dark mode)
 │   └── admin.css              # Styling modern dashboard admin
@@ -64,9 +64,9 @@ profilku/
 
 ## 🔐 Dashboard Admin & Manajemen Database
 
-Website ini telah dilengkapi **Portal Admin Modern (`admin.html`)** yang memungkinkan pendidik mengelola seluruh konten secara visual tanpa harus mengedit kode HTML secara manual:
+Website ini telah dilengkapi **Portal Admin Modern (`admin-panel-secret-x9v2.html`)** yang memungkinkan pendidik mengelola seluruh konten secara visual tanpa harus mengedit kode HTML secara manual:
 
-- **Akses Admin:** Buka `admin.html` atau klik tombol **Admin** di pojok kanan atas website.
+- **Akses Admin:** Buka `admin-panel-secret-x9v2.html` pada browser Anda (disembunyikan dari tautan publik untuk keamanan).
 - **Kredensial Default:**
   - **Username:** `admin`
   - **Password:** `password` (atau `admin123`)

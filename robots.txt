@@ -1,0 +1,5 @@
+# robots.txt for guru-chusni
+User-agent: *
+Disallow: /admin-panel-secret-x9v2.html
+Disallow: /admin.html
+Allow: /

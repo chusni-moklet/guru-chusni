@@ -15,7 +15,6 @@ function initApp() {
   initAccordion();
   initBackToTop();
   initContactForm();
-  initDiscreetAdminAccess();
   initPortfolioTabs();
   initTrainingFilters();
 
@@ -1390,29 +1389,7 @@ function escapeHtml(str) {
 }
 
 /* --------------------------------------------------
-   12. AKSES ADMIN TERSEMBUNYI (DISCREET ADMIN ACCESS)
-   -------------------------------------------------- */
-function initDiscreetAdminAccess() {
-  // 1. Pintasan keyboard global: Ctrl + Shift + A atau Cmd + Shift + A
-  window.addEventListener('keydown', (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
-      e.preventDefault();
-      window.location.href = 'admin.html';
-    }
-  });
-
-  // 2. Klik ganda (double-click) pada logo / brand navbar untuk pemilik website
-  const brandEl = document.querySelector('.navbar-brand');
-  if (brandEl) {
-    brandEl.addEventListener('dblclick', (e) => {
-      e.preventDefault();
-      window.location.href = 'admin.html';
-    });
-  }
-}
-
-/* --------------------------------------------------
-   13. PORTOFOLIO TABS NAVIGATION (SIDEBAR FILTER)
+   12. PORTOFOLIO TABS NAVIGATION (SIDEBAR FILTER)
    -------------------------------------------------- */
 function initPortfolioTabs() {
   const tabBtns = document.querySelectorAll('.portfolio-nav-item, .portfolio-tab-btn');
