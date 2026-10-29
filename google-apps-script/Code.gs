@@ -619,10 +619,32 @@ function saveSectionData(ss, sheetName, items) {
   var headers = [];
 
   if (existingValues.length > 0 && existingValues[0].length > 0 && existingValues[0][0] !== "") {
-    headers = existingValues[0];
+    headers = existingValues[0].slice();
+    // Tambahkan header baru jika ada field di items yang belum terdaftar di baris 1 spreadsheet
+    var headerLowerSet = {};
+    for (var h = 0; h < headers.length; h++) {
+      headerLowerSet[String(headers[h]).toLowerCase().trim()] = true;
+    }
+    for (var i = 0; i < items.length; i++) {
+      for (var k in items[i]) {
+        var kLower = String(k).toLowerCase().trim();
+        if (!headerLowerSet[kLower] && typeof items[i][k] !== 'function') {
+          headers.push(k);
+          headerLowerSet[kLower] = true;
+        }
+      }
+    }
   } else {
     // Buat header dari keys item pertama
     headers = Object.keys(items[0]);
+  }
+
+  // Khusus sheet Prestasi, pastikan selalu memiliki kolom berkas (PdfUrl & PdfFileName)
+  if (sheetName === SHEETS.PRESTASI) {
+    var hasPdfUrl = headers.some(function(h) { return String(h).toLowerCase() === 'pdfurl'; });
+    var hasPdfFileName = headers.some(function(h) { return String(h).toLowerCase() === 'pdffilename'; });
+    if (!hasPdfUrl) headers.push("PdfUrl");
+    if (!hasPdfFileName) headers.push("PdfFileName");
   }
 
   sheet.clear();

@@ -164,39 +164,75 @@ const DB = (function () {
 ],
   "prestasi": [
     {
-      "id": "1792284295308",
-      "year": "2019",
-      "title": "Hello Moklet",
-      "issuer": "Yayasan Pendidikan Telkom",
-      "category": "Juara 2 Nasional",
+      "id": "1793275660253",
+      "year": "2026",
+      "title": "Anugerah Guru dan Kepala Sekolah Prima 2026",
+      "issuer": "PGRI",
+      "category": "Juara 2 Kota",
       "icon": "fa-trophy",
-      "desc": "#2 ideate - Aplikasi Augmented Reality untuk promosi melalui brosur sekolah",
+      "desc": "Kompetisi Best Practice Pembelajaran dengan AI",
       "highlight": false,
-      "pdfUrl": "https://drive.google.com/file/d/1HBFG-QxoA45nlyF_vqU2R4fRu3snBjml/view?usp=sharing",
-      "pdfFileName": "1Tr1OhfdZsFJCNMHCcE0mNGguwROkiJNL"
+      "pdfUrl": "assets/docs/Juara 2 AGP 2026.jpeg",
+      "pdfFileName": "Juara 2 AGP 2026.jpeg"
     },
     {
-      "id": "1792284625904",
-      "year": "2020",
-      "title": "Filgaru Plus",
-      "issuer": "Yayasan Pendidikan Telkom",
-      "category": "Juara 2 Nasional",
+      "id": "1792285809157",
+      "year": "2026",
+      "title": "HKI - Portofolio",
+      "issuer": "Dirjen HKI",
+      "category": "HKI",
       "icon": "fa-trophy",
-      "desc": "#3 - IDEATE - Filter rumus pada platform instagram untuk meningkatkan minat belajar siswa",
+      "desc": "platform inovatif yang secara khusus menghubungkan portofolio para siswa dengan dunia industri teknologi. Melalui ekosistem terpadu ini, siswa dapat membuat CV dan menampilkan karya mereka. Sebaliknya, perusahaan mendapat kemudahan mencari dan merekrut talenta digital terverifikasi yang siap bekerja untuk memajukan bisnis mereka secara profesional.",
       "highlight": false,
-      "pdfUrl": "https://drive.google.com/file/d/1-XkfkgMCaw3xA7Gg8yntJu0UEEkFjsj2/view?usp=sharing",
-      "pdfFileName": "view"
+      "pdfUrl": "assets/docs/Sertifikat_HKI_Portofolio_Siswa.pdf",
+      "pdfFileName": "Sertifikat_HKI_Portofolio_Siswa.pdf"
     },
     {
-      "id": "1792284735366",
-      "year": "2021",
-      "title": "SEMANGQA",
-      "issuer": "Yayasan Pendidikan Telkom",
-      "category": "Juara Harapan 3 Nasional",
+      "id": "1792285921203",
+      "year": "2026",
+      "title": "HKI - Telkom Society",
+      "issuer": "Dirjen HKI",
+      "category": "HKI",
       "icon": "fa-trophy",
-      "desc": "#4 IDEATE - Aplikasi membaca Al-Quran untuk siswa SMK Telkom Malang",
+      "desc": "Platform untuk komunitas siswa untuk mengikuti lomba ata mengerjakan project sesuai role (hacker, hipster, hacker, public relation dan project manager).",
       "highlight": false,
-      "pdfUrl": "https://drive.google.com/file/d/1_s6kzUtvuAIUnGDBllpbwtAcp0KqsM_Q/view?usp=sharing",
+      "pdfUrl": "assets/docs/Sertifikat_HKI_Telkom Society.pdf",
+      "pdfFileName": "Sertifikat_HKI_Telkom Society.pdf"
+    },
+    {
+      "id": "1792285249215",
+      "year": "2025",
+      "title": "PORTO-Q",
+      "issuer": "Yayasan Pendidikan Telkom",
+      "category": "Juara 1 Nasional",
+      "icon": "fa-trophy",
+      "desc": "INNOVFEST 2025 - Platform inovatif yang secara khusus menghubungkan portofolio para siswa dengan dunia industri teknologi dan perguruan tinggi.",
+      "highlight": false,
+      "pdfUrl": "assets/docs/SERTIFIKAT PORTO-Q.jpeg",
+      "pdfFileName": "SERTIFIKAT PORTO-Q.jpeg"
+    },
+    {
+      "id": "1792289307626",
+      "year": "2024",
+      "title": "Green Commute Challenge",
+      "issuer": "Yayasan Pendidikan Telkom",
+      "category": "Juara Nasional",
+      "icon": "fa-trophy",
+      "desc": "Lomba video pergi bekerja dengan transportasi ramah lingkungan",
+      "highlight": false,
+      "pdfUrl": "",
+      "pdfFileName": ""
+    },
+    {
+      "id": "1792285092050",
+      "year": "2023",
+      "title": "Inovator Prestatif",
+      "issuer": "Kemenparekraf RI dan Malang Cerdas",
+      "category": "Juara Malang Raya",
+      "icon": "fa-trophy",
+      "desc": "Guru Award 2023",
+      "highlight": false,
+      "pdfUrl": "https://drive.google.com/file/d/19pkWKC3VAoj6jrdpZDno9k0Nlzye5jYO/view?usp=sharing",
       "pdfFileName": "view"
     },
     {
@@ -212,64 +248,40 @@ const DB = (function () {
       "pdfFileName": "view"
     },
     {
-      "id": "1792285092050",
-      "year": "2023",
-      "title": "Inovator Prestatif",
-      "issuer": "Kemenparekraf RI dan Malang Cerdas",
-      "category": "Juara Malang Raya",
+      "id": "1792284735366",
+      "year": "2021",
+      "title": "SEMANGQA",
+      "issuer": "Yayasan Pendidikan Telkom",
+      "category": "Juara Harapan 3 Nasional",
       "icon": "fa-trophy",
-      "desc": "Guru Award 2023",
+      "desc": "#4 IDEATE - Aplikasi membaca Al-Quran untuk siswa SMK Telkom Malang",
       "highlight": false,
-      "pdfUrl": "https://drive.google.com/file/d/19pkWKC3VAoj6jrdpZDno9k0Nlzye5jYO/view?usp=sharing",
+      "pdfUrl": "https://drive.google.com/file/d/1_s6kzUtvuAIUnGDBllpbwtAcp0KqsM_Q/view?usp=sharing",
       "pdfFileName": "view"
     },
     {
-      "id": "1792289307626",
-      "year": "2024",
-      "title": "Green Commute Challenge",
+      "id": "1792284625904",
+      "year": "2020",
+      "title": "Filgaru Plus",
       "issuer": "Yayasan Pendidikan Telkom",
-      "category": "Juara Nasional",
+      "category": "Juara 2 Nasional",
       "icon": "fa-trophy",
-      "desc": "Lomba video pergi bekerja dengan transportasi ramah lingkungan",
+      "desc": "#3 - IDEATE - Filter rumus pada platform instagram untuk meningkatkan minat belajar siswa",
       "highlight": false,
-      "pdfUrl": "indexeddb:prestasi_1792289307626",
-      "pdfFileName": "Screenshot 2026-10-18 at 09.06.44.png"
+      "pdfUrl": "https://drive.google.com/file/d/1-XkfkgMCaw3xA7Gg8yntJu0UEEkFjsj2/view?usp=sharing",
+      "pdfFileName": "view"
     },
     {
-      "id": "1792285249215",
-      "year": "2025",
-      "title": "PORTO-Q",
+      "id": "1792284295308",
+      "year": "2019",
+      "title": "Hello Moklet",
       "issuer": "Yayasan Pendidikan Telkom",
-      "category": "Juara 1 Nasional",
+      "category": "Juara 2 Nasional",
       "icon": "fa-trophy",
-      "desc": "INNOVFEST 2025 - Platform inovatif yang secara khusus menghubungkan portofolio para siswa dengan dunia industri teknologi dan perguruan tinggi.",
+      "desc": "#2 ideate - Aplikasi Augmented Reality untuk promosi melalui brosur sekolah",
       "highlight": false,
-      "pdfUrl": "indexeddb:prestasi_1792285249215",
-      "pdfFileName": "SERTIFIKAT PORTO-Q.jpeg"
-    },
-    {
-      "id": "1792285809157",
-      "year": "2026",
-      "title": "HKI - Portofolio",
-      "issuer": "Dirjen HKI",
-      "category": "HKI",
-      "icon": "fa-trophy",
-      "desc": "platform inovatif yang secara khusus menghubungkan portofolio para siswa dengan dunia industri teknologi. Melalui ekosistem terpadu ini, siswa dapat membuat CV dan menampilkan karya mereka. Sebaliknya, perusahaan mendapat kemudahan mencari dan merekrut talenta digital terverifikasi yang siap bekerja untuk memajukan bisnis mereka secara profesional.",
-      "highlight": false,
-      "pdfUrl": "indexeddb:prestasi_1792285809157",
-      "pdfFileName": "Sertifikat_HKI_Portofolio_Siswa.pdf"
-    },
-    {
-      "id": "1792285921203",
-      "year": "2026",
-      "title": "HKI - Telkom Society",
-      "issuer": "Dirjen HKI",
-      "category": "HKI",
-      "icon": "fa-trophy",
-      "desc": "Platform untuk komunitas siswa untuk mengikuti lomba ata mengerjakan project sesuai role (hacker, hipster, hacker, public relation dan project manager).",
-      "highlight": false,
-      "pdfUrl": "indexeddb:prestasi_1792285921203",
-      "pdfFileName": "Sertifikat_HKI_Telkom Society.pdf"
+      "pdfUrl": "https://drive.google.com/file/d/1HBFG-QxoA45nlyF_vqU2R4fRu3snBjml/view?usp=sharing",
+      "pdfFileName": "1Tr1OhfdZsFJCNMHCcE0mNGguwROkiJNL"
     }
   ],
   "jadwal": [
@@ -1220,18 +1232,40 @@ const DB = (function () {
 
         if (Array.isArray(incoming.prestasi) && incoming.prestasi.length) {
           currentData.prestasi = incoming.prestasi.map(p => {
-            const existing = (currentData.prestasi || []).find(x => String(x.id) === String(p.ID || p.id));
+            const pId = String(p.ID || p.id || '');
+            const pTitle = (p.Judul || p.title || '').trim();
+            const existing = (currentData.prestasi || []).find(x => String(x.id) === pId || (x.title && pTitle && x.title.toLowerCase().trim() === pTitle.toLowerCase().trim()));
+            const defaultItem = (DEFAULT_DATA.prestasi || []).find(d => 
+              String(d.id) === pId || 
+              (d.title && pTitle && (
+                d.title.toLowerCase().includes(pTitle.toLowerCase()) || 
+                pTitle.toLowerCase().includes(d.title.toLowerCase())
+              ))
+            );
+
             let pdfUrl = p.PdfUrl || p.pdfUrl || '';
             let pdfFileName = p.PdfFileName || p.pdfFileName || '';
-            // Pertahankan berkas lokal jika Google Sheets kosong atau referensi indexeddb
-            if ((!pdfUrl || pdfUrl.startsWith('indexeddb:')) && existing && existing.pdfUrl) {
+
+            // 1. Jika ada di existing lokal dan URL valid non-indexeddb
+            if ((!pdfUrl || pdfUrl.startsWith('indexeddb:')) && existing && existing.pdfUrl && !existing.pdfUrl.startsWith('indexeddb:')) {
               pdfUrl = existing.pdfUrl;
               pdfFileName = existing.pdfFileName || pdfFileName;
             }
+            // 2. Fallback ke DEFAULT_DATA (berkas statis assets/docs/ atau Google Drive)
+            if ((!pdfUrl || pdfUrl.startsWith('indexeddb:')) && defaultItem && defaultItem.pdfUrl) {
+              pdfUrl = defaultItem.pdfUrl;
+              pdfFileName = defaultItem.pdfFileName || pdfFileName;
+            }
+            // 3. Fallback ke existing jika hanya ada indexeddb di perangkat ini
+            if (!pdfUrl && existing && existing.pdfUrl) {
+              pdfUrl = existing.pdfUrl;
+              pdfFileName = existing.pdfFileName || pdfFileName;
+            }
+
             return {
-              id: String(p.ID || p.id || ''),
+              id: pId,
               year: String(p.Tahun || p.year || ''),
-              title: p.Judul || p.title || '',
+              title: pTitle,
               issuer: p.Penyelenggara || p.issuer || '',
               category: p.Kategori || p.category || '',
               icon: p.Icon || p.icon || 'fa-trophy',
@@ -2048,8 +2082,12 @@ const DB = (function () {
       }
     }
 
-    // 3. Jika berupa URL biasa (Google Drive, cloud storage, direct link)
-    window.open(pdfUrl, '_blank');
+    // 3. Jika berupa URL biasa (Google Drive, cloud storage, direct link, assets/...)
+    try {
+      window.open(encodeURI(pdfUrl), '_blank');
+    } catch (e) {
+      window.open(pdfUrl, '_blank');
+    }
   }
 
   // Listener untuk reaktif render di UI
