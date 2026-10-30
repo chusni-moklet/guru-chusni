@@ -1860,7 +1860,7 @@ const AdminApp = (function () {
             </div>
             <div class="form-group">
               <label class="form-label">Urutan Tampil (Nomor)</label>
-              <input type="number" class="form-control" name="order" min="1" max="99" value="${item ? item.order : items.length + 1}" required>
+              <input type="number" class="form-control" name="order" min="1" max="99" value="${item ? item.order : 1}" required>
             </div>
           </div>
           <div class="form-group" style="margin-top: 0.5rem; background: var(--admin-bg-base); padding: 0.75rem; border-radius: 0.5rem; border: 1px solid var(--admin-card-border);">
@@ -2680,7 +2680,13 @@ const AdminApp = (function () {
     // Penanganan khusus Menu Navigasi
     if (type === 'nav_menus') {
       newItem.is_active = (formData.get('is_active') === 'true' || formData.get('is_active') === 'on');
-      newItem.order = Number(formData.get('order') || (items.length + 1));
+      const inputOrder = formData.get('order');
+      if (!isEdit && (!inputOrder || Number(inputOrder) === 1)) {
+        newItem.order = 1;
+        items.forEach(m => { m.order = (Number(m.order) || 1) + 1; });
+      } else {
+        newItem.order = Number(inputOrder || 1);
+      }
     }
 
     // Penanganan khusus Pelatihan & Sertifikasi
@@ -2695,8 +2701,8 @@ const AdminApp = (function () {
       items = items.map(x => x.id === id ? Object.assign({}, x, newItem) : x);
       showToast('Data berhasil diperbarui!', 'success');
     } else {
-      items.push(newItem);
-      showToast('Data baru berhasil ditambahkan!', 'success');
+      items.unshift(newItem);
+      showToast('Data baru berhasil ditambahkan di posisi teratas!', 'success');
     }
 
     if (type === 'nav_menus') {
