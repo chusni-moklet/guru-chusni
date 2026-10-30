@@ -388,15 +388,23 @@ function renderDynamicPrestasi(prestasiList) {
       <h3 class="award-name">${escapeHtml(p.title)}</h3>
       <p class="award-issuer">${escapeHtml(p.issuer)}</p>
       <p class="award-desc">${escapeHtml(p.desc)}</p>
-      ${p.pdfUrl ? `
+      ${p.pdfUrl ? (() => {
+        let btnText = p.pdfFileName || '';
+        if (!btnText || btnText.toLowerCase() === 'view' || btnText.toLowerCase() === 'edit' || !btnText.includes('.')) {
+          btnText = defaultLabel;
+        } else if (btnText.length > 25) {
+          btnText = btnText.substring(0, 22) + '...';
+        }
+        return `
         <div class="award-pdf-wrap">
           <button type="button" class="${btnClass}" onclick="window.openPdfDocument('${escapeHtml(p.pdfUrl)}', '${escapeHtml(p.pdfFileName || defaultName)}')" title="${titleText}">
             <i class="${iconClass}"></i>
-            <span class="award-pdf-text">${escapeHtml(p.pdfFileName ? (p.pdfFileName.length > 25 ? p.pdfFileName.substring(0, 22) + '...' : p.pdfFileName) : defaultLabel)}</span>
+            <span class="award-pdf-text">${escapeHtml(btnText)}</span>
             <i class="fa-solid fa-arrow-up-right-from-square award-pdf-ext"></i>
           </button>
         </div>
-      ` : ''}
+        `;
+      })() : ''}
     </div>
     `;
   }).join('');

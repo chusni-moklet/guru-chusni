@@ -2415,11 +2415,15 @@ const AdminApp = (function () {
         const urlVal = altUrlInput.value.trim();
         if (urlVal) {
           pdfUrlInput.value = urlVal;
-          const inferredName = urlVal.split('/').pop().split('?')[0] || 'Dokumen_Online';
+          let inferredName = urlVal.split('/').pop().split('?')[0] || 'Dokumen_Online';
+          if (!inferredName || inferredName.toLowerCase() === 'view' || inferredName.toLowerCase() === 'edit' || inferredName.toLowerCase() === 'sharing' || !inferredName.includes('.')) {
+            const titleInput = document.querySelector('input[name="title"]');
+            inferredName = (titleInput && titleInput.value.trim() ? titleInput.value.trim() + '.pdf' : 'Sertifikat_Prestasi.pdf');
+          }
           const isImg = /\.(jpe?g|png|webp|gif|bmp|svg)$/i.test(inferredName);
           updatePreviewIcon(isImg);
-          if (pdfFileNameInput && !pdfFileNameInput.value) pdfFileNameInput.value = inferredName;
-          if (fileNameEl) fileNameEl.textContent = pdfFileNameInput.value || inferredName;
+          if (pdfFileNameInput) pdfFileNameInput.value = inferredName;
+          if (fileNameEl) fileNameEl.textContent = inferredName;
           if (fileMetaEl) fileMetaEl.textContent = 'Tautan Berkas Online: ' + (urlVal.length > 35 ? urlVal.substring(0, 32) + '...' : urlVal);
           if (previewBox) previewBox.style.display = 'flex';
         }
@@ -2631,14 +2635,18 @@ const AdminApp = (function () {
       const hiddenName = document.getElementById('modal-prestasi-pdf-filename');
       const altUrl = document.getElementById('modal-prestasi-alt-pdf-url');
 
-      let finalPdfUrl = (hiddenUrl && hiddenUrl.value.trim()) || newItem.pdfUrl || '';
-      let finalPdfName = (hiddenName && hiddenName.value.trim()) || newItem.pdfFileName || '';
-
-      if (!finalPdfUrl && altUrl && altUrl.value.trim()) {
+      let finalPdfUrl = '';
+      if (altUrl && altUrl.value.trim()) {
         finalPdfUrl = altUrl.value.trim();
-        if (!finalPdfName) {
-          finalPdfName = finalPdfUrl.split('/').pop().split('?')[0] || 'Dokumen_Online';
-        }
+      } else if (hiddenUrl && hiddenUrl.value.trim()) {
+        finalPdfUrl = hiddenUrl.value.trim();
+      } else {
+        finalPdfUrl = newItem.pdfUrl || '';
+      }
+
+      let finalPdfName = (hiddenName && hiddenName.value.trim()) || newItem.pdfFileName || '';
+      if (!finalPdfName || finalPdfName.toLowerCase() === 'view' || finalPdfName.toLowerCase() === 'edit' || !finalPdfName.includes('.')) {
+        finalPdfName = '';
       }
 
       if (finalPdfUrl && finalPdfUrl.startsWith('data:')) {
