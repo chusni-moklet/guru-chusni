@@ -558,7 +558,7 @@ const AdminApp = (function () {
 
     // Badge 2 (Pojok Kiri Bawah)
     const badgeSnbt = getVal('badge_snbt', '98% Siswa Lolos SNBT');
-    const badgeSnbtSub = getVal('badge_snbt_sub', 'Bimbingan Penalaran Matematika');
+    const badgeSnbtSub = getVal('badge_snbt_sub', 'Bimbingan Penalaran KIK & Informatika');
     const badgeSnbtIcon = getVal('badge_snbt_icon', 'fa-solid fa-user-graduate');
     const badgeSnbtColor = getVal('badge_snbt_color', 'bg-emerald');
     const badgeSnbtHide = getVal('badge_snbt_hide', 'false');
@@ -1518,7 +1518,7 @@ const AdminApp = (function () {
           <div class="form-grid-2">
             <div class="form-group">
               <label class="form-label">Nama Berkas Unduhan</label>
-              <input type="text" class="form-control" name="fileNotice" id="modal-modul-file-notice" placeholder="Modul_Matematika_FaseE.pdf" value="${escapeHtml(item ? item.fileNotice : '')}">
+              <input type="text" class="form-control" name="fileNotice" id="modal-modul-file-notice" placeholder="Modul_KIK_FaseE.pdf" value="${escapeHtml(item ? item.fileNotice : '')}">
             </div>
             <div class="form-group">
               <label class="form-label">Tautan / Link Berkas (Google Drive / Direct)</label>

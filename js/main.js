@@ -108,7 +108,13 @@ function renderDynamicConfig(cfg) {
       .replace('Hati', '<span class="text-gradient">Hati</span>')
       .replace('Aksi & Teknologi', '<span class="text-gradient-alt">Aksi & Teknologi</span>');
   }
-  if (heroDesc && cfg.hero_desc) heroDesc.textContent = cfg.hero_desc;
+  if (heroDesc) {
+    let desc = cfg.hero_desc || heroDesc.textContent;
+    if (desc) {
+      desc = desc.replace(/Matematika/g, 'KIK').replace(/matematika/g, 'KIK').replace(/Kewirausahaan/g, 'KIK');
+      heroDesc.textContent = desc;
+    }
+  }
   if (teacherPhoto && cfg.hero_image) teacherPhoto.src = cfg.hero_image;
   if (overlayName && cfg.teacher_name) overlayName.textContent = 'Bpk. ' + cfg.teacher_name;
   if (overlayRole && cfg.teacher_tagline) overlayRole.textContent = cfg.teacher_tagline;
@@ -152,7 +158,7 @@ function renderDynamicConfig(cfg) {
       const icon = badgeBottomLeftEl.querySelector('.badge-icon i');
       const iconBox = badgeBottomLeftEl.querySelector('.badge-icon');
       if (title && cfg.badge_snbt) title.textContent = cfg.badge_snbt;
-      if (sub && cfg.badge_snbt_sub) sub.textContent = cfg.badge_snbt_sub;
+      if (sub && cfg.badge_snbt_sub) sub.textContent = cfg.badge_snbt_sub.replace(/Matematika/g, 'KIK & Informatika');
       if (icon && cfg.badge_snbt_icon) icon.className = cfg.badge_snbt_icon;
       if (iconBox && cfg.badge_snbt_color) {
         iconBox.className = `badge-icon ${cfg.badge_snbt_color}`;

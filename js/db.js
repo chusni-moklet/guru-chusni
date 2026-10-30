@@ -34,7 +34,7 @@ const DB = (function () {
     "personal_email": "chusniarin12@gmail.com",
     "whatsapp_number": 6285106655664,
     "hero_title": "Mendidik dengan Hati, Menginspirasi dengan Aksi & Teknologi",
-    "hero_desc": "Selamat datang di portal edukasi saya. Sebagai pendidik Matematika & Informatika, saya berkomitmen menghadirkan pembelajaran yang memanusiakan murid, interaktif, berbasis nalar kritis, dan relevan dengan tantangan abad ke-21.",
+    "hero_desc": "Selamat datang di portal edukasi saya. Sebagai pendidik KIK & Informatika, saya berkomitmen menghadirkan pembelajaran yang memanusiakan murid, interaktif, berbasis nalar kritis, dan relevan dengan tantangan abad ke-21.",
     "hero_image": "assets/hero-chusni.jpg",
     "announcement_text": "Modul Ajar KIK Fase E & F (Kurikulum Merdeka) Semester Genap sudah tersedia untuk diunduh!",
     "announcement_link": "#modul",
@@ -55,7 +55,7 @@ const DB = (function () {
     "badge_award_icon": "fa-solid fa-trophy",
     "badge_award_color": "bg-amber",
     "badge_award_hide": "false",
-    "badge_snbt_sub": "Bimbingan Penalaran Matematika",
+    "badge_snbt_sub": "Bimbingan Penalaran KIK & Informatika",
     "badge_snbt_icon": "fa-solid fa-user-graduate",
     "badge_snbt_color": "bg-emerald",
     "badge_snbt_hide": "false",
@@ -658,7 +658,7 @@ const DB = (function () {
       "year": "2012",
       "judul": "Magister Pendidikan Kejuruan (S2)",
       "institusi": "Universitas Negeri Malang",
-      "desc": "Fokus riset: \"Pengembangan media pembelajaran sinkronisasi mata pelajaran RPL dengan Matematika\"."
+      "desc": "Fokus riset: \"Pengembangan media pembelajaran sinkronisasi mata pelajaran RPL dengan KIK & Informatika\"."
     },
     {
       "year": "2014",
@@ -986,6 +986,24 @@ const DB = (function () {
           currentData.timeline = JSON.parse(JSON.stringify(DEFAULT_DATA.timeline));
         }
 
+        // Sanitasi spesifik config jika hero_desc atau field lain masih mengandung Matematika atau Kewirausahaan
+        if (currentData.config) {
+          let configChanged = false;
+          ['hero_desc', 'subjects_taught', 'teacher_tagline', 'announcement_text', 'badge_snbt_sub'].forEach(k => {
+            if (typeof currentData.config[k] === 'string' && (currentData.config[k].includes('Matematika') || currentData.config[k].includes('matematika') || currentData.config[k].includes('Kewirausahaan'))) {
+              currentData.config[k] = currentData.config[k]
+                .replace(/Matematika/g, 'KIK')
+                .replace(/matematika/g, 'KIK')
+                .replace(/Kewirausahaan/g, 'KIK');
+              configChanged = true;
+            }
+          });
+          if (configChanged) {
+            console.log("Memperbarui konfigurasi teks Matematika ke KIK...");
+            saveLocal();
+          }
+        }
+
         // Sanitasi spesifik galeri jika foto hilang, dummy, atau belum lengkap
         if (Array.isArray(currentData.galeri)) {
           const isBrokenGaleri = currentData.galeri.length < DEFAULT_DATA.galeri.length || 
@@ -1242,7 +1260,17 @@ const DB = (function () {
       if (json && json.status === 'success' && json.data) {
         // Normalisasi data dari sheets
         const incoming = json.data;
-        if (incoming.config) currentData.config = Object.assign({}, currentData.config, incoming.config);
+        if (incoming.config) {
+          ['hero_desc', 'subjects_taught', 'teacher_tagline', 'announcement_text', 'badge_snbt_sub'].forEach(k => {
+            if (typeof incoming.config[k] === 'string' && (incoming.config[k].includes('Matematika') || incoming.config[k].includes('matematika') || incoming.config[k].includes('Kewirausahaan'))) {
+              incoming.config[k] = incoming.config[k]
+                .replace(/Matematika/g, 'KIK')
+                .replace(/matematika/g, 'KIK')
+                .replace(/Kewirausahaan/g, 'KIK');
+            }
+          });
+          currentData.config = Object.assign({}, currentData.config, incoming.config);
+        }
 
         // Modul Ajar (Validasi data riil vs dummy matematika)
         if (Array.isArray(incoming.modul) && incoming.modul.length) {
