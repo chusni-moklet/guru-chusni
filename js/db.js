@@ -452,7 +452,7 @@ const DB = (function () {
         "title": "Pelatihan 3D Printing - Robopark (mikrokridensial SMK)",
         "category": "projek",
         "categoryLabel": "Upskilling",
-        "imgUrl": "assets/galeri-default.jpg",
+        "imgUrl": "assets/galeri/robopark-3d-printing.jpg",
         "desc": "Upskilling 3D design - FreeCAD"
     },
     {
@@ -476,7 +476,7 @@ const DB = (function () {
         "title": "Talkshow Moklive di RRI Malang",
         "category": "pelatihan",
         "categoryLabel": "Talkshow",
-        "imgUrl": "assets/galeri-default.jpg",
+        "imgUrl": "assets/galeri/talkshow-moklive.jpg",
         "desc": "Talkshow kegiatan kewirausahaan siswa SMK Telkom Malang"
     },
     {
@@ -1023,7 +1023,7 @@ const DB = (function () {
         // Sanitasi spesifik galeri jika foto hilang, dummy, atau belum lengkap
         if (Array.isArray(currentData.galeri)) {
           const isBrokenGaleri = currentData.galeri.length < DEFAULT_DATA.galeri.length || 
-            currentData.galeri.some(g => !g.imgUrl || g.imgUrl.includes('photo-1580582932707-520aed937b7b'));
+            currentData.galeri.some(g => !g.imgUrl || g.imgUrl === 'assets/galeri-default.jpg' || g.imgUrl.includes('photo-1580582932707-520aed937b7b'));
           if (isBrokenGaleri) {
             console.log("Memperbarui galeri dari DEFAULT_DATA (memulihkan foto asli dokumentasi)...");
             currentData.galeri = currentData.galeri.map(g => {
@@ -1033,11 +1033,8 @@ const DB = (function () {
                 (d.id && String(d.id) === gId) || 
                 (d.title && gTitle && d.title.trim().toLowerCase() === gTitle)
               );
-              const isInvalidImg = !g.imgUrl || g.imgUrl.includes('photo-1580582932707-520aed937b7b');
+              const isInvalidImg = !g.imgUrl || g.imgUrl === 'assets/galeri-default.jpg' || g.imgUrl.includes('photo-1580582932707-520aed937b7b');
               let imgUrl = isInvalidImg ? (def && def.imgUrl ? def.imgUrl : 'assets/galeri-default.jpg') : g.imgUrl;
-              if (def && def.imgUrl && def.imgUrl.startsWith('assets/galeri/') && (imgUrl.startsWith('data:') || imgUrl === 'assets/galeri-default.jpg')) {
-                imgUrl = def.imgUrl;
-              }
               return {
                 ...g,
                 imgUrl: imgUrl
@@ -1402,15 +1399,13 @@ const DB = (function () {
 
             // Jika imgUrl dari Google Sheets adalah assets/galeri-default.jpg, kosong, atau dummy, pulihkan foto asli
             if (!imgUrl || imgUrl === 'assets/galeri-default.jpg' || imgUrl.includes('photo-1580582932707-520aed937b7b')) {
-              if (existing && existing.imgUrl && !existing.imgUrl.includes('galeri-default.jpg')) {
+              if (existing && existing.imgUrl && !existing.imgUrl.includes('galeri-default.jpg') && !existing.imgUrl.includes('photo-1580582932707-520aed937b7b')) {
                 imgUrl = existing.imgUrl;
               } else if (def && def.imgUrl) {
                 imgUrl = def.imgUrl;
               } else {
                 imgUrl = 'assets/galeri-default.jpg';
               }
-            } else if (def && def.imgUrl && def.imgUrl.startsWith('assets/galeri/') && imgUrl.startsWith('data:')) {
-              imgUrl = def.imgUrl;
             }
 
             return {

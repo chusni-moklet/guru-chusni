@@ -613,8 +613,6 @@ function renderDynamicGaleri(galeriList) {
       } else {
         img = 'assets/galeri-default.jpg';
       }
-    } else if (def && def.imgUrl && def.imgUrl.startsWith('assets/galeri/') && img.startsWith('data:')) {
-      img = def.imgUrl;
     }
 
     return `

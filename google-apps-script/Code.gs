@@ -162,10 +162,10 @@ function setupDatabase() {
     sheetGaleri.clear();
     sheetGaleri.appendRow(["ID", "Judul", "Kategori", "KategoriLabel", "ImgUrl", "Deskripsi"]);
     var defaultGaleri = [
-      ["1793603760849", "Pelatihan 3D Printing - Robopark (mikrokridensial SMK)", "projek", "Upskilling", "assets/galeri-default.jpg", "Upskilling 3D design - FreeCAD"],
+      ["1793603760849", "Pelatihan 3D Printing - Robopark (mikrokridensial SMK)", "projek", "Upskilling", "assets/galeri/robopark-3d-printing.jpg", "Upskilling 3D design - FreeCAD"],
       ["1793276000621", "Pelatihan STEM Elevate Class - HAFECS", "projek", "Pelatihan", "assets/galeri/stem-hafecs.jpg", "Stem"],
       ["1793236788126", "Anugerah Guru dan Kepala Sekolah Prima 2026", "pelatihan", "Kompetisi Guru", "assets/galeri/anugerah-guru-prima-2026.jpg", "First Time Second Place"],
-      ["1794011210055", "Talkshow Moklive di RRI Malang", "pelatihan", "Talkshow", "assets/galeri-default.jpg", "Talkshow kegiatan kewirausahaan siswa SMK Telkom Malang"],
+      ["1794011210055", "Talkshow Moklive di RRI Malang", "pelatihan", "Talkshow", "assets/galeri/talkshow-moklive.jpg", "Talkshow kegiatan kewirausahaan siswa SMK Telkom Malang"],
       ["1792285437237", "Pembelajaran Game menggunakan Roblox Studio", "pelatihan", "Workshop Daring", "assets/galeri/roblox-studio.jpg", "Kegiatan sharing best practice di lingkungan Yayasan Pendidikan Telkom"],
       ["1792285615864", "Pitching Day - Lomba PT. Telkom Indonesia", "projek", "Pitching Day", "assets/galeri/pitching-day.jpg", "Finalis Lomba Ayo Bikin Nyata"],
       ["1792287837065", "Lokakarya Guru Penggerak", "kelas", "Guru Penggerak", "assets/galeri/lokakarya-gp.jpg", "Program Guru Penggerak Angkatan ke-9"],
