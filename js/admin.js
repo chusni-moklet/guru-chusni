@@ -1951,9 +1951,22 @@ const AdminApp = (function () {
   }
 
   /* --------------------------------------------------
+     HELPER KONVERSI TAUTAN GAMBAR CLOUD (GOOGLE DRIVE TO DIRECT CDN)
+     -------------------------------------------------- */
+  function convertToDirectImageUrl(url) {
+    if (!url || typeof url !== 'string') return url;
+    const trimmed = url.trim();
+    const driveMatch = trimmed.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || trimmed.match(/id=([a-zA-Z0-9_-]+)/);
+    if (driveMatch && driveMatch[1]) {
+      return `https://lh3.googleusercontent.com/d/${driveMatch[1]}`;
+    }
+    return trimmed;
+  }
+
+  /* --------------------------------------------------
      HELPER PROSES GAMBAR DARI DIREKTORI (CANVAS RESIZER)
      -------------------------------------------------- */
-  function processImageFile(file, maxWidth = 800, maxHeight = 600, quality = 0.78, strictSizeLimit = true) {
+  function processImageFile(file, maxWidth = 800, maxHeight = 600, quality = 0.75, strictSizeLimit = true) {
     return new Promise((resolve, reject) => {
       if (!file || !file.type.startsWith('image/')) {
         return reject(new Error('File yang dipilih bukan berkas gambar yang valid.'));
@@ -1981,18 +1994,28 @@ const AdminApp = (function () {
 
           let dataUrl = canvas.toDataURL('image/jpeg', quality);
 
-          // Jika string dataURL melebihi 45.000 karakter (batas aman Google Sheets adalah 50.000 karakter per cell),
-          // kompres ulang secara bertahap bila strictSizeLimit aktif (misal foto profil, galeri, thumbnail karya)
-          if (strictSizeLimit && dataUrl.length > 45000) {
-            dataUrl = canvas.toDataURL('image/jpeg', 0.65);
-          }
-          if (strictSizeLimit && dataUrl.length > 45000) {
-            const smallerCanvas = document.createElement('canvas');
-            smallerCanvas.width = Math.round(width * 0.75);
-            smallerCanvas.height = Math.round(height * 0.75);
-            const sCtx = smallerCanvas.getContext('2d');
-            sCtx.drawImage(canvas, 0, 0, smallerCanvas.width, smallerCanvas.height);
-            dataUrl = smallerCanvas.toDataURL('image/jpeg', 0.65);
+          // Jika string dataURL melebihi 44.000 karakter (batas aman Google Sheets adalah 50.000 karakter per cell),
+          // kompres secara cerdas bertahap agar pas di Google Sheets tanpa merusak rasio foto
+          if (strictSizeLimit) {
+            let q = quality;
+            let curWidth = width;
+            let curHeight = height;
+            let attempts = 0;
+            while (dataUrl.length > 44000 && attempts < 10 && (curWidth > 300 || q > 0.45)) {
+              attempts++;
+              if (q > 0.55) {
+                q -= 0.08;
+              } else {
+                curWidth = Math.round(curWidth * 0.85);
+                curHeight = Math.round(curHeight * 0.85);
+              }
+              const tCanvas = document.createElement('canvas');
+              tCanvas.width = curWidth;
+              tCanvas.height = curHeight;
+              const tCtx = tCanvas.getContext('2d');
+              tCtx.drawImage(img, 0, 0, curWidth, curHeight);
+              dataUrl = tCanvas.toDataURL('image/jpeg', q);
+            }
           }
 
           resolve({
@@ -2029,7 +2052,7 @@ const AdminApp = (function () {
       if (!file) return;
       try {
         if (fileMetaEl) fileMetaEl.textContent = 'Sedang memproses dan mengompres gambar...';
-        const res = await processImageFile(file, 1200, 900, 0.82);
+        const res = await processImageFile(file, 800, 600, 0.75, true);
         imgUrlInput.value = res.dataUrl;
         if (previewImg) previewImg.src = res.dataUrl;
         if (fileNameEl) fileNameEl.textContent = res.name;
@@ -2095,16 +2118,20 @@ const AdminApp = (function () {
     }
 
     if (altUrlInput) {
-      altUrlInput.addEventListener('input', () => {
-        const urlVal = altUrlInput.value.trim();
+      const syncGaleriAltUrl = () => {
+        let urlVal = altUrlInput.value.trim();
         if (urlVal) {
+          urlVal = convertToDirectImageUrl(urlVal);
           imgUrlInput.value = urlVal;
           if (previewImg) previewImg.src = urlVal;
           if (fileNameEl) fileNameEl.textContent = 'Tautan Gambar Web';
-          if (fileMetaEl) fileMetaEl.textContent = urlVal;
+          if (fileMetaEl) fileMetaEl.textContent = urlVal.length > 35 ? urlVal.substring(0, 32) + '...' : urlVal;
           if (previewBox) previewBox.style.display = 'flex';
         }
-      });
+      };
+      altUrlInput.addEventListener('input', syncGaleriAltUrl);
+      altUrlInput.addEventListener('change', syncGaleriAltUrl);
+      altUrlInput.addEventListener('paste', () => setTimeout(syncGaleriAltUrl, 50));
     }
   }
 
@@ -2128,7 +2155,7 @@ const AdminApp = (function () {
       if (!file) return;
       try {
         if (fileMetaEl) fileMetaEl.textContent = 'Sedang memproses dan mengompres gambar...';
-        const res = await processImageFile(file, 800, 600, 0.78);
+        const res = await processImageFile(file, 800, 600, 0.75, true);
         thumbUrlInput.value = res.dataUrl;
         if (previewImg) previewImg.src = res.dataUrl;
         if (fileNameEl) fileNameEl.textContent = res.name;
@@ -2194,16 +2221,20 @@ const AdminApp = (function () {
     }
 
     if (altUrlInput) {
-      altUrlInput.addEventListener('input', () => {
-        const urlVal = altUrlInput.value.trim();
+      const syncKaryaAltUrl = () => {
+        let urlVal = altUrlInput.value.trim();
         if (urlVal) {
+          urlVal = convertToDirectImageUrl(urlVal);
           thumbUrlInput.value = urlVal;
           if (previewImg) previewImg.src = urlVal;
           if (fileNameEl) fileNameEl.textContent = 'Tautan Gambar Web';
-          if (fileMetaEl) fileMetaEl.textContent = urlVal;
+          if (fileMetaEl) fileMetaEl.textContent = urlVal.length > 35 ? urlVal.substring(0, 32) + '...' : urlVal;
           if (previewBox) previewBox.style.display = 'flex';
         }
-      });
+      };
+      altUrlInput.addEventListener('input', syncKaryaAltUrl);
+      altUrlInput.addEventListener('change', syncKaryaAltUrl);
+      altUrlInput.addEventListener('paste', () => setTimeout(syncKaryaAltUrl, 50));
     }
   }
 
@@ -2616,14 +2647,30 @@ const AdminApp = (function () {
       newItem.highlight = false;
     }
 
-    if (type === 'galeri' && !newItem.imgUrl) {
-      showToast('Harap pilih file gambar dari direktori atau masukkan URL gambar terlebih dahulu!', 'error');
-      return false;
+    if (type === 'galeri') {
+      const altUrl = document.getElementById('modal-galeri-alt-url');
+      if (altUrl && altUrl.value.trim()) {
+        newItem.imgUrl = convertToDirectImageUrl(altUrl.value.trim());
+      } else if (newItem.imgUrl) {
+        newItem.imgUrl = convertToDirectImageUrl(newItem.imgUrl);
+      }
+      if (!newItem.imgUrl) {
+        showToast('Harap pilih file gambar dari direktori atau masukkan URL gambar terlebih dahulu!', 'error');
+        return false;
+      }
     }
 
-    if (type === 'karya' && !newItem.thumbnail) {
-      showToast('Harap pilih thumbnail gambar website dari direktori atau masukkan URL gambar!', 'error');
-      return false;
+    if (type === 'karya') {
+      const altUrl = document.getElementById('modal-karya-alt-url');
+      if (altUrl && altUrl.value.trim()) {
+        newItem.thumbnail = convertToDirectImageUrl(altUrl.value.trim());
+      } else if (newItem.thumbnail) {
+        newItem.thumbnail = convertToDirectImageUrl(newItem.thumbnail);
+      }
+      if (!newItem.thumbnail) {
+        showToast('Harap pilih thumbnail gambar website dari direktori atau masukkan URL gambar!', 'error');
+        return false;
+      }
     }
 
     const itemId = isEdit ? id : String(Date.now());

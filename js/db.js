@@ -448,6 +448,14 @@ const DB = (function () {
   ],
   "galeri": [
     {
+        "id": "1793603760849",
+        "title": "Pelatihan 3D Printing - Robopark (mikrokridensial SMK)",
+        "category": "projek",
+        "categoryLabel": "Upskilling",
+        "imgUrl": "assets/galeri-default.jpg",
+        "desc": "Upskilling 3D design - FreeCAD"
+    },
+    {
         "id": "1793276000621",
         "title": "Pelatihan STEM Elevate Class - HAFECS",
         "category": "projek",
@@ -462,6 +470,14 @@ const DB = (function () {
         "categoryLabel": "Kompetisi Guru",
         "imgUrl": "assets/galeri/anugerah-guru-prima-2026.jpg",
         "desc": "First Time Second Place"
+    },
+    {
+        "id": "1794011210055",
+        "title": "Talkshow Moklive di RRI Malang",
+        "category": "pelatihan",
+        "categoryLabel": "Talkshow",
+        "imgUrl": "assets/galeri-default.jpg",
+        "desc": "Talkshow kegiatan kewirausahaan siswa SMK Telkom Malang"
     },
     {
         "id": "1792285437237",
@@ -1007,7 +1023,7 @@ const DB = (function () {
         // Sanitasi spesifik galeri jika foto hilang, dummy, atau belum lengkap
         if (Array.isArray(currentData.galeri)) {
           const isBrokenGaleri = currentData.galeri.length < DEFAULT_DATA.galeri.length || 
-            currentData.galeri.some(g => !g.imgUrl || g.imgUrl === 'assets/galeri-default.jpg' || g.imgUrl.includes('photo-1580582932707-520aed937b7b'));
+            currentData.galeri.some(g => !g.imgUrl || g.imgUrl.includes('photo-1580582932707-520aed937b7b'));
           if (isBrokenGaleri) {
             console.log("Memperbarui galeri dari DEFAULT_DATA (memulihkan foto asli dokumentasi)...");
             currentData.galeri = currentData.galeri.map(g => {
@@ -1017,7 +1033,7 @@ const DB = (function () {
                 (d.id && String(d.id) === gId) || 
                 (d.title && gTitle && d.title.trim().toLowerCase() === gTitle)
               );
-              const isInvalidImg = !g.imgUrl || g.imgUrl === 'assets/galeri-default.jpg' || g.imgUrl.includes('photo-1580582932707-520aed937b7b');
+              const isInvalidImg = !g.imgUrl || g.imgUrl.includes('photo-1580582932707-520aed937b7b');
               let imgUrl = isInvalidImg ? (def && def.imgUrl ? def.imgUrl : 'assets/galeri-default.jpg') : g.imgUrl;
               if (def && def.imgUrl && def.imgUrl.startsWith('assets/galeri/') && (imgUrl.startsWith('data:') || imgUrl === 'assets/galeri-default.jpg')) {
                 imgUrl = def.imgUrl;
@@ -1386,10 +1402,10 @@ const DB = (function () {
 
             // Jika imgUrl dari Google Sheets adalah assets/galeri-default.jpg, kosong, atau dummy, pulihkan foto asli
             if (!imgUrl || imgUrl === 'assets/galeri-default.jpg' || imgUrl.includes('photo-1580582932707-520aed937b7b')) {
-              if (def && def.imgUrl) {
-                imgUrl = def.imgUrl;
-              } else if (existing && existing.imgUrl && !existing.imgUrl.includes('galeri-default.jpg')) {
+              if (existing && existing.imgUrl && !existing.imgUrl.includes('galeri-default.jpg')) {
                 imgUrl = existing.imgUrl;
+              } else if (def && def.imgUrl) {
+                imgUrl = def.imgUrl;
               } else {
                 imgUrl = 'assets/galeri-default.jpg';
               }
@@ -1682,8 +1698,8 @@ const DB = (function () {
             category: g.category,
             KategoriLabel: g.categoryLabel,
             categoryLabel: g.categoryLabel,
-            ImgUrl: (g.imgUrl || '').startsWith('data:') && g.imgUrl.length > 500 ? 'assets/galeri-default.jpg' : (g.imgUrl || ''),
-            imgUrl: (g.imgUrl || '').startsWith('data:') && g.imgUrl.length > 500 ? 'assets/galeri-default.jpg' : (g.imgUrl || ''),
+            ImgUrl: (g.imgUrl || '').startsWith('data:') && g.imgUrl.length > 48000 ? 'assets/galeri-default.jpg' : (g.imgUrl || ''),
+            imgUrl: (g.imgUrl || '').startsWith('data:') && g.imgUrl.length > 48000 ? 'assets/galeri-default.jpg' : (g.imgUrl || ''),
             Deskripsi: g.desc || '',
             desc: g.desc || ''
           })),

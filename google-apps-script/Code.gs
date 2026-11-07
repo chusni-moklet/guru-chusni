@@ -162,8 +162,10 @@ function setupDatabase() {
     sheetGaleri.clear();
     sheetGaleri.appendRow(["ID", "Judul", "Kategori", "KategoriLabel", "ImgUrl", "Deskripsi"]);
     var defaultGaleri = [
+      ["1793603760849", "Pelatihan 3D Printing - Robopark (mikrokridensial SMK)", "projek", "Upskilling", "assets/galeri-default.jpg", "Upskilling 3D design - FreeCAD"],
       ["1793276000621", "Pelatihan STEM Elevate Class - HAFECS", "projek", "Pelatihan", "assets/galeri/stem-hafecs.jpg", "Stem"],
       ["1793236788126", "Anugerah Guru dan Kepala Sekolah Prima 2026", "pelatihan", "Kompetisi Guru", "assets/galeri/anugerah-guru-prima-2026.jpg", "First Time Second Place"],
+      ["1794011210055", "Talkshow Moklive di RRI Malang", "pelatihan", "Talkshow", "assets/galeri-default.jpg", "Talkshow kegiatan kewirausahaan siswa SMK Telkom Malang"],
       ["1792285437237", "Pembelajaran Game menggunakan Roblox Studio", "pelatihan", "Workshop Daring", "assets/galeri/roblox-studio.jpg", "Kegiatan sharing best practice di lingkungan Yayasan Pendidikan Telkom"],
       ["1792285615864", "Pitching Day - Lomba PT. Telkom Indonesia", "projek", "Pitching Day", "assets/galeri/pitching-day.jpg", "Finalis Lomba Ayo Bikin Nyata"],
       ["1792287837065", "Lokakarya Guru Penggerak", "kelas", "Guru Penggerak", "assets/galeri/lokakarya-gp.jpg", "Program Guru Penggerak Angkatan ke-9"],
@@ -562,6 +564,34 @@ function getConfigData(ss) {
   return config;
 }
 
+function convertDataUrlToDriveFile(dataUrl, prefix) {
+  if (!dataUrl || typeof dataUrl !== 'string' || dataUrl.indexOf('data:image/') !== 0) {
+    return dataUrl;
+  }
+  try {
+    var parts = dataUrl.split(';base64,');
+    if (parts.length < 2) return dataUrl;
+    var contentType = parts[0].replace('data:', '') || 'image/jpeg';
+    var rawBase64 = parts[1];
+    var decoded = Utilities.base64Decode(rawBase64);
+    var ext = contentType.indexOf('png') > -1 ? 'png' : (contentType.indexOf('webp') > -1 ? 'webp' : 'jpg');
+    var blob = Utilities.newBlob(decoded, contentType, (prefix || 'foto') + '_' + Date.now() + '.' + ext);
+    
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var ssFile = DriveApp.getFileById(ss.getId());
+    var parents = ssFile.getParents();
+    var folder = parents.hasNext() ? parents.next() : DriveApp.getRootFolder();
+    
+    var file = folder.createFile(blob);
+    file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    return "https://lh3.googleusercontent.com/d/" + file.getId();
+  } catch (e) {
+    Logger.log("Drive upload error: " + e);
+    if (dataUrl.length <= 48000) return dataUrl;
+    return "assets/galeri-default.jpg";
+  }
+}
+
 function saveConfigData(ss, configObj) {
   var sheet = getOrCreateSheet(ss, SHEETS.CONFIG);
   var values = sheet.getDataRange().getValues();
@@ -575,6 +605,9 @@ function saveConfigData(ss, configObj) {
   for (var key in configObj) {
     if (configObj.hasOwnProperty(key)) {
       var val = configObj[key];
+      if (typeof val === 'string' && val.indexOf('data:image/') === 0) {
+        val = convertDataUrlToDriveFile(val, "config_" + key);
+      }
       if (keyRowMap[key]) {
         sheet.getRange(keyRowMap[key], 2).setValue(val);
       } else {
@@ -676,6 +709,9 @@ function saveSectionData(ss, sheetName, items) {
         if (val === "" && (h === "PdfUrl" || h === "pdfUrl")) val = item.pdfUrl || item.PdfUrl || "";
         if (val === "" && (h === "PdfFileName" || h === "pdfFileName")) val = item.pdfFileName || item.PdfFileName || "";
         if (val === "" && h === "ID") val = item.id || "";
+      }
+      if (typeof val === 'string' && val.indexOf('data:image/') === 0) {
+        val = convertDataUrlToDriveFile(val, sheetName);
       }
       row.push(val);
     }

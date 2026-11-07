@@ -474,6 +474,16 @@ function renderAwardsToggleButton(toggleWrap, total, limit) {
   }
 }
 
+function convertToDirectImageUrl(url) {
+  if (!url || typeof url !== 'string') return url;
+  const trimmed = url.trim();
+  const driveMatch = trimmed.match(/\/file\/d\/([a-zA-Z0-9_-]+)/) || trimmed.match(/id=([a-zA-Z0-9_-]+)/);
+  if (driveMatch && driveMatch[1]) {
+    return `https://lh3.googleusercontent.com/d/${driveMatch[1]}`;
+  }
+  return trimmed;
+}
+
 let isKaryaExpanded = false;
 
 function renderDynamicKarya(karyaList) {
@@ -492,11 +502,12 @@ function renderDynamicKarya(karyaList) {
     const isExtra = index >= LIMIT;
     const cardStyle = (isExtra && !isKaryaExpanded) ? 'display: none;' : '';
     const extraClass = isExtra ? 'project-card-extra' : '';
+    const thumbUrl = convertToDirectImageUrl(item.thumbnail || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80');
 
     return `
     <article class="project-card ${extraClass}" ${cardStyle ? `style="${cardStyle}"` : ''}>
       <div class="project-thumb-box">
-        <img src="${escapeHtml(item.thumbnail || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80')}" alt="${escapeHtml(item.title || 'Website')}" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80';">
+        <img src="${escapeHtml(thumbUrl)}" alt="${escapeHtml(item.title || 'Website')}" loading="lazy" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80';">
         <div class="project-thumb-badge"><i class="fa-solid fa-globe"></i> Website</div>
       </div>
       <div class="project-body">
@@ -589,7 +600,7 @@ function renderDynamicGaleri(galeriList) {
   container.innerHTML = galeriList.map(g => {
     const gId = String(g.id || g.ID || '');
     const gTitle = (g.title || g.Judul || '').trim().toLowerCase();
-    let img = g.imgUrl || g.ImgUrl || '';
+    let img = convertToDirectImageUrl(g.imgUrl || g.ImgUrl || '');
 
     const def = defaultGaleri.find(d => 
       (d.id && String(d.id) === gId) || 
